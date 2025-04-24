@@ -2,9 +2,12 @@ package org.example;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import org.example.adapters.PreciseDecimalAdapter;
+import org.example.adapters.UCUMUnitAdapter;
 import org.example.util.PreciseDecimal;
 
 import java.util.Collection;

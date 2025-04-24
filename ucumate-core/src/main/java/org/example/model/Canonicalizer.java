@@ -16,9 +16,8 @@ public class Canonicalizer {
     public record CanonicalStep(PreciseDecimal conversionFactor, Expression.Term term) {}
 
 
-    public CanonicalizationResult canonicalize(Expression.Term term) {
-        SpecialUnitConversionContext specialUnitConversionContext;
-        return null;
+    public CanonicalizationResult canonicalizeNoSpecialUnitAllowed(Expression.Term term) {
+        return canonicalize(term, new SpecialUnitConversionContext(PreciseDecimal.ONE, SpecialUnitApplicationDirection.NO_SPECIAL_INVOLVED));
     }
 
     public CanonicalizationResult canonicalize(Expression.Term term, SpecialUnitConversionContext specialContext) {

@@ -38,16 +38,6 @@ public class UCUMRegistry {
         this.definedUnitSourceDefinitions = new HashMap<>();
     }
 
-    private void translateValueDefinitions() {
-        /*
-        this.definedUnitSourceDefinitions = ucumEssence.definedUnits().stream()
-                                                       .collect(Collectors.toMap(
-                                                               Function.identity(),
-                                                               this::translateUnitInsideDefinedUnitToTerm
-                                                       ));
-        */
-    }
-
     private Expression.Term translateUnitInsideDefinedUnitToTerm(UCUMDefinition.DefinedUnit definedUnit) {
         return switch(definedUnit) {
             case UCUMDefinition.DerivedUnit _, UCUMDefinition.DimlessUnit _, UCUMDefinition.ArbitraryUnit _ -> handleCommon(definedUnit);
@@ -103,6 +93,26 @@ public class UCUMRegistry {
         term = translateUnitInsideDefinedUnitToTerm(definedUnit);
         definedUnitSourceDefinitions.put(definedUnit, term);
         return term;
+    }
+
+    public Optional<UCUMDefinition.Concept> getConcept(String concept) {
+        UCUMDefinition.Concept prefix = getConceptFrom(concept, prefixes);
+        if(prefix != null) {
+            return Optional.of(prefix);
+        }
+        UCUMDefinition.BaseUnit baseUnit = (UCUMDefinition.BaseUnit) getConceptFrom(concept, baseUnits);
+        if(baseUnit != null) {
+            return Optional.of(baseUnit);
+        }
+        UCUMDefinition.DefinedUnit definedUnit = (UCUMDefinition.DefinedUnit) getConceptFrom(concept, definedUnits);
+        if(definedUnit != null) {
+            return Optional.of(definedUnit);
+        }
+        return Optional.empty();
+    }
+
+    private UCUMDefinition.Concept getConceptFrom(String concept, Map<String, ? extends UCUMDefinition.Concept> source) {
+        return source.get(concept);
     }
 
     private static <T extends UCUMDefinition.Concept> Map<String, T> identityFromList(List<T> list) {

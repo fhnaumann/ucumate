@@ -1,11 +1,17 @@
 package org.example.model;
 
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.base.Preconditions;
 import org.example.UCUMDefinition;
 import org.example.util.PreciseDecimal;
 import org.jetbrains.annotations.NotNull;
 
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@type"
+)
 public sealed interface Expression permits Expression.Operator, Expression.Annotation, Expression.CanoncialExpression, Expression.Component, Expression.Exponent, Expression.MixedExpression, Expression.Term, Expression.Unit {
 
     sealed interface CanoncialExpression extends Expression {}

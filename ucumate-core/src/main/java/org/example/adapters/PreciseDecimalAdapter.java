@@ -1,4 +1,4 @@
-package org.example;
+package org.example.adapters;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class PreciseDecimalAdapter extends JsonDeserializer<PreciseDecimal> {
     @Override
-    public PreciseDecimal deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
+    public PreciseDecimal deserialize(JsonParser parser, DeserializationContext ctx) throws IOException {
         String text = parser.getText();
         try {
             return new PreciseDecimal(text);
