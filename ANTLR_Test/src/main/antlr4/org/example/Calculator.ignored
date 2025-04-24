@@ -1,0 +1,23 @@
+grammar Calculator;
+
+calc: stat+ ;
+
+stat: expr NEWLINE #printExpr;
+
+expr: expr ADD expr # addition
+    | expr SUB expr # subtraction
+    | expr MUL expr # multiplication
+    | expr DIV expr # division
+    | expr POW expr # pow
+    | SUB? INT # int
+    | '(' expr ')' # parens
+    ;
+
+INT : [0-9]+;
+MUL : '*';
+DIV : '/';
+ADD : '+';
+SUB : '-';
+POW : '^';
+NEWLINE:'\r'? '\n' ;
+WS  :   [ \t]+ -> skip ; // toss out whitespace

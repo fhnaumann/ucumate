@@ -1,0 +1,27 @@
+grammar Expr;
+
+/** The start rule; begin parsing here. */
+prog:   stat+ ;
+
+stat:   expr NEWLINE # printExpr
+    |   ID '=' expr NEWLINE # assign
+    |   NEWLINE # blank
+    |   'clear' # clear
+    ;
+
+expr:   expr op=('*'|'/') expr # MulDiv // '#' indicates a label name for the rule (generates a visitor method for each label)
+    |   expr op=('+'|'-') expr # AddSub
+    |   INT # int
+    |   ID # id
+    |   '(' expr ')' # parens
+    ;
+
+ID  :   [a-zA-Z]+ ;      // match identifiers
+INT :   [0-9]+ ;         // match integers
+NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
+WS  :   [ \t]+ -> skip ; // toss out whitespace
+
+MUL : '*';
+DIV : '/';
+ADD : '+';
+SUB : '-';
