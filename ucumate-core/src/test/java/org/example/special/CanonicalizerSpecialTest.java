@@ -93,4 +93,10 @@ public class CanonicalizerSpecialTest {
         Canonicalizer.CanonicalizationResult result = canonicalizer.canonicalize(_5_prism_diop_term(), new Canonicalizer.SpecialUnitConversionContext(ONE, Canonicalizer.SpecialUnitApplicationDirection.FROM));
         assert_success(result, pd("0.0500"), rad_term());
     }
+
+    @Test
+    public void canonicalize_cf1_percent_slope() {
+        Canonicalizer.CanonicalizationResult result = canonicalizer.canonicalize(percentage_slope_term(), new Canonicalizer.SpecialUnitConversionContext(ONE, Canonicalizer.SpecialUnitApplicationDirection.FROM));
+        assert_success(result, pd("0.000174527107784301"), rad_term());
+    }
 }

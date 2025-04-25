@@ -17,7 +17,9 @@ public class SpecialUtil {
     private static final UCUMDefinition.UCUMUnit celsius = getUCUMUnit("Cel");
     private static final UCUMDefinition.UCUMUnit degF = getUCUMUnit("[degF]");
     private static final UCUMDefinition.UCUMUnit prism_diopter = getUCUMUnit("[p'diop]");
+    private static final UCUMDefinition.UCUMUnit percentage_slope = getUCUMUnit("%[slope]");
     private static final UCUMDefinition.UCUMUnit rad = getUCUMUnit("rad");
+    private static final UCUMDefinition.UCUMUnit deg = getUCUMUnit("deg");
 
     static Expression.Term rad_term() {
         return SoloTermBuilder.builder().withoutPrefix(rad).noExpNoAnnot().asTerm().build();
@@ -73,6 +75,14 @@ public class SpecialUtil {
                                  .multiplyWith()
                                  .right(prism_diop_term())
                                  .build();
+    }
+
+    static Expression.Term percentage_slope_term() {
+        return SoloTermBuilder.builder().withoutPrefix(percentage_slope).noExpNoAnnot().asTerm().build();
+    }
+
+    static Expression.Term degree_term() {
+        return SoloTermBuilder.builder().withoutPrefix(deg).noExpNoAnnot().asTerm().build();
     }
 
     static void assert_success_and_equal_to(Converter.ConversionResult result, PreciseDecimal value) {

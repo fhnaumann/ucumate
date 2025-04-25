@@ -2,6 +2,8 @@ package org.example;
 
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.example.funcs.PrettyPrinter;
+import org.example.funcs.UnitExtractor;
 import org.example.model.Canonicalizer;
 import org.example.model.Expression;
 import org.example.util.PreciseDecimal;
@@ -43,9 +45,13 @@ public class UCUMRegistry {
             case UCUMDefinition.DerivedUnit _, UCUMDefinition.DimlessUnit _, UCUMDefinition.ArbitraryUnit _ -> handleCommon(definedUnit);
             case UCUMDefinition.SpecialUnit _ -> {
                 Expression.Term term = (Expression.Term) Main.visitTerm(definedUnit.value().function().unit());
+                Expression.Term extracted = new UnitExtractor().extractUnits(term);
+                PrettyPrinter pp = new PrettyPrinter(true, false, false);
+                System.out.println(pp.print(term) + " is extracted to " + pp.print(extracted));
+                yield extracted;
                 // canonicalization necessary because the UCUM definition uses a term here, which is already covered in the specialfunction.
                 // Here we are only interested in the dimension of the special unit
-                Canonicalizer.CanonicalizationResult result = new Canonicalizer().canonicalize(term, new Canonicalizer.SpecialUnitConversionContext(PreciseDecimal.ONE, Canonicalizer.SpecialUnitApplicationDirection.NO_SPECIAL_INVOLVED));
+                /*Canonicalizer.CanonicalizationResult result = new Canonicalizer().canonicalize(term, new Canonicalizer.SpecialUnitConversionContext(PreciseDecimal.ONE, Canonicalizer.SpecialUnitApplicationDirection.NO_SPECIAL_INVOLVED));
                 yield switch(result) {
                     case Canonicalizer.Success(
                             PreciseDecimal _, Expression.Term term1,
@@ -53,6 +59,9 @@ public class UCUMRegistry {
                                                ) -> term1;
                     case Canonicalizer.FailedCanonicalization failedCanonicalization -> throw new RuntimeException("CATASTROPHIC, IMPROVE ERROR HANDLING");
                 };
+
+                 */
+                //yield term;
             }
         };
     }
@@ -91,6 +100,7 @@ public class UCUMRegistry {
             return term;
         }
         term = translateUnitInsideDefinedUnitToTerm(definedUnit);
+        //System.out.println("translated " + definedUnit.code() + " to " + new PrettyPrinter(false, false, false).print(term));
         definedUnitSourceDefinitions.put(definedUnit, term);
         return term;
     }

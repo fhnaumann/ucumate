@@ -246,21 +246,28 @@ public class Canonicalizer {
                 // We need two pieces of information here:
                 // The scaling factor from the 'from' unit and
                 // if the special unit conversion happens from special->base (.invert) or base->special (.convert)
-                SpecialUnits.ConversionFunction conversionFunction = SpecialUnits.getFunction(specialUnit.value().function().name());
-                double conversionFactor = switch(specialContext.direction()) {
+                SpecialUnitsFunctionProvider.ConversionFunction conversionFunction = SpecialUnits.getFunction(specialUnit.value().function().name());
+                PreciseDecimal conversionFactor = switch(specialContext.direction()) {
                     case FROM -> {
-                        yield conversionFunction.inverse(specialContext.factor().getValue().doubleValue()); // todo using double in special case for now
+                        yield conversionFunction.inverse(specialContext.factor()); // todo using double in special case for now
                     }
                     case TO -> {
-                        yield conversionFunction.convert(specialContext.factor().getValue().doubleValue()); // todo using double in special case for now
+                        yield conversionFunction.convert(specialContext.factor()); // todo using double in special case for now
                     }
                     case NO_SPECIAL_INVOLVED -> throw new RuntimeException("Special Unit found but check earlier said no special unit exists inside %s".formatted(concept));
                 };
                 // todo: I am using a fixed scale (4) for now. For more precision another (heavy) math library is needed. A feature flag?
-                PreciseDecimal preciseDecimal = PreciseDecimal.fromDoubleFixedScale(conversionFactor);
-                yield new CanonicalStep(preciseDecimal,
-                                        registry.getDefinedUnitSourceDefinition(specialUnit)
-                );
+                PreciseDecimal preciseDecimal = conversionFactor; // PreciseDecimal.fromDoubleFixedScale(conversionFactor);
+                /*
+                Special units have other UCUM terms as definitions. Sometimes these definitions are non-canonical terms themselves.
+                In these cases we need to canonicalize them here and apply the conversion factor.
+                Editor note: I don't think its entirely safe to multiply the factors here, but no special unit uses another special unit
+                in its source definition. Hence, it *should* be safe (?) to do the multiplication here.
+                 */
+                Expression.Term termDefinition = registry.getDefinedUnitSourceDefinition(specialUnit);
+                CanonicalStep sourceStep = canonicalizeImpl(termDefinition, specialContext);
+                preciseDecimal = preciseDecimal.multiply(sourceStep.conversionFactor()); // %[slope] requires this here, but it also breaks other special units
+                yield new CanonicalStep(preciseDecimal, sourceStep.term());
             }
             case UCUMDefinition.ArbitraryUnit arbitraryUnit -> throw new TermHasArbitraryUnitException(arbitraryUnit);
         };

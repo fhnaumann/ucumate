@@ -5,9 +5,6 @@ import org.assertj.core.groups.Tuple;
 import org.example.UCUMDefinition;
 import org.example.UCUMRegistry;
 import org.example.model.Expression;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 
 import java.util.ArrayList;
 import java.util.List;

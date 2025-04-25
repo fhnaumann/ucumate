@@ -19,7 +19,7 @@ public class PrettyPrinter {
 
     public String print(Expression expression) {
         return switch(expression) {
-            case null -> throw new RuntimeException("Null expression");
+            case null -> "";
             case Expression.BinaryTerm binaryTerm ->
                     print(binaryTerm.left()) + print(binaryTerm.operator()) + print(binaryTerm.right());
             case Expression.AnnotTerm annotTerm -> print(annotTerm.term()) + print(annotTerm.annotation());
