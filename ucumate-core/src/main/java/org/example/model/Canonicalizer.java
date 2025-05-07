@@ -260,6 +260,7 @@ public class Canonicalizer {
                 PreciseDecimal preciseDecimal = conversionFactor; // PreciseDecimal.fromDoubleFixedScale(conversionFactor);
                 /*
                 Special units have other UCUM terms as definitions. Sometimes these definitions are non-canonical terms themselves.
+
                 In these cases we need to canonicalize them here and apply the conversion factor.
                 Editor note: I don't think its entirely safe to multiply the factors here, but no special unit uses another special unit
                 in its source definition. Hence, it *should* be safe (?) to do the multiplication here.

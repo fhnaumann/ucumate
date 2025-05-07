@@ -44,6 +44,15 @@ public class UCUMRegistry {
         return switch(definedUnit) {
             case UCUMDefinition.DerivedUnit _, UCUMDefinition.DimlessUnit _, UCUMDefinition.ArbitraryUnit _ -> handleCommon(definedUnit);
             case UCUMDefinition.SpecialUnit _ -> {
+                /*
+                The definition of special units are UCUM expressions themselves. However, some information are redundant
+                because factors are already accounted for in each special unit case. Therefore, we are really only
+                interested in the units (but not any factors) in the definition. That's what the extractor is used for.
+                Here are some examples:
+                Degree is defined as "K" -> Keep as is
+                Fahrenheit is defined as "K/9" -> Only keep "K" because the "/9" is already accounted for manually in the conversion
+
+                 */
                 Expression.Term term = (Expression.Term) Main.visitTerm(definedUnit.value().function().unit());
                 Expression.Term extracted = new UnitExtractor().extractUnits(term);
                 PrettyPrinter pp = new PrettyPrinter(true, false, false);

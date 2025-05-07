@@ -24,11 +24,14 @@ public class Constants {
     /*
     Most math is covered by the PreciseDecimal class to handle correct rounding, precision and scale.
     It is hard to cover the mathematical operations that are necessary to calculate special unit conversion.
-    For now, the scale is fixed to 4 which should be enough in most cases. If *exact* conversion is necessary,
+    This parameter controls the scaling that is used in calculations with special units. If *exact* conversion is necessary,
     then this flag can be set to false. Then an external (much slower) math library will be used to calculate
     the special conversion factors *exactly*.
     The math library is https://github.com/eobermuhlner/big-math and has to be supplied by the developer using
     this UCUM library.
+    min: 1
+    max: 10 (?)
+    -1 means it is ignored and the additional math lib will be used (most precise results)
      */
-    public static final boolean EXPRESSIONS_WITH_SPECIAL_UNITS_LIMITED_TO_4_SCALE = true;
+    public static final int EXPRESSIONS_WITH_SPECIAL_UNITS_LIMITED_SCALE = 4;
 }

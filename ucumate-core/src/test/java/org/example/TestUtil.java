@@ -11,6 +11,7 @@ public class TestUtil {
     public static final UCUMDefinition.UCUMPrefix giga = getUCUMPrefix("G");
     public static final UCUMDefinition.UCUMPrefix mega = getUCUMPrefix("M");
     public static final UCUMDefinition.UCUMPrefix dezi = getUCUMPrefix("d");
+    public static final UCUMDefinition.UCUMPrefix nano = getUCUMPrefix("n");
 
     public static final UCUMDefinition.UCUMUnit meter = getUCUMUnit("m");
     public static final UCUMDefinition.UCUMUnit gram = getUCUMUnit("g");
@@ -42,6 +43,10 @@ public class TestUtil {
 
     public static PreciseDecimal pd(String s) {
         return new PreciseDecimal(s);
+    }
+
+    public static Expression.Term single(UCUMDefinition.UCUMUnit ucumUnit) {
+        return SoloTermBuilder.builder().withoutPrefix(ucumUnit).noExpNoAnnot().asTerm().build();
     }
 
     public static Expression.Term meter_term() {

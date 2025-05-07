@@ -1,7 +1,6 @@
 package org.example.special;
 
 import org.example.UCUMDefinition;
-import org.example.UCUMRegistry;
 import org.example.builders.CombineTermBuilder;
 import org.example.builders.SoloTermBuilder;
 import org.example.funcs.Converter;
@@ -20,6 +19,7 @@ public class SpecialUtil {
     private static final UCUMDefinition.UCUMUnit percentage_slope = getUCUMUnit("%[slope]");
     private static final UCUMDefinition.UCUMUnit rad = getUCUMUnit("rad");
     private static final UCUMDefinition.UCUMUnit deg = getUCUMUnit("deg");
+    private static final UCUMDefinition.UCUMUnit bel_volt = getUCUMUnit("B[V]");
 
     static Expression.Term rad_term() {
         return SoloTermBuilder.builder().withoutPrefix(rad).noExpNoAnnot().asTerm().build();
@@ -81,9 +81,19 @@ public class SpecialUtil {
         return SoloTermBuilder.builder().withoutPrefix(percentage_slope).noExpNoAnnot().asTerm().build();
     }
 
+    static Expression.Term bel_volt_term() {
+        return single(bel_volt);
+    }
+
+    static Expression.Term volt_term() {
+        return single(getUCUMUnit("V"));
+    }
+
     static Expression.Term degree_term() {
         return SoloTermBuilder.builder().withoutPrefix(deg).noExpNoAnnot().asTerm().build();
     }
+
+
 
     static void assert_success_and_equal_to(Converter.ConversionResult result, PreciseDecimal value) {
         assertThat(result)

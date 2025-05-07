@@ -1,9 +1,18 @@
 package org.example.util;
 
 import org.example.UCUMRegistry;
+import static org.junit.jupiter.api.Named.*;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.params.provider.Arguments.*;
 
 import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 import static org.example.TestUtil.*;
 import static org.assertj.core.api.Assertions.*;
@@ -58,6 +67,7 @@ public class PreciseDecimalTest {
         // 1.0e2 -> 100.0
         // 1.00e2 -> 100.00
         // 1.000e2 -> 100.000
+        // 254e-2 ->
         // Does 254e-2 -> 2.54 have infinite precision or 3 precision (scale 2)?
         assert_limited_with(pd("1.0e2"), "100.0", true, 2, 1);
         assert_limited_with(pd("1.00e2"), "100.00", true, 3, 2);
@@ -75,17 +85,26 @@ public class PreciseDecimalTest {
                 });
     }
 
-    @Test
-    public void pos_scientific_notation_with_multiple_digits_before_decimal_is_limited() {
-        assert_limited_with(pd("2.54e2"), "254", true, 3, 0);
-        assert_limited_with(pd("0.254e5"), "25400", true, 3, 0);
-        assert_limited_with(pd("0.2540e5"), "25400", true, 4, 0);
-        assert_limited_with(pd("0.25400e5"), "25400", true, 5, 0);
-        assert_limited_with(pd("0.254000e5"), "25400.0", true, 6, 1);
-        assert_limited_with(pd("0.2540000e5"), "25400.00", true, 7, 2);
-        assert_limited_with(pd("0.25400000e5"), "25400.000", true, 8, 3);
-        assert_limited_with(pd("0.254000001e5"), "25400.0001", true, 9, 4);
-        assert_limited_with(pd("2.54e3"), "2540", true, 3, 0);
+    @ParameterizedTest
+    @DisplayName("Positive scientific notation with multiple digits before the decimal is limited")
+    @MethodSource("provide_pos_scientific_notation_with_multiple_digits_before_decimal_is_limited")
+    public void pos_scientific_notation_with_multiple_digits_before_decimal_is_limited(PDTestCase pdTestCase) {
+        assert_limited_with(pd(pdTestCase.actual()), pdTestCase.expectedDisplay(), pdTestCase.limited(), pdTestCase.expectedPrecision(), pdTestCase.expectedScale());
+    }
+
+    private static Stream<PDTestCase> provide_pos_scientific_notation_with_multiple_digits_before_decimal_is_limited() {
+        return Stream.of(
+                test("2.54e2", "254.00", true, 5, 2),
+                test("2.54e2", "254.00", true, 5, 2),
+                test("0.254e5", "25400.000", true, 8, 3),
+                test( "0.2540e5", "25400.0000", true, 9, 4),
+                test("0.25400e5", "25400.00000", true, 10, 5),
+                test("0.254000e5", "25400.000000", true, 11, 6),
+                test("0.2540000e5", "25400.0000000", true, 12, 7),
+                test("0.25400000e5", "25400.00000000", true, 13, 8),
+                test("0.254000001e5", "25400.000100000", true, 14, 9),
+                test("2.54e3", "2540.00", true, 6, 2)
+        );
     }
 
     @Test
@@ -174,5 +193,16 @@ public class PreciseDecimalTest {
         assertThat(actual.isLimited()).isEqualTo(expectedLimited);
         assertThat(actual.getPrecision()).isEqualTo(expectedPrecision);
         assertThat(actual.getScale()).isEqualTo(expectedScale);
+    }
+
+    public record PDTestCase(String actual, String expectedDisplay, boolean limited, int expectedPrecision, int expectedScale) {
+        @Override
+        public String toString() {
+            return String.format("%s -> %s", actual, expectedDisplay);
+        }
+    }
+
+    private static PDTestCase test(String actual, String expectedDisplay, boolean limited, int expectedPrecision, int expectedScale) {
+        return new PDTestCase(actual, expectedDisplay, limited, expectedPrecision, expectedScale);
     }
 }

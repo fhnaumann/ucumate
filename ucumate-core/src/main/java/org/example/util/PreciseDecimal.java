@@ -80,14 +80,32 @@ public class PreciseDecimal {
         this.value = new BigDecimal(s);
         // Check for scientific notation
         if(abs.contains("e") || abs.contains("E")) {
+            /*
+            Possible cases:
+            1) The coefficient is an integer number -> It is defined as exact (unlimited precision).
+            Examples: "1e2", "3e-5", "-6e3", "254e-2"
+            2) The coefficient has a decimal point and is therefore a decimal number -> It is not defined as exact. The
+            precision and scale are limited. The scale is always taken before the number is converted from the scientific
+            notation. That means the exponent does not influence the scaling.
+            Examples:
+                     "1.0e2"    -> 100.0      (precision 4, scale 1)
+                     "1.000e2"  -> 100.000    (precision 6, scale 3)
+                     "1.0e5"    -> 100000.0   (precision 7, scale 1)
+                     "1.00e-4"  -> 0.000100   (precision 3, scale 3)
+                     "2.54e2"   -> 254.00     (precision 5, scale 2)
+                     "2.54e4"   -> 25400.00   (precision 7, scale 2)
+                     "2.5400e4" -> 25400.0000 (precision 9, scale 4)
+             */
             String[] parts = abs.toLowerCase().split("e");
-            String mantissa = parts[0];
-            if(mantissa.contains(".")) {
+            String coefficient = parts[0];
+            if(coefficient.contains(".")) {
                 // "1.0e3" or "2.54e-2" → limited precision
                 this.limited = true;
                 // String clean = mantissa.replace(".", "").replaceFirst("^0+", "");
-                this.precision = countSignificantDigits(mantissa);
-                this.scale = countScale(mantissa, Integer.parseInt(parts[1]));
+                String[] split = coefficient.split("\\.");
+                this.scale = split[1].length();
+                this.precision = value.toPlainString().split("\\.")[0].length() + this.scale;
+
             }
             else {
                 // "1e3", "254e-2" → exact
@@ -447,8 +465,14 @@ public class PreciseDecimal {
     }
 
     public static PreciseDecimal fromDoubleFixedScale(double value) {
-        BigDecimal bd = BigDecimal.valueOf(value).setScale(4, RoundingMode.HALF_UP);
-        return new PreciseDecimal(bd.toPlainString());
-        //return new PreciseDecimal(bd, true, computePrecision(bd.toPlainString()), 4); // fixed sigfigs & scale
+        int limitedScale = Constants.EXPRESSIONS_WITH_SPECIAL_UNITS_LIMITED_SCALE;
+        if(limitedScale == -1) {
+            throw new RuntimeException("Exact precision required but math lib not implemented yet!");
+        }
+        else {
+            BigDecimal bd = BigDecimal.valueOf(value).setScale(limitedScale, RoundingMode.HALF_UP);
+            return new PreciseDecimal(bd.toPlainString());
+            //return new PreciseDecimal(bd, true, computePrecision(bd.toPlainString()), 4); // fixed sigfigs & scale
+        }
     }
 }

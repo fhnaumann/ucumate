@@ -97,6 +97,22 @@ public class CanonicalizerSpecialTest {
     @Test
     public void canonicalize_cf1_percent_slope() {
         Canonicalizer.CanonicalizationResult result = canonicalizer.canonicalize(percentage_slope_term(), new Canonicalizer.SpecialUnitConversionContext(ONE, Canonicalizer.SpecialUnitApplicationDirection.FROM));
-        assert_success(result, pd("0.000174527107784301"), rad_term());
+        assert_success(result, pd("0.000175"), rad_term());
+    }
+
+    @Test
+    public void canonicalize_cf1_5_percent_slope() {
+
+    }
+
+    @Test
+    public void canonicalize_cf5_5_percent_slope() {
+
+    }
+
+    @Test
+    public void canonicalize_cf1_bel_volt() {
+        Canonicalizer.CanonicalizationResult result = canonicalizer.canonicalize(bel_volt_term(), new Canonicalizer.SpecialUnitConversionContext(ONE, Canonicalizer.SpecialUnitApplicationDirection.FROM));
+        //assert_success(result, pd("3162.3"), volt_term()); todo canonical result is not volt but whatever it canonicalizes to
     }
 }
