@@ -70,14 +70,24 @@ public class PreciseDecimal {
      *         if the string is not a valid decimal.
      */
     public PreciseDecimal(String s) {
+        this(s, false); // assume unlimited precision (for now, might flip this later)
+    }
+
+    public PreciseDecimal(String s, boolean limited) {
         if(s == null) {
             throw new IllegalArgumentException("Input string cannot be null");
         }
         s = s.trim();
         // Check if the number is negative; ignore the leading '-' for parsing the digit counts.
-        boolean isNegative = s.startsWith("-");
+        boolean isNegative = s.startsWith("-"); // todo correct that if negative this information is later discarded?
         String abs = isNegative ? s.substring(1) : s;
         this.value = new BigDecimal(s);
+        if(!limited) {
+            this.limited = false;
+            this.precision = -1;
+            this.scale = -1;
+            return; // short-circuit if intentionally limited, no need for further determining of precision and scale.
+        }
         // Check for scientific notation
         if(abs.contains("e") || abs.contains("E")) {
             /*
@@ -108,10 +118,15 @@ public class PreciseDecimal {
 
             }
             else {
-                // "1e3", "254e-2" → exact
-                this.limited = false;
-                this.precision = 0;
-                this.scale = 0;
+                if(limited) {
+                    throw new RuntimeException("Non-normalized scientific notation together with limited boolean flag is not supported.");
+                }
+                else {
+                    // "1e3", "254e-2" → exact
+                    this.limited = false;
+                    this.precision = 0;
+                    this.scale = 0;
+                }
             }
         }
         else if(abs.contains(".")) {
@@ -123,7 +138,7 @@ public class PreciseDecimal {
             // We remove the decimal point.
             String digits = abs.replace(".", "");
             // In numbers less than 1, leading zeros immediately after the decimal are not significant.
-             if(abs.startsWith("0") && decIndex == 1) {
+            if(abs.startsWith("0") && decIndex == 1) {
                 // Remove any leading zeros in the fractional part.
                 String trimmed = abs.substring(decIndex + 1).replaceFirst("^0+", "");
                 // If the number is 0 (like "0.000"), treat it as one significant digit.
@@ -135,63 +150,25 @@ public class PreciseDecimal {
             }
         }
         else {
-            // Whole numbers: mark as unlimited (exact).
-            this.limited = false;
-            this.precision = 0; // Not used for unlimited numbers.
-            this.scale = 0;
-        }
-    }
-
-    private int countSignificantDigits(String s) {
-        String digitsOnly = s.replace(".", "");
-
-        // Remove leading zeros
-        String stripped = digitsOnly.replaceFirst("^0+", "");
-
-        // If the result is empty (e.g., "0.000"), treat it as infinite sig fig
-        return stripped.isEmpty() ? -1 : stripped.length();
-        /*
-        int dotIdx = s.indexOf(".");
-        if(dotIdx == -1) {
-            // i.e. 1e3, 5e3, 560e6
-            // all parts are significant
-            return s.length();
-        }
-        else {
-            // i.e. 1.0e3, 2.54e5
-            int excludeLeadingZeros = 0;
-            boolean leadingZero = true;
-            for(int i=0; i<s.length(); i++) {
-                if(i == dotIdx) {
-                    continue;
-                }
-                if(leadingZero && s.charAt(i) == '0') {
-                    continue;
-                }
-                leadingZero = false;
-                excludeLeadingZeros++;
+            if(limited) {
+                // Its an int but its explicitly defined as limited
+                this.limited = true;
+                // There is ambiguity with trailing zeros here. I.e. the input 2540 could either mean that the measurement
+                // is correct down to last zero (it counts towards precision), or its a rounded result where it should not
+                // count towards precision.
+                // For now, I will count trailing zeros towards the precision amount.
+                String sigFigs = s.replaceFirst("^0+", "");
+                this.precision = sigFigs.isEmpty() ? 1 : sigFigs.length();
+                this.scale = 0; // no decimal place with ints
             }
-            return excludeLeadingZeros;
-        }
+            else {
+                // Whole numbers: mark as unlimited (exact).
+                this.limited = false;
+                this.precision = 0; // Not used for unlimited numbers.
+                this.scale = 0;
+            }
 
-         */
-    }
-
-    private int countScale(String s, int exponent) {
-        int dotIndex = s.indexOf('.');
-        if (dotIndex == -1) {
-            return 0; // no decimal point = scale 0
         }
-
-        // shift the dot in s exponent-many times to the right.
-        // The remaining digits to the right are the remaining scale.
-        int shiftedDotIdx = dotIndex + exponent - 1;
-        int numberOfDigitsAfterDot = s.length() - dotIndex - 1;
-        if(shiftedDotIdx >= numberOfDigitsAfterDot) {
-            // even more zeros are necessary -> it's an integer, not a fraction
-            return 0;
-        }
-        return numberOfDigitsAfterDot - shiftedDotIdx;
     }
 
     // Private constructor for internal operations.

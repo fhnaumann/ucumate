@@ -41,8 +41,12 @@ public class TestUtil {
                            .orElseThrow(() -> new IllegalStateException("UCUM prefix '%s' not found!".formatted(prefix)));
     }
 
-    public static PreciseDecimal pd(String s) {
-        return new PreciseDecimal(s);
+    public static PreciseDecimal pd_l(String s) {
+        return new PreciseDecimal(s, true);
+    }
+
+    public static PreciseDecimal pd_u(String s) {
+        return new PreciseDecimal(s, false);
     }
 
     public static Expression.Term single(UCUMDefinition.UCUMUnit ucumUnit) {

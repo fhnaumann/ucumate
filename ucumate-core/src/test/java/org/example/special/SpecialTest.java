@@ -1,16 +1,12 @@
 package org.example.special;
 
-import org.example.builders.CombineTermBuilder;
-import org.example.builders.SoloTermBuilder;
 import org.example.funcs.Converter;
-import org.example.model.Expression;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.example.special.SpecialUtil.*;
 import static org.example.TestUtil.*;
-import static org.assertj.core.api.Assertions.*;
 
 public class SpecialTest {
 
@@ -26,7 +22,7 @@ public class SpecialTest {
     public void convert_cf1_celsius_to_kelvin() {
         Converter.ConversionResult result = converter.convert(new Converter.Conversion(ONE, celsius_term()), kelvin_term());
         System.out.println(result);
-        assert_success_and_equal_to(result, pd("274.1500"));
+        assert_success_and_equal_to(result, pd_l("274.1500"));
     }
 
     @Test
@@ -34,7 +30,7 @@ public class SpecialTest {
     public void convert_cf5_celsius_to_kelvin() {
         Converter.ConversionResult result = converter.convert(new Converter.Conversion(FIVE, celsius_term()), kelvin_term());
         System.out.println(result);
-        assert_success_and_equal_to(result, pd("278.1500"));
+        assert_success_and_equal_to(result, pd_l("278.1500"));
     }
 
     @Test
@@ -42,7 +38,7 @@ public class SpecialTest {
     public void convert_5_celsius_to_kelvin() {
         Converter.ConversionResult result = converter.convert(new Converter.Conversion(ONE, _5_celsius_term()), kelvin_term());
         System.out.println(result);
-        assert_success_and_equal_to(result, pd("278.1500"));
+        assert_success_and_equal_to(result, pd_l("278.1500"));
     }
 
     @Test
