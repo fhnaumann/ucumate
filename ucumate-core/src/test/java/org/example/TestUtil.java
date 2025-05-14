@@ -11,6 +11,7 @@ public class TestUtil {
     public static final UCUMDefinition.UCUMPrefix giga = getUCUMPrefix("G");
     public static final UCUMDefinition.UCUMPrefix mega = getUCUMPrefix("M");
     public static final UCUMDefinition.UCUMPrefix dezi = getUCUMPrefix("d");
+    public static final UCUMDefinition.UCUMPrefix centi = getUCUMPrefix("c");
     public static final UCUMDefinition.UCUMPrefix nano = getUCUMPrefix("n");
 
     public static final UCUMDefinition.UCUMUnit meter = getUCUMUnit("m");
@@ -57,12 +58,24 @@ public class TestUtil {
         return from(meter);
     }
 
+    public static Expression.Term cm_term() {
+        return SoloTermBuilder.builder().withPrefix(centi, meter).noExpNoAnnot().asTerm().build();
+    }
+
     public static Expression.Term meter_parens_term() {
         return SoloTermBuilder.builder().withoutPrefix(meter).noExpNoAnnot().asTermWithParens().asTerm().build();
     }
 
     public static Expression.Term inch_term() {
         return from(inches);
+    }
+
+    public static Expression.Term inch2_term() {
+        return SoloTermBuilder.builder().withoutPrefix(inches).asComponent().withExponent(2).withoutAnnotation().asTerm().build();
+    }
+
+    public static Expression.Term cm2_term() {
+        return SoloTermBuilder.builder().withPrefix(centi, meter).asComponent().withExponent(2).withoutAnnotation().asTerm().build();
     }
 
     private static Expression.Term from(UCUMDefinition.UCUMUnit ucumUnit) {

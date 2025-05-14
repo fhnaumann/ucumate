@@ -81,6 +81,10 @@ public class PreciseDecimal {
         // Check if the number is negative; ignore the leading '-' for parsing the digit counts.
         boolean isNegative = s.startsWith("-"); // todo correct that if negative this information is later discarded?
         String abs = isNegative ? s.substring(1) : s;
+        s = s.replaceFirst("^0+", ""); // remove leading 0s
+        if(s.isEmpty()) {
+            s = "0"; // If removing leading 0s results in an empty string, then that means it was exactly the number 0
+        }
         this.value = new BigDecimal(s);
         if(!limited) {
             this.limited = false;
@@ -101,7 +105,7 @@ public class PreciseDecimal {
                      "1.0e2"    -> 100.0      (precision 4, scale 1)
                      "1.000e2"  -> 100.000    (precision 6, scale 3)
                      "1.0e5"    -> 100000.0   (precision 7, scale 1)
-                     "1.00e-4"  -> 0.000100   (precision 3, scale 3)
+                     "1.00e-4"  -> 0.000100   (precision 3, scale 3) (or scale 6?)
                      "2.54e2"   -> 254.00     (precision 5, scale 2)
                      "2.54e4"   -> 25400.00   (precision 7, scale 2)
                      "2.5400e4" -> 25400.0000 (precision 9, scale 4)
@@ -113,8 +117,9 @@ public class PreciseDecimal {
                 this.limited = true;
                 // String clean = mantissa.replace(".", "").replaceFirst("^0+", "");
                 String[] split = coefficient.split("\\.");
-                this.scale = split[1].length();
-                this.precision = value.toPlainString().split("\\.")[0].length() + this.scale;
+                this.scale = value.toPlainString().split("\\.")[1].length();
+                this.precision = split[0].length() + split[1].length();
+                //this.precision = split[0].length() + this.scale;
 
             }
             else {
@@ -157,8 +162,7 @@ public class PreciseDecimal {
                 // is correct down to last zero (it counts towards precision), or its a rounded result where it should not
                 // count towards precision.
                 // For now, I will count trailing zeros towards the precision amount.
-                String sigFigs = s.replaceFirst("^0+", "");
-                this.precision = sigFigs.isEmpty() ? 1 : sigFigs.length();
+                this.precision = s.isEmpty() ? 1 : s.length();
                 this.scale = 0; // no decimal place with ints
             }
             else {
@@ -169,6 +173,37 @@ public class PreciseDecimal {
             }
 
         }
+    }
+
+    public static int countSignificantDigits(String number) {
+        // Remove sign if present
+        number = number.trim().replaceFirst("^[+-]", "");
+
+        // Remove scientific notation (optional enhancement)
+        if (number.toLowerCase().contains("e")) {
+            throw new IllegalArgumentException("Scientific notation not supported: " + number);
+        }
+
+        // Remove the decimal point temporarily
+        String digitsOnly = number.replace(".", "");
+
+        // Remove leading zeros
+        int firstNonZero = 0;
+        while (firstNonZero < digitsOnly.length() && digitsOnly.charAt(firstNonZero) == '0') {
+            firstNonZero++;
+        }
+
+        // Remove trailing zeros (only after decimal point!)
+        int lastNonZero = digitsOnly.length() - 1;
+        if (number.contains(".")) {
+            while (lastNonZero >= 0 && digitsOnly.charAt(lastNonZero) == '0') {
+                lastNonZero--;
+            }
+        }
+
+        // Count the digits between the first and last non-zero (inclusive)
+        int count = lastNonZero - firstNonZero + 1;
+        return Math.max(0, count);
     }
 
     // Private constructor for internal operations.
@@ -297,7 +332,8 @@ public class PreciseDecimal {
         if(effectivePrecision == Integer.MAX_VALUE) {
             // Both operands are unlimited.
             BigDecimal product = this.value.multiply(other.value);
-            return new PreciseDecimal(product, false, 0, product.scale());
+            return unlimitedPrecision(product);
+            //return new PreciseDecimal(product, false, -1, -1);
         } else {
             MathContext mc = new MathContext(effectivePrecision, RoundingMode.HALF_UP);
             BigDecimal product = this.value.multiply(other.value, mc);
@@ -324,18 +360,47 @@ public class PreciseDecimal {
         if(other.value.compareTo(BigDecimal.ZERO) == 0) {
             throw new ArithmeticException("Division by zero");
         }
+        if(this.equals(other)) {
+            // Sometimes there are (unavoidable) redundant divisions where both numbers are the same, short circuit then
+            return ONE;
+        }
         int effectivePrecision = Math.min(getEffectivePrecision(this), getEffectivePrecision(other));
         if(effectivePrecision == Integer.MAX_VALUE) {
             // Both operands are unlimited; choose a default scale.
 
             BigDecimal quotient = this.value.divide(other.value, 20, RoundingMode.HALF_UP);
-            return new PreciseDecimal(quotient, true, 20, quotient.scale());
+            return unlimitedPrecision(quotient);
+            // return new PreciseDecimal(quotient, true, 20, quotient.scale()); // todo is scale really needed here or can it be -1?
         } else {
             MathContext mc = new MathContext(effectivePrecision, RoundingMode.HALF_UP);
             BigDecimal quotient = this.value.divide(other.value, mc);
             int newScale = quotient.scale();
             return new PreciseDecimal(quotient, true, effectivePrecision, newScale);
         }
+    }
+
+    private static PreciseDecimal unlimitedPrecision(BigDecimal bigDecimalResult) {
+        String s = bigDecimalResult.toPlainString();
+        String[] split = s.split("\\.");
+        if(!s.contains(".") || !s.endsWith("0")) {
+            return new PreciseDecimal(s, false);
+        }
+        String decimalPart = split[1];
+        int splitIdx = decimalPart.length();
+        for(int i=decimalPart.length()-1; i>=0; i--) {
+            if(decimalPart.charAt(i) != '0') {
+                break;
+            }
+            splitIdx--;
+        }
+        if(splitIdx >= 0) {
+            s = s.substring(0, split[0].length() + 1 + splitIdx);
+            // If it ends in all 0s then the last symbol will be the dot, remove it then
+            if(s.endsWith(".")) {
+                s = s.substring(0, s.length()-1);
+            }
+        }
+        return new PreciseDecimal(s, false);
     }
 
     /**
@@ -448,7 +513,7 @@ public class PreciseDecimal {
         }
         else {
             BigDecimal bd = BigDecimal.valueOf(value).setScale(limitedScale, RoundingMode.HALF_UP);
-            return new PreciseDecimal(bd.toPlainString());
+            return new PreciseDecimal(bd.toPlainString(), true);
             //return new PreciseDecimal(bd, true, computePrecision(bd.toPlainString()), 4); // fixed sigfigs & scale
         }
     }

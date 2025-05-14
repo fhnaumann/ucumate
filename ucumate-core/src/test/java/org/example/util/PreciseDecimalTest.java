@@ -85,11 +85,11 @@ public class PreciseDecimalTest {
         // 1.000e2 -> 100.000
         // 254e-2 ->
         // Does 254e-2 -> 2.54 have infinite precision or 3 precision (scale 2)?
-        assert_limited_with(pd_l("1.0e2"), "100.0", true, 2, 1);
-        assert_limited_with(pd_l("1.00e2"), "100.00", true, 3, 2);
-        assert_limited_with(pd_l("1.000e2"), "100.000", true, 4, 3);
-        assert_limited_with(pd_l("1.0000e2"), "100.0000", true, 5, 4);
-        assert_limited_with(pd_l("1.00000e2"), "100.00000", true, 6, 5);
+        assert_limited_with(pd_l("1.0e2"), "100.0", true, 4, 1);
+        assert_limited_with(pd_l("1.00e2"), "100.00", true, 5, 2);
+        assert_limited_with(pd_l("1.000e2"), "100.000", true, 6, 3);
+        assert_limited_with(pd_l("1.0000e2"), "100.0000", true, 7, 4);
+        assert_limited_with(pd_l("1.00000e2"), "100.00000", true, 8, 5);
     }
 
     @Test
@@ -126,9 +126,9 @@ public class PreciseDecimalTest {
     @Test
     public void neg_scientific_notation_with_multiple_digits_before_decimal_is_limited() {
         assert_limited_with(pd_l("2.54e-2"), "0.0254", true, 3, 4);
-        assert_limited_with(pd_l("0.254e-5"), "0.00000254", true, 3, 8);
-        assert_limited_with(pd_l("0.2540e-5"), "0.000002540", true, 4, 9);
-        assert_limited_with(pd_l("0.25400e-5"), "0.0000025400", true, 5, 10);
+        assert_limited_with(pd_l("0.254e-5"), "0.00000254", true, 4, 8);
+        assert_limited_with(pd_l("0.2540e-5"), "0.000002540", true, 5, 9);
+        assert_limited_with(pd_l("0.25400e-5"), "0.0000025400", true, 6, 10);
     }
 
     @Test

@@ -37,6 +37,7 @@ public class Converter {
                 else {
                     // no special unit involved
                     conversionFactor = from.factor.multiply(fromSuccess.conversionFactor()).multiply(PreciseDecimal.ONE.divide(toSuccess.conversionFactor()));
+
                 }
                 yield new Success(conversionFactor);
             }

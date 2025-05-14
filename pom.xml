@@ -13,8 +13,6 @@
 
     <modules>
         <module>ucumate-core</module>
-        <module>ucumate-store</module>
-        <module>ucumate-demo</module>
         <module>ucumate-demo</module>
         <module>ucumate-core-exact-special-math</module>
     </modules>

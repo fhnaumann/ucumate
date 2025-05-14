@@ -68,7 +68,7 @@ factor involves a unit that is inherently irrational like pi or the gravitationa
 The ucum-essence file uses the scientific notation for many of the conversion factor definitions. For example,
 the inch to cm conversion factor (2.54) is actually defined as 254e-2. This non-normalized form of the scientific notation
 can be problematic. 254 is an integer but the normalized or interpreted form is a decimal number with limited precision.
-In the conversion factor definitions this is not a problem because they are considered to be exact anyway (with a few exceptions)
+In the conversion factor definitions this is not a problem because they are considered to be exact anyway (with a few exceptions).
 
 ## User-provided Factor
 
@@ -76,6 +76,9 @@ When canonicalizing or converting between units, the user may provide an additio
 For example, the user might want to convert 3.5 inches to cm. The system is incapable of determining whether this custom
 factor has limited precision/scaling or not. It depends on what the user wants and therefore (maybe) I can add an additional
 bool parameter to flag this behaviour?
+
+There is additional complexity when the factor is in scientific notation, especially regarding the decimal places after the dot.
+1.0e2 expands to 100.0, 1.00e2 -> 100.00, etc. Conversely, 1.0e-2 expands to 0.010, 1.00e-2 -> 0.0100
 
 ## Examples
 
