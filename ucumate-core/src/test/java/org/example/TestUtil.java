@@ -16,6 +16,7 @@ public class TestUtil {
 
     public static final UCUMDefinition.UCUMUnit meter = getUCUMUnit("m");
     public static final UCUMDefinition.UCUMUnit gram = getUCUMUnit("g");
+    public static final UCUMDefinition.UCUMUnit second = getUCUMUnit("s");
     public static final UCUMDefinition.UCUMUnit newton = getUCUMUnit("N");
     public static final UCUMDefinition.UCUMUnit feet = getUCUMUnit("[ft_i]");
     public static final UCUMDefinition.UCUMUnit celsius = getUCUMUnit("Cel");
@@ -58,6 +59,10 @@ public class TestUtil {
         return from(meter);
     }
 
+    public static Expression.Term gram_term() {
+        return from(gram);
+    }
+
     public static Expression.Term cm_term() {
         return SoloTermBuilder.builder().withPrefix(centi, meter).noExpNoAnnot().asTerm().build();
     }
@@ -76,6 +81,10 @@ public class TestUtil {
 
     public static Expression.Term cm2_term() {
         return SoloTermBuilder.builder().withPrefix(centi, meter).asComponent().withExponent(2).withoutAnnotation().asTerm().build();
+    }
+
+    public static Expression.Term second_term() {
+        return single(second);
     }
 
     private static Expression.Term from(UCUMDefinition.UCUMUnit ucumUnit) {

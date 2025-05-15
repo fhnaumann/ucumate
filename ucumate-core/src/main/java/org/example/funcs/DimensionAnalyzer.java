@@ -1,12 +1,8 @@
 package org.example.funcs;
 
-import org.example.UCUMDefinition;
 import org.example.model.Expression;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,7 +35,11 @@ public class DimensionAnalyzer {
         }
     }
 
-    public static Map<Dimension, Integer> analyze(Expression.CanonicalTerm term, int sign) {
+    public static Map<Dimension, Integer> analyze(Expression.CanonicalTerm term) {
+        return analyze(term, 1);
+    }
+
+    private static Map<Dimension, Integer> analyze(Expression.CanonicalTerm term, int sign) {
         return switch(term) {
             case Expression.CanonicalComponentTerm componentTerm -> analyzeComponent(componentTerm.component(), sign);
             case Expression.AnnotOnlyTerm _ -> Collections.EMPTY_MAP;
@@ -62,8 +62,8 @@ public class DimensionAnalyzer {
 
     private static Map<Dimension, Integer> analyzeComponent(Expression.CanonicalComponent component, int sign) {
         return switch(component) {
-            case Expression.CanonicalComponentExponent(Expression.CanonicalUnit unit, Expression.Exponent(int exponent)) -> scaleDimensions(analyzeUnit(unit), exponent);
-            case Expression.CanonicalComponentNoExponent(Expression.CanonicalUnit unit) -> analyzeUnit(unit);
+            case Expression.CanonicalComponentExponent(Expression.CanonicalUnit unit, Expression.Exponent(int exponent)) -> scaleDimensions(analyzeUnit(unit, sign), sign*exponent);
+            case Expression.CanonicalComponentNoExponent(Expression.CanonicalUnit unit) -> analyzeUnit(unit, sign);
         };
     }
 
@@ -81,10 +81,10 @@ public class DimensionAnalyzer {
                 ));
     }
 
-    private static Map<Dimension, Integer> analyzeUnit(Expression.CanonicalUnit unit) {
+    private static Map<Dimension, Integer> analyzeUnit(Expression.CanonicalUnit unit, int sign) {
         return switch(unit) {
-            case Expression.CanonicalSimpleUnit canonicalSimpleUnit -> Map.of(fromUCUMEssenceString(canonicalSimpleUnit.ucumUnit().dim()), 1);
-            case Expression.IntegerUnit _ -> Map.of(Dimension.NO_DIMENSION, 1);
+            case Expression.CanonicalSimpleUnit canonicalSimpleUnit -> Map.of(fromUCUMEssenceString(canonicalSimpleUnit.ucumUnit().dim()), sign);
+            case Expression.IntegerUnit _ -> Map.of(Dimension.NO_DIMENSION, 1); // sign does not matter here (I think?)
         };
     }
 
@@ -101,16 +101,5 @@ public class DimensionAnalyzer {
         };
     }
 
-
-    public enum Dimension {
-        LENGTH,
-        TIME,
-        MASS,
-        PLANE_ANGLE,
-        TEMPERATURE,
-        ELECTRIC_CHARGE,
-        LUMINOUS_INTENSITY,
-        NO_DIMENSION;
-    }
 
 }
