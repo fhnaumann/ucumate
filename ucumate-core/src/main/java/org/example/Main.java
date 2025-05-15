@@ -21,6 +21,12 @@ public class Main {
         return visitor.visit(tree);
     }
 
+    public static Expression.CanonicalTerm visitCanonicalTerm(String input) {
+        Expression expression = visitTerm(input);
+        Canonicalizer.CanonicalizationResult result = new Canonicalizer().canonicalizeNoSpecialUnitAllowed((Expression.Term) expression);
+        return ((Canonicalizer.Success) result).canonicalTerm();
+    }
+
     public static void main(String[] args) {
 //        String input = "a=5\nb=6\na+b*2\n";
         //String input = "(1/2).k[ft_i]+3";

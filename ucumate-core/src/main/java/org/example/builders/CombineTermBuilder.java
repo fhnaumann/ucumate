@@ -5,6 +5,7 @@ import org.example.model.Expression;
 public class CombineTermBuilder {
     public interface FinishStep {
         Expression.Term build();
+        Expression.CanonicalTerm buildCanonical();
     }
 
     public interface RightStep {
@@ -46,6 +47,15 @@ public class CombineTermBuilder {
                 };
             }
             throw new RuntimeException("Builder reached unexpected stage.");
+        }
+
+        @Override
+        public Expression.CanonicalTerm buildCanonical() {
+            try {
+                return (Expression.CanonicalTerm) build();
+            } catch (ClassCastException e) {
+                throw new RuntimeException("Builder was directed to build a canonical term but the contents given were mixed!");
+            }
         }
 
         @Override

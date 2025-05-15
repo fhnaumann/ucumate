@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.builders.CombineTermBuilder;
+import org.example.builders.SoloTermBuilder;
 import org.example.funcs.PrettyPrinter;
 import org.example.model.Expression;
 import org.example.util.ParseUtil;
@@ -7,9 +9,13 @@ import org.example.util.ParseUtil;
 public class MyUCUMVisitor extends NewUCUMBaseVisitor<Expression> {
 
     private final UCUMRegistry registry;
+    private SoloTermBuilder.UnitStep soloTermBuilder;
+    private CombineTermBuilder.LeftStep combineTermBuilder;
 
     public MyUCUMVisitor(UCUMRegistry registry) {
         this.registry = registry;
+        this.soloTermBuilder = SoloTermBuilder.builder();
+        this.combineTermBuilder = CombineTermBuilder.builder();
     }
 
     @Override
@@ -26,6 +32,7 @@ public class MyUCUMVisitor extends NewUCUMBaseVisitor<Expression> {
 
     @Override
     public Expression visitMaybeAPrefixSymbolUnit(NewUCUMParser.MaybeAPrefixSymbolUnitContext ctx) {
+        resetSoloTermBuilder();
         ParseUtil.MatchResult matchResult = ParseUtil.separatePrefixFromUnit(ctx.getText(), registry);
         return switch(matchResult) {
             case ParseUtil.SuccessNoPrefixUnit(UCUMDefinition.UCUMUnit unit) -> new Expression.MixedNoPrefixSimpleUnit(unit);
@@ -105,8 +112,20 @@ public class MyUCUMVisitor extends NewUCUMBaseVisitor<Expression> {
         return new Expression.MixedUnaryDivTerm(term);
     }
 
+    private SoloTermBuilder.UnitStep resetSoloTermBuilder() {
+        soloTermBuilder = SoloTermBuilder.builder();
+        return soloTermBuilder;
+    }
+
+    private CombineTermBuilder.LeftStep resetCombineTermBuilder() {
+        combineTermBuilder = CombineTermBuilder.builder();
+        return combineTermBuilder;
+    }
+
     @Override
     public Expression visitBinaryDivTerm(NewUCUMParser.BinaryDivTermContext ctx) {
+        resetCombineTermBuilder();
+
         Expression.Term left = (Expression.Term) visit(ctx.term(0));
         Expression.Term right = (Expression.Term) visit(ctx.term(1));
         return new Expression.MixedBinaryTerm(left, Expression.Operator.DIV, right);
