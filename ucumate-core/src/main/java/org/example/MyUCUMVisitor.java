@@ -3,6 +3,7 @@ package org.example;
 import org.example.builders.CombineTermBuilder;
 import org.example.builders.SoloTermBuilder;
 import org.example.funcs.PrettyPrinter;
+import org.example.funcs.Validator;
 import org.example.model.Expression;
 import org.example.util.ParseUtil;
 
@@ -37,7 +38,8 @@ public class MyUCUMVisitor extends NewUCUMBaseVisitor<Expression> {
         return switch(matchResult) {
             case ParseUtil.SuccessNoPrefixUnit(UCUMDefinition.UCUMUnit unit) -> new Expression.MixedNoPrefixSimpleUnit(unit);
             case ParseUtil.SuccessPrefixUnit(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.UCUMUnit unit) -> new Expression.MixedPrefixSimpleUnit(prefix, unit);
-            default -> throw new RuntimeException(); // todo redo this mess
+            case ParseUtil.InvalidResults invalidResults -> throw new Validator.ParserException(invalidResults);
+            case ParseUtil.FailureResult failureResult -> throw new Validator.ParserException(failureResult);
         };
     }
 
@@ -214,7 +216,7 @@ public class MyUCUMVisitor extends NewUCUMBaseVisitor<Expression> {
         Expression.Term term = (Expression.Term) visit(ctx.term());
         boolean valid = checkForSpecialUnitInTerm(term).isValid();
         if(!valid) {
-            throw new RuntimeException("TODO: better message, special unit used at invalid place %s".formatted(new PrettyPrinter(false, false, false).print(term)));
+            throw new RuntimeException("TODO: better message, special unit used at invalid place %s".formatted(new PrettyPrinter(false, false, false, false).print(term)));
         }
         return term;
     }

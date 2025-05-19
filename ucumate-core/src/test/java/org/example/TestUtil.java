@@ -1,10 +1,17 @@
 package org.example;
 
 import org.example.builders.SoloTermBuilder;
+import org.example.funcs.Validator;
+import org.example.funcs.printer.UCUMSyntaxPrinter;
+import org.example.funcs.printer.WolframAlphaSyntaxPrinter;
+import org.example.model.Canonicalizer;
 import org.example.model.Expression;
 import org.example.util.PreciseDecimal;
 
 public class TestUtil {
+
+    private static final UCUMSyntaxPrinter ucumSyntaxPrinter = new UCUMSyntaxPrinter();
+    private static final WolframAlphaSyntaxPrinter wolframAlphaSyntaxPrinter = new WolframAlphaSyntaxPrinter();
 
     private static final UCUMRegistry ucumRegistry = UCUMRegistry.getInstance();
 
@@ -89,5 +96,25 @@ public class TestUtil {
 
     private static Expression.Term from(UCUMDefinition.UCUMUnit ucumUnit) {
         return SoloTermBuilder.builder().withoutPrefix(ucumUnit).noExpNoAnnot().asTerm().build();
+    }
+
+    public static Expression.Term parse(String input) {
+        return ((Validator.Success) Validator.validate(input)).term();
+    }
+
+    public static Expression.CanonicalTerm parse_canonical(String input) {
+        return ((Canonicalizer.Success) new Canonicalizer().canonicalize(parse(input), new Canonicalizer.SpecialUnitConversionContext(ONE, Canonicalizer.SpecialUnitApplicationDirection.NO_SPECIAL_INVOLVED), false, false)).canonicalTerm();
+    }
+
+    public static String print(Expression expression) {
+        return ucumSyntaxPrinter.print(expression);
+    }
+
+    public static String print(Expression expression, boolean forWolframAlpha) {
+        if(forWolframAlpha) {
+            return wolframAlphaSyntaxPrinter.print(expression);
+        } else {
+            return ucumSyntaxPrinter.print(expression);
+        }
     }
 }

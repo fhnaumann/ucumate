@@ -64,8 +64,8 @@ public class DimensionAnalyzer {
 
     private static Map<Dimension, Integer> analyzeUnit(Expression.CanonicalUnit unit, int sign) {
         return switch(unit) {
-            case Expression.CanonicalSimpleUnit canonicalSimpleUnit -> Map.of(Dimension.fromUCUMEssenceString(canonicalSimpleUnit.ucumUnit().dim()), sign);
-            case Expression.IntegerUnit _ -> Map.of(Dimension.NO_DIMENSION, 1); // sign does not matter here (I think?)
+            case Expression.CanonicalSimpleUnit canonicalSimpleUnit -> Map.of(Dimension.fromUCUMEssenceString(canonicalSimpleUnit.ucumUnit().dim()), Math.abs(sign)); // was: just 'sign'
+            case Expression.IntegerUnit _ -> Map.of(); //Map.of(Dimension.NO_DIMENSION, 1); // sign does not matter here (I think?)
         };
     }
 

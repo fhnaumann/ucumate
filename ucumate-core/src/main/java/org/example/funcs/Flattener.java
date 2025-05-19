@@ -32,7 +32,7 @@ public class Flattener {
                     }
                     case DIV -> {
                         flattenImpl(binaryTerm.left(), sign, out);
-                        flattenImpl(binaryTerm.right(), -sign, out);
+                        flattenImpl(binaryTerm.right(), -sign, out); // "-sign" or "-1*sing" ???
                     }
                 }
             }
@@ -56,13 +56,10 @@ public class Flattener {
     }
 
     public static Expression.CanonicalTerm buildFlatProduct(List<Map.Entry<Expression.CanonicalUnit, Integer>> map) {
-        Expression.CanonicalTerm identity = (Expression.CanonicalTerm) SoloTermBuilder.UNITY;
         return map.stream()
-                .reduce(
-                        identity,
-                        Flattener::accumulate,
-                        Flattener::combineMul
-                );
+                .map(entry -> componentTerm(entry.getKey(), entry.getValue())) // turn Map.Entry into CanonicalTerm
+                .reduce(Flattener::combineMul)   // combine with multiplication
+                .orElse((Expression.CanonicalTerm) SoloTermBuilder.UNITY); // use 1 only if truly empty
     }
 
     private static Expression.CanonicalTerm accumulate(Expression.CanonicalTerm acc, Map.Entry<Expression.CanonicalUnit, Integer> entry) {
@@ -77,6 +74,7 @@ public class Flattener {
     }
 
     private static Expression.CanonicalTerm combineDiv(Expression.CanonicalTerm left, Expression.CanonicalTerm right) {
+        //return CombineTermBuilder.builder().left(left).multiplyWith().right(right.invert()).buildCanonical();
         return CombineTermBuilder.builder().left(left).divideBy().right(right).buildCanonical();
     }
 
@@ -93,24 +91,10 @@ public class Flattener {
     }
 
     private static Expression.CanonicalTerm rebuildFromMap(Map<Expression.CanonicalUnit, Integer> map) {
-        Expression.CanonicalTerm identity = (Expression.CanonicalTerm) SoloTermBuilder.UNITY;
-        Expression.CanonicalTerm num = map.entrySet().stream()
-                .filter(entry -> entry.getValue() > 0)
+        return map.entrySet().stream()
                 .map(entry -> componentTerm(entry.getKey(), entry.getValue()))
                 .reduce(Flattener::combineMul)
-                .orElse(identity);
-        Expression.CanonicalTerm denom = map.entrySet().stream()
-                .filter(entry -> entry.getValue() < 0)
-                .map(entry -> componentTerm(entry.getKey(), -entry.getValue()))
-                .reduce(Flattener::combineMul)
-                .orElse(identity);
-        if(denom.equals(identity)) {
-            return num;
-        }
-        if(num.equals(identity)) {
-            return CombineTermBuilder.builder().unaryDiv().right(denom).buildCanonical();
-        }
-        return combineDiv(num, denom);
+                .orElse((Expression.CanonicalTerm) SoloTermBuilder.UNITY);
     }
 
     private static Expression.CanonicalTerm componentTerm(Expression.CanonicalUnit unit, int exponent) {

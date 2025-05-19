@@ -4,7 +4,9 @@ import org.example.UCUMDefinition;
 import org.example.UCUMRegistry;
 import org.example.builders.CombineTermBuilder;
 import org.example.builders.SoloTermBuilder;
+import org.example.funcs.Flattener;
 import org.example.funcs.Normalizer;
+import org.example.funcs.printer.WolframAlphaSyntaxPrinter;
 import org.example.util.PreciseDecimal;
 
 import java.util.Optional;
@@ -17,17 +19,28 @@ public class Canonicalizer {
 
 
     public CanonicalizationResult canonicalizeNoSpecialUnitAllowed(Expression.Term term) {
-        return canonicalize(term, new SpecialUnitConversionContext(PreciseDecimal.ONE, SpecialUnitApplicationDirection.NO_SPECIAL_INVOLVED));
+        // todo right now I just trust the user that no special unit is involved
+        return canonicalize(term, new SpecialUnitConversionContext(PreciseDecimal.ONE, SpecialUnitApplicationDirection.NO_SPECIAL_INVOLVED), true, true);
     }
 
     public CanonicalizationResult canonicalize(Expression.Term term, SpecialUnitConversionContext specialContext) {
+        return canonicalize(term, specialContext, true, true);
+    }
+
+    public CanonicalizationResult canonicalize(Expression.Term term, SpecialUnitConversionContext specialContext, boolean normalize, boolean flatten) {
         try {
             CanonicalStep canonicalStep = canonicalizeImpl(term, specialContext);
             if(!(canonicalStep.term() instanceof Expression.CanonicalTerm canonicalTerm)) {
                 throw new RuntimeException("Expected CanonicalTerm, got " + canonicalStep.term);
             }
-            Expression.CanonicalTerm normalizedTerm = (Expression.CanonicalTerm) new Normalizer().normalize(canonicalTerm);
-            return new Success(canonicalStep.conversionFactor(), normalizedTerm, specialContext.direction());
+            Expression.CanonicalTerm resultTerm = canonicalTerm;
+            if(normalize) {
+                resultTerm = (Expression.CanonicalTerm) new Normalizer().normalize(canonicalTerm);
+            }
+            if(flatten) {
+                resultTerm = Flattener.flattenAndCancel(resultTerm);
+            }
+            return new Success(canonicalStep.conversionFactor(), resultTerm, specialContext.direction());
         } catch(TermHasArbitraryUnitException e) {
             return new TermHasArbitraryUnit(e.arbitraryUnit);
         }
@@ -59,6 +72,36 @@ public class Canonicalizer {
         };
     }
 
+    private Expression.Term removePrefixes(Expression.Term term, int exponent) {
+        return switch (term) {
+            case Expression.BinaryTerm binaryTerm -> {
+                var tmp = switch (binaryTerm.operator()) {
+                case MUL -> CombineTermBuilder.builder().left(removePrefixes(binaryTerm.left(), exponent)).multiplyWith().right(removePrefixes(binaryTerm.right(), exponent)).build();
+                case DIV -> CombineTermBuilder.builder().left(removePrefixes(binaryTerm.left(), exponent)).divideBy().right(removePrefixes(binaryTerm.right(), exponent)).build();
+                };
+                System.out.println(new WolframAlphaSyntaxPrinter().print(tmp));
+                yield tmp;
+            }
+            case Expression.UnaryDivTerm unaryDivTerm -> CombineTermBuilder.builder().unaryDiv().right(removePrefixes(unaryDivTerm.term(), exponent)).build();
+            case Expression.ParenTerm parenTerm -> removePrefixes(parenTerm.term(), exponent);
+            case Expression.AnnotTerm annotTerm -> removePrefixes(annotTerm.term(), exponent);
+            case Expression.AnnotOnlyTerm annotOnlyTerm -> SoloTermBuilder.UNITY;
+            case Expression.ComponentTerm componentTerm -> {
+                int existingExponent = switch (componentTerm.component()) {
+                    case Expression.ComponentExponent componentExponent -> exponent * componentExponent.exponent().exponent(); // not to sure about the multiplication here being correct :/
+                    case Expression.ComponentNoExponent componentNoExponent -> exponent;
+                };
+                Expression.Unit unit = componentTerm.component().unit();
+                var tmp = switch (unit) {
+                    case Expression.SimpleUnit simpleUnit -> SoloTermBuilder.builder().withoutPrefix(simpleUnit.ucumUnit()).asComponent().withExponent(existingExponent).withoutAnnotation().asTerm().build(); // todo do I need the exponent here?
+                    case Expression.IntegerUnit integerUnit -> SoloTermBuilder.builder().withIntegerUnit(integerUnit.value()).asComponent().withExponent(existingExponent).withoutAnnotation().asTerm().build();
+                };
+                //System.out.println(new WolframAlphaSyntaxPrinter().print(tmp));
+                yield tmp;
+            }
+        };
+    }
+
     private CanonicalStep handleCompTerm(Expression.ComponentTerm componentTerm, SpecialUnitConversionContext specialContext) throws TermHasArbitraryUnitException {
         CanonicalStep canonicalStep = canonicalizeUnit(componentTerm.component().unit(), specialContext);
         return switch(componentTerm.component()) {
@@ -68,6 +111,8 @@ public class Canonicalizer {
                 // may not have an exponent. Therefore, it's safe to assume the term in the canonical step is a CompTerm
                 // with a unit without an exponent.
                 // todo might be broken for terms without any units at all because the casting to SimpleUnit would fail
+
+                /*
                 Expression.SimpleUnit canonicalStepUnit = (Expression.SimpleUnit) ((Expression.ComponentTerm) canonicalStep.term()).component().unit();
                 // We just calculated the exponent into the conversion factor, but unlike prefixes, the exponent should stay
                 // during the canonicalization process.
@@ -79,10 +124,28 @@ public class Canonicalizer {
                                                       .asTerm()
                                                       .build();
 
+
+
+                 */
+                //Expression.Term term = canonicalizeImpl(canonicalStep.term(), specialContext).term();
+                Expression.Term term = removePrefixes(canonicalStep.term(), componentExponent.exponent().exponent());
+
                 yield new CanonicalStep(conversionFactor, term);
             }
-            case Expression.ComponentNoExponent _ -> canonicalStep;
+            case Expression.ComponentNoExponent _ -> canonicalStep; //encloseInBracketsIfNecessary(canonicalStep);
         };
+    }
+
+    private CanonicalStep encloseInBracketsIfNecessary(CanonicalStep canonicalStep) {
+        Expression.Term term = switch (canonicalStep.term()) {
+            case Expression.BinaryTerm binaryTerm -> new Expression.CanonicalParenTerm((Expression.CanonicalTerm) canonicalStep.term());
+            case Expression.UnaryDivTerm unaryDivTerm -> new Expression.CanonicalParenTerm((Expression.CanonicalTerm) canonicalStep.term());
+            case Expression.AnnotTerm annotTerm -> canonicalStep.term();
+            case Expression.ParenTerm parenTerm -> canonicalStep.term();
+            case Expression.AnnotOnlyTerm annotOnlyTerm -> canonicalStep.term();
+            case Expression.ComponentTerm componentTerm -> canonicalStep.term();
+        };
+        return new CanonicalStep(canonicalStep.conversionFactor(), term);
     }
 
     private CanonicalStep handleBinaryTerm(Expression.BinaryTerm binaryTerm, SpecialUnitConversionContext specialContext) throws TermHasArbitraryUnitException {
@@ -104,39 +167,25 @@ public class Canonicalizer {
             leftResult = canonicalizeImpl(binaryTerm.left(), specialContext);
             rightResult = canonicalizeImpl(binaryTerm.right(), specialContext);
         }
-        PreciseDecimal mulConversionFactor = leftResult.conversionFactor().multiply(rightResult.conversionFactor());
-        PreciseDecimal divConversionFactor = leftResult.conversionFactor().divide(rightResult.conversionFactor());
+        PreciseDecimal convFactor = switch (binaryTerm.operator()) {
+            case MUL -> leftResult.conversionFactor().multiply(rightResult.conversionFactor());
+            case DIV -> leftResult.conversionFactor().divide(rightResult.conversionFactor());
+        };
         if(leftResult.term() instanceof Expression.CanonicalTerm leftCanonicalTerm && rightResult.term() instanceof Expression.CanonicalTerm rightCanonicalTerm) {
-                return switch(binaryTerm.operator()) {
-                    case MUL -> new CanonicalStep(mulConversionFactor,
-                                                  new Expression.CanonicalBinaryTerm(leftCanonicalTerm,
-                                                                                     Expression.Operator.MUL,
-                                                                                     rightCanonicalTerm
-                                                  )
-                    );
-                    case DIV -> new CanonicalStep(divConversionFactor,
-                                                  new Expression.CanonicalBinaryTerm(leftCanonicalTerm,
-                                                                                     Expression.Operator.DIV,
-                                                                                     rightCanonicalTerm
-                                                  )
-                    );
-                };
+            return new CanonicalStep(convFactor,
+                    new Expression.CanonicalBinaryTerm(leftCanonicalTerm,
+                            binaryTerm.operator(),
+                            rightCanonicalTerm
+                    )
+            );
         }
         else {
-            return switch(binaryTerm.operator()) {
-                case MUL -> new CanonicalStep(mulConversionFactor,
-                                              new Expression.MixedBinaryTerm(leftResult.term(),
-                                                                             Expression.Operator.MUL,
-                                                                             rightResult.term()
-                                              )
-                );
-                case DIV -> new CanonicalStep(divConversionFactor,
-                                              new Expression.MixedBinaryTerm(leftResult.term(),
-                                                                             Expression.Operator.DIV,
-                                                                             rightResult.term()
-                                              )
-                );
-            };
+            return new CanonicalStep(convFactor,
+                    new Expression.MixedBinaryTerm(leftResult.term(),
+                            binaryTerm.operator(),
+                            rightResult.term()
+                    )
+            );
         }
     }
 

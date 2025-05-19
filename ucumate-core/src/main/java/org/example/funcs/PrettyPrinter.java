@@ -10,11 +10,13 @@ public class PrettyPrinter {
     private final boolean expressive;
     private final boolean fullPrefixNames;
     private final boolean fullUnitNames;
+    private final boolean ucumSyntax;
 
-    public PrettyPrinter(boolean expressive, boolean fullPrefixNames, boolean fullUnitNames) {
+    public PrettyPrinter(boolean expressive, boolean fullPrefixNames, boolean fullUnitNames, boolean ucumSyntax) {
         this.expressive = expressive;
         this.fullPrefixNames = fullPrefixNames;
         this.fullUnitNames = fullUnitNames;
+        this.ucumSyntax = ucumSyntax;
     }
 
     public String print(Expression expression) {
@@ -60,6 +62,6 @@ public class PrettyPrinter {
     }
 
     public static String defaultPrettyPrinter(Expression expression) {
-        return new PrettyPrinter(false, false, false).print(expression);
+        return new PrettyPrinter(false, false, false, false).print(expression);
     }
 }

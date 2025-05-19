@@ -12,10 +12,11 @@ public class MapUtil {
     public static <K> Map<K, Integer> calculateDiff(Map<K,Integer> map1, Map<K,Integer> map2, boolean filterEmpty) {
         return Stream.concat(map1.entrySet().stream(), map2.entrySet().stream())
                         .distinct()
+                .map(entry -> Map.entry(entry.getKey(), map1.getOrDefault(entry.getKey(),  0) - map2.getOrDefault(entry.getKey(), 0)))
                 .filter(filterEmptyIfDesired.apply(filterEmpty))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> map1.getOrDefault(entry.getKey(),  0) - map2.getOrDefault(entry.getKey(), 0)
+                        Map.Entry::getValue
                 )
         );
     }

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.example.TestUtil.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FlattenerTest {
 
@@ -36,5 +37,45 @@ public class FlattenerTest {
         Expression.CanonicalTerm canonicalTerm = ((Canonicalizer.Success) new Canonicalizer().canonicalizeNoSpecialUnitAllowed(inTerm)).canonicalTerm();
         var tmp = Flattener.flattenAndCancel(canonicalTerm);
         System.out.println(PrettyPrinter.defaultPrettyPrinter(tmp));
+    }
+
+    @Test
+    public void test3() {
+        Expression.CanonicalTerm term = parse_canonical("m/s");
+        Expression.CanonicalTerm flattenAndCancel = Flattener.flattenAndCancel(term);
+        assertThat(print(flattenAndCancel))
+                .isEqualTo("m1.s-1");
+    }
+
+    @Test
+    public void test4() {
+        Expression.CanonicalTerm term = parse_canonical("m/(s.g2)");
+        Expression.CanonicalTerm flattenAndCancel = Flattener.flattenAndCancel(term);
+        assertThat(print(flattenAndCancel))
+                .isEqualTo("m1.s-1.g-2");
+    }
+
+    @Test
+    public void test5() {
+        Expression.CanonicalTerm term = parse_canonical("m/(s/g)");
+        Expression.CanonicalTerm flattenAndCancel = Flattener.flattenAndCancel(term);
+        assertThat(print(flattenAndCancel))
+                .isEqualTo("m1.s-1.g1");
+    }
+
+    @Test
+    public void test6() {
+        Expression.CanonicalTerm term = parse_canonical("m/(s/(g/C))");
+        System.out.println(print(term));
+        Expression.CanonicalTerm flattenAndCancel = Flattener.flattenAndCancel(term);
+        var tmp = Flattener.flattenToProduct(term);
+        System.out.println(print(tmp));
+        assertThat(print(flattenAndCancel))
+                .isEqualTo("C-1.m1.s-1.g1");
+    }
+
+    @Test
+    public void test_functional_tests_3_126() {
+
     }
 }

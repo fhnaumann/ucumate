@@ -60,7 +60,7 @@ public class CombineTermBuilder {
 
         @Override
         public OperatorStep left(Expression.Term left) {
-            this.left = handlePotentialParensWrapping(left);
+            this.left = handlePotentialParensWrapping(operator, left);
             return this;
         }
 
@@ -84,15 +84,30 @@ public class CombineTermBuilder {
 
         @Override
         public FinishStep right(Expression.Term right) {
-            this.right = handlePotentialParensWrapping(right);
+            this.right = handlePotentialParensWrapping(operator, right);
             return this;
         }
 
-        private Expression.Term handlePotentialParensWrapping(Expression.Term term) {
+        private Expression.Term handlePotentialParensWrapping(Expression.Operator operator, Expression.Term term) {
             return switch(term) {
                 case Expression.ComponentTerm _, Expression.AnnotOnlyTerm _, Expression.AnnotTerm _,
                      Expression.ParenTerm _ -> term;
-                case Expression.BinaryTerm _, Expression.UnaryDivTerm _ -> wrapInParens(term);
+                case Expression.BinaryTerm binaryTerm -> {
+                    if(operator == Expression.Operator.DIV) {
+                        yield wrapInParens(binaryTerm);
+                    }
+                    else {
+                        yield term;
+                    }
+                }
+                case Expression.UnaryDivTerm unaryDivTerm -> {
+                    if(operator == Expression.Operator.DIV) {
+                        yield wrapInParens(unaryDivTerm);
+                    }
+                    else {
+                        yield term;
+                    }
+                }
             };
         }
 

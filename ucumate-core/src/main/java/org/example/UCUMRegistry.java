@@ -55,7 +55,7 @@ public class UCUMRegistry {
                  */
                 Expression.Term term = (Expression.Term) Main.visitTerm(definedUnit.value().function().unit());
                 Expression.Term extracted = new UnitExtractor().extractUnits(term);
-                PrettyPrinter pp = new PrettyPrinter(true, false, false);
+                PrettyPrinter pp = new PrettyPrinter(true, false, false, false);
                 System.out.println(pp.print(term) + " is extracted to " + pp.print(extracted));
                 yield extracted;
                 // canonicalization necessary because the UCUM definition uses a term here, which is already covered in the specialfunction.
