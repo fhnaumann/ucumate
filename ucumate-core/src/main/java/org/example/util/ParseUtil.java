@@ -5,6 +5,7 @@ import org.example.UCUMDefinition;
 import org.example.UCUMRegistry;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,6 +43,19 @@ public class ParseUtil {
         }
     }
 
+    private static Comparator<MatchResult> preferUnitsOverPrefixedUnits() {
+        return (o1, o2) -> {
+            if (o1 instanceof SuccessPrefixUnit && o2 instanceof SuccessNoPrefixUnit) {
+                return 1;
+            }
+            if (o1 instanceof SuccessNoPrefixUnit && o2 instanceof SuccessPrefixUnit) {
+                return -1;
+            } else {
+                return 0;
+            }
+        };
+    }
+
     public static MatchResult separatePrefixFromUnit(String textMaybeWithUCUMUnit, UCUMRegistry registry) {
         List<MatchResult> matchResults = IntStream.iterate(textMaybeWithUCUMUnit.length() - 1,
                                                            i -> i >= 0,
@@ -55,6 +69,7 @@ public class ParseUtil {
                                                   .toList();
         return matchResults.stream()
                            .filter(matchResult -> matchResult instanceof SuccessResult)
+                .sorted(preferUnitsOverPrefixedUnits())
                            .findFirst()
                            .orElse(new InvalidResults(matchResults.stream()
                                                                   .filter(matchResult -> matchResult instanceof FailureResult)
