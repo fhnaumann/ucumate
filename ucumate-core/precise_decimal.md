@@ -82,14 +82,14 @@ There is additional complexity when the factor is in scientific notation, especi
 
 ## Examples
 
-0 -> unlimited
-3 -> unlimited
-2.54 (ucum cf) -> unlimited
-254e-2 (ucum cf) -> unlimited
+* 0 -> unlimited
+* 3 -> unlimited
+* 2.54 (ucum cf) -> unlimited
+* 254e-2 (ucum cf) -> unlimited
 
-1.0 -> p: 2, s: 1
-1.00 -> p: 3, s: 2
-0.01 -> p: 1, s: 1
-0.0100 -> p: 3, s: 3
+* 1.0 -> p: 2, s: 1
+* 1.00 -> p: 3, s: 2
+* 0.01 -> p: 1, s: 1
+* 0.0100 -> p: 3, s: 3
 
-3.1415926535897932384626433832795028841971693993751058209749445923 (ucum def) -> p: ..., s: p-1
+* 3.1415926535897932384626433832795028841971693993751058209749445923 (ucum def) -> p: ..., s: p-1

@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.ucumate</groupId>
+    <groupId>me.fhnau.org</groupId>
     <artifactId>ucumate-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -13,8 +13,8 @@
 
     <modules>
         <module>ucumate-core</module>
-        <module>ucumate-demo</module>
         <module>ucumate-core-exact-special-math</module>
+        <module>ucum-test-utils</module>
     </modules>
 
     <dependencyManagement>
