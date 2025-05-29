@@ -5,8 +5,6 @@ import me.fhnau.org.model.UCUMExpression;
 
 public class Normalizer {
 
-    // TODO: Do actual normalization, not just unity replacing
-
     public Normalizer() {
 
     }

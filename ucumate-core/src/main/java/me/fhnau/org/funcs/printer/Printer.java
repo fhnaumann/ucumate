@@ -3,10 +3,30 @@ package me.fhnau.org.funcs.printer;
 import me.fhnau.org.UCUMDefinition;
 import me.fhnau.org.model.UCUMExpression;
 
+/**
+ * Provides methods to print the UCUMExpression model (and its subclasses) to a string representation.
+ * <br>
+ * You can extend this class to create your own printer implementation.
+ */
 public abstract class Printer {
 
+    /**
+     * The different print types.
+     */
     public enum PrintType {
-        UCUM_SYNTAX, EXPRESSIVE_UCUM_SYNTAX, WOLFRAM_ALPHA_SYNTAX
+        /**
+         * Produces valid UCUM syntax strings.
+         */
+        UCUM_SYNTAX,
+        /**
+         * Produces more detailed strings in the spirit of the UCUM syntax. But the strings are not valid UCUM syntax.
+         */
+        EXPRESSIVE_UCUM_SYNTAX,
+        /**
+         * Produces strings in the common math notation. Should be used when the term is used with a another tool that
+         * does not use the UCUM syntax. I.e. it can be used to directly paste into WolframAlpha for term canonicalization.
+         */
+        WOLFRAM_ALPHA_SYNTAX
     }
 
     public String print(UCUMExpression UCUMExpression) {

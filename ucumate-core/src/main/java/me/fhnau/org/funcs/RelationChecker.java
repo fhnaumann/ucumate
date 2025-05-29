@@ -43,12 +43,42 @@ public class RelationChecker {
         return term1.equals(term2);
     }
 
+    /**
+     * Contains information about the relation check.
+     */
     public sealed interface RelationResult {}
+
+    /**
+     * The relation check succeeded and did not result in a failure. The subclasses provide more details.
+     */
     sealed interface Success extends RelationResult {}
+
+    /**
+     * The two given terms are (semantically) equal.
+     * @param strictEqual True if the two terms are exactly identical (same brackets, etc.), false otherwise.
+     * @param equalAfterProcessing True if the two terms are equal in their canonical form (normalized, only multiplication and exponents), false otherwise.
+     */
     record IsEqual(boolean strictEqual, boolean equalAfterProcessing) implements Success {}
     //record IsEqual() implements Success {}
+
+    /**
+     * The two given terms are not equal. Information about the commensurability is found here and in the subclasses.
+     */
     public sealed interface CommensurableResult extends Success {}
+
+    /**
+     * The two terms are commensurable. This is the case if they share the same base dimensions and exponents.
+     */
     public record IsCommensurable() implements CommensurableResult {}
+
+    /**
+     * The two terms are not commensurable. This is the case if they don't share the same base dimensions and exponents.
+     * @param diff A map containing the difference between the two terms dimensions and exponents.
+     */
     public record NotCommensurable(Map<Dimension, Integer> diff) implements CommensurableResult {}
+
+    /**
+     * The relation check failed. This can happen when the canonicalization failed.
+     */
     public record Failure() implements RelationResult {}
 }

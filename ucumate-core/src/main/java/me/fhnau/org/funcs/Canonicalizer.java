@@ -125,124 +125,6 @@ public class Canonicalizer {
             );
     }
 
-
-    /*
-    private class CanonicalStepIgnore {
-        private static enum Area {
-            MAIN_LEVEL, NESTED_LEVEL
-        }
-
-        private PreciseDecimal cFPrefix;
-        private PreciseDecimal magnitude;
-        /*
-        By default, every conversion factor is combined in magnitude.
-        As soon as a special unit is encountered, the current magnitude is written into cFPrefix,
-        the "def" of the special unit is written into magnitude, and any subsequent conversion factors
-        write into cFPrefix instead.
-        This structure should work because if a special unit is present that means that all other components
-        in this term can only be integer units or prefixes for said special unit. And they can only be multiplied, no division.
-
-        Examples:
-        "5.cm"
-        1) 5 is written into magnitude
-        2) c=0.01 is written into magnitude. magnitude=5*0.01=0.05
-        3) No special unit encountered, magnitude=0.05 and cFPrefix=1
-
-        "5.k[degF]"
-        1) 5 is written into magnitude
-        2) k=1000 is written into magnitude. magnitude=5*1000=5000
-        3) [degF] encountered, move magnitude. magnitude=1, cFPrefix=5000
-        4) Definition from [degF] into magnitude. magnitude=5/9, cFPrefix=5000
-
-        "5.k[degF].7.2"
-        1) 5 is written into magnitude
-        2) k=1000 is written into magnitude. magnitude=5*1000=5000
-        3) [degF] encountered, move magnitude. magnitude=1, cFPrefix=5000
-        4) Definition from [degF] into magnitude. magnitude=5/9, cFPrefix=5000
-        5) 7 is written into cFPrefix. magnitude=5/9, cFPrefix=7*5000=35000
-        6) 2 is written into cFPrefix. magnitude=5/9 cFPrefix=2*35000=70000
-
-        private boolean writeToMagnitude = true;
-        private SpecialUnitsFunctionProvider.ConversionFunction specialFunction;
-        private Term term;
-
-        private List<PreciseDecimal> cfPrefixFactors = new ArrayList<>();
-        private List<PreciseDecimal> magnitudeFactors = new ArrayList<>();
-
-        public CanonicalStep(PreciseDecimal cFPrefix, PreciseDecimal magnitude, Term term) {
-            this.cFPrefix = cFPrefix;
-            this.magnitude = magnitude;
-            this.term = term;
-        }
-
-        public CanonicalStep multiplyValue(PreciseDecimal preciseDecimal) {
-            if(writeToMagnitude) {
-                magnitudeFactors.add(magnitude);
-                magnitude = preciseDecimal.multiply(magnitude);
-            }
-            else {
-                cfPrefixFactors.add(cFPrefix);
-                cFPrefix = preciseDecimal.multiply(cFPrefix);
-            }
-            return this;
-        }
-
-        public CanonicalStep divideValue(PreciseDecimal preciseDecimal) {
-            if(writeToMagnitude) {
-                magnitude = magnitude.divide(preciseDecimal);
-            }
-            else {
-                cFPrefix = cFPrefix.divide(preciseDecimal);
-            }
-            return this;
-        }
-
-        public CanonicalStep powValue(int exponent) {
-            if(writeToMagnitude) {
-                magnitude = magnitude.pow(exponent);
-            }
-            else {
-               cFPrefix = cFPrefix.pow(exponent);
-            }
-            return this;
-        }
-
-        public PreciseDecimal getValue() {
-            if(writeToMagnitude) {
-                return magnitude;
-            }
-            else {
-                return cFPrefix;
-            }
-        }
-
-        public Term getTerm() {
-            return term;
-        }
-
-        public CanonicalStep setTerm(Term term) {
-            this.term = term;
-            return this;
-        }
-
-        public CanonicalStep setWriteToMagnitudeAndSwap(boolean writeToMagnitude) {
-            if(!writeToMagnitude) {
-                PreciseDecimal tmp = this.magnitude;
-                this.magnitude = this.cFPrefix;
-                this.cFPrefix = tmp;
-            }
-            this.writeToMagnitude = writeToMagnitude;
-            return this;
-        }
-
-        public CanonicalStep setSpecialFunction(SpecialUnitsFunctionProvider.ConversionFunction specialFunction) {
-            this.specialFunction = specialFunction;
-            return this;
-        }
-    }
-
-    */
-
     public enum UnitDirection {
         FROM, TO
     }
@@ -543,13 +425,29 @@ public class Canonicalizer {
         }
     }
 
+    /**
+     * Contains information about the canonicalization.
+     */
     public sealed interface CanonicalizationResult {}
 
+    /**
+     * Represents a failed canonicalization. The subclasses provide more details.
+     */
     public sealed interface FailedCanonicalization extends CanonicalizationResult {}
 
+    /**
+     * The canonicalization was successful.
+     * @param magnitude The conversion factor that was created during the canonicalization.
+     * @param canonicalTerm The canonical form of the given input term.
+     */
     public record Success(PreciseDecimal magnitude, CanonicalTerm canonicalTerm) implements
         CanonicalizationResult {}
 
+    /**
+     * The canonicalization failed because the input term contains an arbitrary unit. Arbitrary units cannot be
+     * converted to or from anything.
+     * @param arbitraryUnit The arbitrary unit that was encountered and caused the failure.
+     */
     public record TermHasArbitraryUnit(ArbitraryUnit arbitraryUnit) implements
         FailedCanonicalization {}
 

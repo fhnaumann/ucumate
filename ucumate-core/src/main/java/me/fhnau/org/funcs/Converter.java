@@ -108,10 +108,34 @@ public class Converter {
 
  */
 
+    /**
+     * Contains information about the conversion.
+     */
     public sealed interface ConversionResult {}
+
+    /**
+     * Represents a failed conversion. The subclasses provide more details.
+     */
     public sealed interface FailedConversion extends ConversionResult {}
 
+    /**
+     * The conversion was successful.
+     * @param conversionFactor The resulting conversion factor. I.e. <code>x</code> in <code>factor * from = x * to</code>.
+     */
     public record Success(PreciseDecimal conversionFactor) implements ConversionResult {}
+
+    /**
+     * The conversion failed because the two terms don't share the same base dimensions.
+     * <br>
+     * I.e. if <code>from='m'</code> and <code>to='s'</code> then they can't be converted because they are in different dimensions.
+     * @param failure More details about the dimension failure.
+     */
     public record BaseDimensionMismatch(DimensionAnalyzer.Failure failure) implements FailedConversion {}
+
+    /**
+     * The conversion failed because one or both terms failed the canonicalization.
+     * So far this may only occur when a term contains an arbitrary unit.
+     * @param failedCanonicalization More details about the canonicalization failure.
+     */
     public record FailedCanonicalization(Canonicalizer.FailedCanonicalization failedCanonicalization) implements FailedConversion {}
 }
