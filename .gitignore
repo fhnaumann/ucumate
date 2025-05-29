@@ -32,6 +32,11 @@ build/
 !**/src/test/**/build/
 
 /ucumate-core-exact-special-math/target
+/ucumate-demo/target
+/ucumate-demo/frontend/.idea
+/ucumate-demo/frontend/.vscode
+/ucumate-demo/frontend/node_modules
+
 
 ### VS Code ###
 .vscode/

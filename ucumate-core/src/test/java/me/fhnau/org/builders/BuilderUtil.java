@@ -1,6 +1,6 @@
 package me.fhnau.org.builders;
 
-import me.fhnau.org.UCUMDefinition;
+import me.fhnau.org.model.UCUMDefinition;
 import me.fhnau.org.model.UCUMExpression;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.groups.Tuple;

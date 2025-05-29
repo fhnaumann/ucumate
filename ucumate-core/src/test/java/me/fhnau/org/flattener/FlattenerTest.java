@@ -5,7 +5,7 @@ import me.fhnau.org.builders.CombineTermBuilder;
 import me.fhnau.org.builders.SoloTermBuilder;
 import me.fhnau.org.funcs.Canonicalizer;
 import me.fhnau.org.funcs.Flattener;
-import me.fhnau.org.funcs.PrettyPrinter;
+import me.fhnau.org.funcs.printer.PrettyPrinter;
 import me.fhnau.org.model.UCUMExpression;
 import org.junit.jupiter.api.Test;
 
@@ -24,11 +24,9 @@ public class FlattenerTest {
         List<Map. Entry<UCUMExpression.CanonicalUnit, Integer>> map = Flattener.flatten(Main.visitCanonicalTerm(in));
         System.out.println(map);
         UCUMExpression.CanonicalTerm test = Flattener.buildFlatProduct(map);
-        System.out.println(PrettyPrinter.defaultPrettyPrinter(test));
         //Expression.CanonicalTerm inTerm = Main.visitCanonicalTerm(in);
         var inTerm = CombineTermBuilder.builder().left(SoloTermBuilder.builder().withIntegerUnit(10).noExpNoAnnot().asTerm().build()).divideBy().right(SoloTermBuilder.builder().withIntegerUnit(5).noExpNoAnnot().asTerm().build()).buildCanonical();
         var tmp = Flattener.flattenAndCancel(inTerm);
-        System.out.println(PrettyPrinter.defaultPrettyPrinter(tmp));
     }
 
     @Test
@@ -36,7 +34,6 @@ public class FlattenerTest {
         UCUMExpression.Term inTerm = CombineTermBuilder.builder().left(SoloTermBuilder.builder().withoutPrefix(newton).noExpNoAnnot().asTerm().build()).multiplyWith().right(meter_term()).build();
         UCUMExpression.CanonicalTerm canonicalTerm = ((Canonicalizer.Success) new Canonicalizer().canonicalize(inTerm)).canonicalTerm();
         var tmp = Flattener.flattenAndCancel(canonicalTerm);
-        System.out.println(PrettyPrinter.defaultPrettyPrinter(tmp));
     }
 
     @Test

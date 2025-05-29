@@ -1,6 +1,6 @@
 package me.fhnau.org.funcs.printer;
 
-import me.fhnau.org.UCUMDefinition;
+import me.fhnau.org.model.UCUMDefinition;
 
 public class ExpressiveUCUMSyntaxPrinter extends Printer {
 

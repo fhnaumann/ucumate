@@ -1,6 +1,5 @@
-package me.fhnau.org;
+package me.fhnau.org.funcs;
 
-import me.fhnau.org.funcs.*;
 import me.fhnau.org.funcs.Canonicalizer.CanonicalizationResult;
 import me.fhnau.org.funcs.Converter.Conversion;
 import me.fhnau.org.funcs.Converter.ConversionResult;

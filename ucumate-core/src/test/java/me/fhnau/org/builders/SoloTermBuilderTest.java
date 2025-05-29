@@ -1,6 +1,6 @@
 package me.fhnau.org.builders;
 
-import me.fhnau.org.UCUMDefinition;
+import me.fhnau.org.model.UCUMDefinition;
 import me.fhnau.org.model.UCUMExpression;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

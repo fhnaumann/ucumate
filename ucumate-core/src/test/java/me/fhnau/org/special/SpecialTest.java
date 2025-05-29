@@ -1,6 +1,6 @@
 package me.fhnau.org.special;
 
-import me.fhnau.org.UCUMService;
+import me.fhnau.org.funcs.UCUMService;
 import me.fhnau.org.funcs.Converter;
 import me.fhnau.org.util.PreciseDecimal;
 import org.junit.jupiter.api.BeforeEach;

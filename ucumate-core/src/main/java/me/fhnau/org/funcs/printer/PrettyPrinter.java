@@ -2,7 +2,7 @@ package me.fhnau.org.funcs.printer;
 
 import me.fhnau.org.model.UCUMExpression;
 
-public class PrettyPrinter2 extends Printer {
+public class PrettyPrinter extends Printer {
 
     @Override
     protected String printOperator(UCUMExpression.Operator operator) {

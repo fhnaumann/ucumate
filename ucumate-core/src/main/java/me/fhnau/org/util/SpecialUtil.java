@@ -1,6 +1,6 @@
 package me.fhnau.org.util;
 
-import me.fhnau.org.UCUMDefinition;
+import me.fhnau.org.model.UCUMDefinition;
 import me.fhnau.org.model.UCUMExpression;
 
 public class SpecialUtil {

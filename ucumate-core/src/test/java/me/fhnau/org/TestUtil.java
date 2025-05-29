@@ -5,8 +5,10 @@ import me.fhnau.org.funcs.Canonicalizer;
 import me.fhnau.org.funcs.Validator;
 import me.fhnau.org.funcs.printer.UCUMSyntaxPrinter;
 import me.fhnau.org.funcs.printer.WolframAlphaSyntaxPrinter;
+import me.fhnau.org.model.UCUMDefinition;
 import me.fhnau.org.model.UCUMExpression;
 import me.fhnau.org.util.PreciseDecimal;
+import me.fhnau.org.util.UCUMRegistry;
 
 public class TestUtil {
 

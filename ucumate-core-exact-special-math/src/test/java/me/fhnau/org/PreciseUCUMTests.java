@@ -1,9 +1,6 @@
 package me.fhnau.org;
 
-import me.fhnau.org.funcs.Canonicalizer;
-import me.fhnau.org.funcs.Converter;
-import me.fhnau.org.funcs.RelationChecker;
-import me.fhnau.org.funcs.Validator;
+import me.fhnau.org.funcs.*;
 import me.fhnau.org.model.UCUMExpression;
 import me.fhnau.org.model.special.SpecialUnits;
 import me.fhnau.org.util.PreciseDecimal;

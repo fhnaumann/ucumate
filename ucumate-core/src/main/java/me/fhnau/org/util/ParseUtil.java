@@ -1,7 +1,6 @@
 package me.fhnau.org.util;
 
-import me.fhnau.org.UCUMDefinition;
-import me.fhnau.org.UCUMRegistry;
+import me.fhnau.org.model.UCUMDefinition;
 import me.fhnau.org.funcs.Validator.ParserException;
 import org.antlr.v4.runtime.tree.ParseTree;
 

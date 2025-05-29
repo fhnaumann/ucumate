@@ -1,6 +1,8 @@
-package me.fhnau.org;
+package me.fhnau.org.util;
 
-import me.fhnau.org.funcs.PrettyPrinter;
+import me.fhnau.org.Main;
+import me.fhnau.org.model.UCUMDefinition;
+import me.fhnau.org.funcs.printer.PrettyPrinter;
 import me.fhnau.org.model.UCUMExpression;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -54,7 +56,7 @@ public class UCUMRegistry {
                  */
                 UCUMExpression.Term term = (UCUMExpression.Term) Main.visitTerm(definedUnit.value().function().unit());
                 //UCUMExpression.Term extracted = new UnitExtractor().extractUnits(term);
-                PrettyPrinter pp = new PrettyPrinter(true, false, false, false);
+                PrettyPrinter pp = new PrettyPrinter();
                 //System.out.println(pp.print(term) + " is extracted to " + pp.print(extracted));
                 yield term;
                 // canonicalization necessary because the UCUM definition uses a term here, which is already covered in the specialfunction.
@@ -139,7 +141,6 @@ public class UCUMRegistry {
 
     private static UCUMRegistry loadFromUCUMEssence(InputStream ucumEssenceXML) {
         try {
-            System.out.println(ucumEssenceXML);
             // Setting the flag in the module is necessary
             // https://github.com/FasterXML/jackson-dataformat-xml/issues/219#issuecomment-286003056
             JacksonXmlModule module = new JacksonXmlModule();

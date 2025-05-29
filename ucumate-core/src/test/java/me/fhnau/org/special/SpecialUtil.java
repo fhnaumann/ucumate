@@ -1,6 +1,6 @@
 package me.fhnau.org.special;
 
-import me.fhnau.org.UCUMDefinition;
+import me.fhnau.org.model.UCUMDefinition;
 import me.fhnau.org.builders.CombineTermBuilder;
 import me.fhnau.org.builders.SoloTermBuilder;
 import me.fhnau.org.funcs.Converter;

@@ -1,6 +1,7 @@
 package me.fhnau.org.functionaltests;
 
-import me.fhnau.org.UCUMRegistry;
+import me.fhnau.org.TestCaseLoader;
+import me.fhnau.org.util.UCUMRegistry;
 import me.fhnau.org.funcs.Converter;
 import me.fhnau.org.funcs.Validator;
 import me.fhnau.org.model.UCUMExpression;
@@ -140,8 +141,7 @@ public class UCUMFunctionalTests {
 
     public static Stream<Arguments> getTestXMLElements() throws IOException, ParserConfigurationException, SAXException {
         List<Arguments> elements = new ArrayList<>();
-        String tests = "src/test/resources/UcumFunctionalTests.xml";
-        Document doc = XmlUtils.parseDOM(new FileInputStream(tests));
+        Document doc = XmlUtils.parseDOM(TestCaseLoader.loadGrahamFunctionalTests());
         Element element = doc.getDocumentElement();
 
         if (!element.getNodeName().equals("ucumTests"))

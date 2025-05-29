@@ -1,7 +1,7 @@
 package me.fhnau.org.funcs;
 
-import me.fhnau.org.UCUMDefinition.*;
-import me.fhnau.org.UCUMRegistry;
+import me.fhnau.org.model.UCUMDefinition.*;
+import me.fhnau.org.util.UCUMRegistry;
 import me.fhnau.org.builders.CombineTermBuilder;
 import me.fhnau.org.builders.SoloTermBuilder;
 import me.fhnau.org.funcs.Validator.Failure;

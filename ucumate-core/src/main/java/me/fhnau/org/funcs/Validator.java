@@ -1,9 +1,8 @@
 package me.fhnau.org.funcs;
 
-import me.fhnau.org.MyUCUMVisitor;
-import me.fhnau.org.MyUCUMVisitor.SpecialCheckResult;
-import me.fhnau.org.UCUMDefinition.UCUMUnit;
-import me.fhnau.org.UCUMRegistry;
+import me.fhnau.org.model.UCUMSyntaxVisitor;
+import me.fhnau.org.model.UCUMDefinition.UCUMUnit;
+import me.fhnau.org.util.UCUMRegistry;
 import me.fhnau.org.builders.SoloTermBuilder;
 import me.fhnau.org.model.UCUMExpression;
 import me.fhnau.org.model.UCUMExpression.Term;
@@ -51,7 +50,7 @@ public class Validator {
         }
         try {
             Term term = validateImpl(input);
-            SpecialCheckResult specialCheckResult = MyUCUMVisitor.checkForSpecialUnitInTerm(term, new SpecialCheckResult(false, false,false));
+            SpecialChecker.SpecialCheckResult specialCheckResult = SpecialChecker.checkForSpecialUnitInTerm(term, new SpecialChecker.SpecialCheckResult(false, false,false));
             ValidationResult result = specialCheckResult.isValid() ? new Success(term) : new Failure();
             cache.put(input, result);
             return result;
@@ -82,7 +81,7 @@ public class Validator {
             }
         });
         ParseTree tree = parser.mainTerm();
-        MyUCUMVisitor visitor = new MyUCUMVisitor(UCUMRegistry.getInstance());
+        UCUMSyntaxVisitor visitor = new UCUMSyntaxVisitor(UCUMRegistry.getInstance());
         UCUMExpression.Term term = (UCUMExpression.Term) visitor.visit(tree);
         return term;
     }

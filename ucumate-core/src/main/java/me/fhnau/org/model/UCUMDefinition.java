@@ -1,4 +1,4 @@
-package me.fhnau.org;
+package me.fhnau.org.model;
 
 import me.fhnau.org.adapters.PreciseDecimalAdapter;
 import me.fhnau.org.adapters.UCUMUnitAdapter;

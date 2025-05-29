@@ -1,7 +1,6 @@
 package me.fhnau.org.model;
 
 
-import me.fhnau.org.UCUMDefinition;
 import me.fhnau.org.util.PreciseDecimal;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.jetbrains.annotations.NotNull;

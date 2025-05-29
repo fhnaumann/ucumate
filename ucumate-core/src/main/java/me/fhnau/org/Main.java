@@ -2,8 +2,10 @@ package me.fhnau.org;
 
 import me.fhnau.org.funcs.Canonicalizer;
 import me.fhnau.org.funcs.Converter;
+import me.fhnau.org.model.UCUMSyntaxVisitor;
 import me.fhnau.org.model.UCUMExpression;
 import me.fhnau.org.util.PreciseDecimal;
+import me.fhnau.org.util.UCUMRegistry;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -17,7 +19,7 @@ public class Main {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         NewUCUMParser parser = new NewUCUMParser(tokens);
         ParseTree tree = parser.mainTerm();
-        MyUCUMVisitor visitor = new MyUCUMVisitor(UCUMRegistry.getInstance());
+        UCUMSyntaxVisitor visitor = new UCUMSyntaxVisitor(UCUMRegistry.getInstance());
 
         return visitor.visit(tree);
     }
