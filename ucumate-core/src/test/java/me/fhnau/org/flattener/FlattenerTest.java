@@ -21,7 +21,7 @@ public class FlattenerTest {
     public void test() {
 
         String in = "10/5";
-        List<Map. Entry<UCUMExpression.CanonicalUnit, Integer>> map = Flattener.flatten(Main.visitCanonicalTerm(in));
+        List<Map. Entry<UCUMExpression.CanonicalUnit, Integer>> map = Flattener.flatten(parse_canonical(in));
         System.out.println(map);
         UCUMExpression.CanonicalTerm test = Flattener.buildFlatProduct(map);
         //Expression.CanonicalTerm inTerm = Main.visitCanonicalTerm(in);

@@ -1,6 +1,8 @@
 package me.fhnau.org.util;
 
 import me.fhnau.org.Main;
+import me.fhnau.org.funcs.UCUMService;
+import me.fhnau.org.funcs.Validator;
 import me.fhnau.org.model.UCUMDefinition;
 import me.fhnau.org.funcs.printer.PrettyPrinter;
 import me.fhnau.org.model.UCUMExpression;
@@ -54,7 +56,7 @@ public class UCUMRegistry {
                 Fahrenheit is defined as "K/9" -> Only keep "K" because the "/9" is already accounted for manually in the conversion
 
                  */
-                UCUMExpression.Term term = (UCUMExpression.Term) Main.visitTerm(definedUnit.value().function().unit());
+                UCUMExpression.Term term = ((Validator.Success) UCUMService.validate(definedUnit.value().function().unit())).term();
                 //UCUMExpression.Term extracted = new UnitExtractor().extractUnits(term);
                 PrettyPrinter pp = new PrettyPrinter();
                 //System.out.println(pp.print(term) + " is extracted to " + pp.print(extracted));
@@ -77,7 +79,7 @@ public class UCUMRegistry {
     }
 
     private UCUMExpression.Term handleCommon(UCUMDefinition.DefinedUnit definedUnit) {
-        return (UCUMExpression.Term) Main.visitTerm(definedUnit.value().unit());
+        return ((Validator.Success) UCUMService.validate(definedUnit.value().unit())).term();
     }
 
     public Optional<UCUMDefinition.UCUMUnit> getUCUMUnit(String unit) {

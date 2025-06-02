@@ -1,5 +1,9 @@
 package me.fhnau.org.funcs;
 
+import me.fhnau.org.NewUCUMBaseVisitor;
+import me.fhnau.org.NewUCUMLexer;
+import me.fhnau.org.NewUCUMParser;
+import me.fhnau.org.model.CanonicalUCUMSyntaxVisitor;
 import me.fhnau.org.model.UCUMSyntaxVisitor;
 import me.fhnau.org.model.UCUMDefinition.UCUMUnit;
 import me.fhnau.org.util.UCUMRegistry;
@@ -11,8 +15,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.example.NewUCUMLexer;
-import org.example.NewUCUMParser;
 
 import java.util.Optional;
 
@@ -38,6 +40,15 @@ public class Validator {
         public ParserException(ParseUtil.InvalidResults invalidResults) {}
     }
 
+    /**
+     * Internal use only!
+     * @param input The string input that is definitely in a canonical form
+     * @return The parsed canonical term, avoiding expensive calls to {@link Canonicalizer}.
+     */
+    public static UCUMExpression.CanonicalTerm parseCanonical(String input) {
+        return (UCUMExpression.CanonicalTerm) validateImpl(input, new CanonicalUCUMSyntaxVisitor(UCUMRegistry.getInstance()));
+    }
+
     public static ValidationResult validate(String input) {
         ValidationResult cached = cache.getIfPresent(input);
         if(cached != null) {
@@ -49,7 +60,7 @@ public class Validator {
             return new Success(SoloTermBuilder.builder().withoutPrefix(optionalUCUMUnit.get()).noExpNoAnnot().asTerm().build());
         }
         try {
-            Term term = validateImpl(input);
+            Term term = validateImpl(input, new UCUMSyntaxVisitor(UCUMRegistry.getInstance()));
             SpecialChecker.SpecialCheckResult specialCheckResult = SpecialChecker.checkForSpecialUnitInTerm(term, new SpecialChecker.SpecialCheckResult(false, false,false));
             ValidationResult result = specialCheckResult.isValid() ? new Success(term) : new Failure();
             cache.put(input, result);
@@ -61,7 +72,7 @@ public class Validator {
         }
     }
 
-    private static Term validateImpl(String input) {
+    private static Term validateImpl(String input, NewUCUMBaseVisitor<UCUMExpression> visitor) {
         NewUCUMLexer lexer = new NewUCUMLexer(CharStreams.fromString(input));
         lexer.removeErrorListeners();
         lexer.addErrorListener(new BaseErrorListener() {
@@ -81,7 +92,6 @@ public class Validator {
             }
         });
         ParseTree tree = parser.mainTerm();
-        UCUMSyntaxVisitor visitor = new UCUMSyntaxVisitor(UCUMRegistry.getInstance());
         UCUMExpression.Term term = (UCUMExpression.Term) visitor.visit(tree);
         return term;
     }

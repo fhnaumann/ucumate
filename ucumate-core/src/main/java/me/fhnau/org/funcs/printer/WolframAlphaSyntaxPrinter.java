@@ -14,7 +14,14 @@ public class WolframAlphaSyntaxPrinter extends Printer {
 
     @Override
     protected String printComponentExponent(UCUMExpression.ComponentExponent componentExponent) {
-        return "(%s^%s)".formatted(print(componentExponent.unit()), print(componentExponent.exponent()));
+        int exp = componentExponent.exponent().exponent();
+        String unitString = print(componentExponent.unit());
+        String expString = print(componentExponent.exponent());
+        if(exp < 0) {
+            expString = "(-%s)".formatted(expString);
+        }
+        String s = unitString.endsWith("^") ? "%s%s".formatted(unitString, expString) : "%s^%s".formatted(unitString, expString); // Printing the unit "10^" would otherwise lead to "10^^5"
+        return s;
     }
 
     @Override
@@ -28,6 +35,6 @@ public class WolframAlphaSyntaxPrinter extends Printer {
             rightBrackets = true;
             //return "(%s%s%s)".formatted(print(binaryTerm.left()), print(binaryTerm.operator()), print(rightBinaryTerm));
         }
-        return "(" + super.printBinaryTerm(binaryTerm) + ")";
+        return super.printBinaryTerm(binaryTerm);
     }
 }

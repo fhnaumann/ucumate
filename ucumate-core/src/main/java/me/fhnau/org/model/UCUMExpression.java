@@ -3,7 +3,6 @@ package me.fhnau.org.model;
 
 import me.fhnau.org.util.PreciseDecimal;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.jetbrains.annotations.NotNull;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.CLASS,
@@ -24,15 +23,15 @@ public sealed interface UCUMExpression permits UCUMExpression.Operator, UCUMExpr
     sealed interface MixedUnit extends MixedUCUMExpression, Unit {}
 
     sealed interface SimpleUnit extends Unit {
-        @NotNull UCUMDefinition.UCUMUnit ucumUnit();
+        UCUMDefinition.UCUMUnit ucumUnit();
     }
     sealed interface CanonicalSimpleUnit extends CanonicalUnit, SimpleUnit {
         @Override
-        @NotNull UCUMDefinition.BaseUnit ucumUnit();
+        UCUMDefinition.BaseUnit ucumUnit();
     }
     sealed interface MixedSimpleUnit extends MixedUnit, SimpleUnit {}
     sealed interface PrefixSimpleUnit extends SimpleUnit {
-        @NotNull UCUMDefinition.UCUMPrefix prefix();
+        UCUMDefinition.UCUMPrefix prefix();
     }
     sealed interface NoPrefixSimpleUnit extends SimpleUnit {}
 
@@ -42,10 +41,10 @@ public sealed interface UCUMExpression permits UCUMExpression.Operator, UCUMExpr
         }
     }
 
-    record CanonicalPrefixSimpleUnit(@NotNull UCUMDefinition.UCUMPrefix prefix, @NotNull UCUMDefinition.BaseUnit ucumUnit) implements CanonicalSimpleUnit, PrefixSimpleUnit {}
-    record CanonicalNoPrefixSimpleUnit(@NotNull UCUMDefinition.BaseUnit ucumUnit) implements CanonicalSimpleUnit, NoPrefixSimpleUnit {}
-    record MixedPrefixSimpleUnit(@NotNull UCUMDefinition.UCUMPrefix prefix, @NotNull UCUMDefinition.UCUMUnit ucumUnit) implements MixedSimpleUnit, PrefixSimpleUnit {}
-    record MixedNoPrefixSimpleUnit(@NotNull UCUMDefinition.UCUMUnit ucumUnit) implements MixedSimpleUnit, NoPrefixSimpleUnit {}
+    record CanonicalPrefixSimpleUnit(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.BaseUnit ucumUnit) implements CanonicalSimpleUnit, PrefixSimpleUnit {}
+    record CanonicalNoPrefixSimpleUnit(UCUMDefinition.BaseUnit ucumUnit) implements CanonicalSimpleUnit, NoPrefixSimpleUnit {}
+    record MixedPrefixSimpleUnit(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.UCUMUnit ucumUnit) implements MixedSimpleUnit, PrefixSimpleUnit {}
+    record MixedNoPrefixSimpleUnit(UCUMDefinition.UCUMUnit ucumUnit) implements MixedSimpleUnit, NoPrefixSimpleUnit {}
 
     /*
     Component Definitions
@@ -67,10 +66,10 @@ public sealed interface UCUMExpression permits UCUMExpression.Operator, UCUMExpr
 
     record Exponent(int exponent) implements UCUMExpression {}
 
-    record CanonicalComponentExponent(@NotNull CanonicalUnit unit, @NotNull Exponent exponent) implements CanonicalComponent, ComponentExponent {}
-    record CanonicalComponentNoExponent(@NotNull CanonicalUnit unit) implements CanonicalComponent, ComponentNoExponent {}
-    record MixedComponentExponent(@NotNull Unit unit, @NotNull Exponent exponent) implements MixedComponent, ComponentExponent {}
-    record MixedComponentNoExponent(@NotNull Unit unit) implements MixedComponent, ComponentNoExponent {}
+    record CanonicalComponentExponent(CanonicalUnit unit, Exponent exponent) implements CanonicalComponent, ComponentExponent {}
+    record CanonicalComponentNoExponent(CanonicalUnit unit) implements CanonicalComponent, ComponentNoExponent {}
+    record MixedComponentExponent(Unit unit, Exponent exponent) implements MixedComponent, ComponentExponent {}
+    record MixedComponentNoExponent(Unit unit) implements MixedComponent, ComponentNoExponent {}
 
     /*
     Term Definitions
@@ -81,41 +80,41 @@ public sealed interface UCUMExpression permits UCUMExpression.Operator, UCUMExpr
     sealed interface MixedTerm extends MixedUCUMExpression, Term {}
 
     sealed interface ComponentTerm extends Term {
-        @NotNull Component component();
+        Component component();
     }
     sealed interface AnnotTerm extends Term {
-        @NotNull Term term();
-        @NotNull Annotation annotation();
+        Term term();
+        Annotation annotation();
     }
     sealed interface ParenTerm extends Term {
-        @NotNull Term term();
+        Term term();
     }
     sealed interface BinaryTerm extends Term {
-        @NotNull Term left();
-        @NotNull Operator operator();
-        @NotNull Term right();
+        Term left();
+        Operator operator();
+        Term right();
     }
     sealed interface UnaryDivTerm extends Term {
-        @NotNull Term term();
+        Term term();
         default Operator operator() {
             return Operator.DIV;
         }
     }
 
-    record Annotation(@NotNull String annotation) implements UCUMExpression {}
+    record Annotation(String annotation) implements UCUMExpression {}
 
-    record AnnotOnlyTerm(@NotNull Annotation annotation) implements CanonicalTerm, MixedTerm {}
+    record AnnotOnlyTerm(Annotation annotation) implements CanonicalTerm, MixedTerm {}
 
-    record CanonicalComponentTerm(@NotNull CanonicalComponent component) implements CanonicalTerm, ComponentTerm {}
-    record CanonicalAnnotTerm(@NotNull CanonicalTerm term, @NotNull Annotation annotation) implements CanonicalTerm, AnnotTerm {}
-    record CanonicalParenTerm(@NotNull CanonicalTerm term) implements CanonicalTerm, ParenTerm {}
-    record CanonicalBinaryTerm(@NotNull CanonicalTerm left, @NotNull Operator operator,@NotNull CanonicalTerm right) implements CanonicalTerm, BinaryTerm {}
-    record CanonicalUnaryDivTerm(@NotNull CanonicalTerm term) implements CanonicalTerm, UnaryDivTerm {}
-    record MixedComponentTerm(@NotNull Component component) implements MixedTerm, ComponentTerm {}
-    record MixedAnnotTerm(@NotNull Term term, @NotNull Annotation annotation) implements MixedTerm, AnnotTerm {}
-    record MixedParenTerm(@NotNull Term term) implements MixedTerm, ParenTerm {}
-    record MixedBinaryTerm(@NotNull Term left, @NotNull Operator operator, @NotNull Term right) implements MixedTerm, BinaryTerm {}
-    record MixedUnaryDivTerm(@NotNull Term term) implements MixedTerm, UnaryDivTerm {}
+    record CanonicalComponentTerm(CanonicalComponent component) implements CanonicalTerm, ComponentTerm {}
+    record CanonicalAnnotTerm(CanonicalTerm term, Annotation annotation) implements CanonicalTerm, AnnotTerm {}
+    record CanonicalParenTerm(CanonicalTerm term) implements CanonicalTerm, ParenTerm {}
+    record CanonicalBinaryTerm(CanonicalTerm left, Operator operator,CanonicalTerm right) implements CanonicalTerm, BinaryTerm {}
+    record CanonicalUnaryDivTerm(CanonicalTerm term) implements CanonicalTerm, UnaryDivTerm {}
+    record MixedComponentTerm(Component component) implements MixedTerm, ComponentTerm {}
+    record MixedAnnotTerm(Term term, Annotation annotation) implements MixedTerm, AnnotTerm {}
+    record MixedParenTerm(Term term) implements MixedTerm, ParenTerm {}
+    record MixedBinaryTerm(Term left, Operator operator, Term right) implements MixedTerm, BinaryTerm {}
+    record MixedUnaryDivTerm(Term term) implements MixedTerm, UnaryDivTerm {}
 
     enum Operator implements UCUMExpression {
         MUL, DIV

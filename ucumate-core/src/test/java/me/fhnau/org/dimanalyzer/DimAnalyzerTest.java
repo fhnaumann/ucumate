@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static me.fhnau.org.TestUtil.parse_canonical;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DimAnalyzerTest {
@@ -16,8 +17,8 @@ public class DimAnalyzerTest {
     public void test() {
         //Expression.Term term = CombineTermBuilder.builder().left(meter_term()).divideBy().right(CombineTermBuilder.builder().left(meter_term()).multiplyWith().right(second_term()).build()).build();
         //Expression.Term term = CombineTermBuilder.builder().left(CombineTermBuilder.builder().left(meter_term()).divideBy().right(second_term()).build()).divideBy().right(gram_term()).build();
-        Map<Dimension, Integer> result = DimensionAnalyzer.analyze(Main.visitCanonicalTerm("s/4/m"));
-        Map<Dimension, Integer> result2 = DimensionAnalyzer.analyze(Main.visitCanonicalTerm("s/m"));
+        Map<Dimension, Integer> result = DimensionAnalyzer.analyze(parse_canonical("s/4/m"));
+        Map<Dimension, Integer> result2 = DimensionAnalyzer.analyze(parse_canonical("s/m"));
         System.out.println(result);
         System.out.println(result2);
     }

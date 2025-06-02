@@ -1,6 +1,8 @@
 package me.fhnau.org.funcs;
 
 import me.fhnau.org.model.UCUMDefinition.*;
+import me.fhnau.org.persistence.PersistenceProvider;
+import me.fhnau.org.persistence.PersistenceRegistry;
 import me.fhnau.org.util.UCUMRegistry;
 import me.fhnau.org.builders.CombineTermBuilder;
 import me.fhnau.org.builders.SoloTermBuilder;
@@ -13,11 +15,11 @@ import me.fhnau.org.util.PreciseDecimal;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
+import java.util.Optional;
+
 public class Canonicalizer {
 
     private static final UCUMRegistry registry = UCUMRegistry.getInstance();
-
-    public static final Cache<UCUMExpression, CanonicalStepResult> cache = Caffeine.newBuilder().maximumSize(10_000).recordStats().build();
 
     public record CanonicalStepResult(
         Term term,
@@ -240,7 +242,7 @@ public class Canonicalizer {
 
     private CanonicalStepResult canonicalizeImpl(Term term, CanonicalStepResult canonicalStep)
         throws TermHasArbitraryUnitException {
-        CanonicalStepResult cached = cache.getIfPresent(term);
+        CanonicalStepResult cached = PersistenceRegistry.getInstance().getCanonical(term);
         if(cached != null) {
             return cached;
         }
@@ -253,7 +255,7 @@ public class Canonicalizer {
             case AnnotTerm annotTerm -> canonicalizeImpl(annotTerm.term(), canonicalStep);
             case AnnotOnlyTerm annotOnlyTerm -> new CanonicalStepResult(SoloTermBuilder.UNITY, PreciseDecimal.ONE, PreciseDecimal.ONE, canonicalStep.specialHandlingActive(), canonicalStep.specialFunction());
         };
-        cache.put(term, result);
+        PersistenceRegistry.getInstance().saveCanonical(term, result);
         return result;
     }
 

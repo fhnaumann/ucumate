@@ -1,12 +1,12 @@
 package me.fhnau.org.model;
 
+import me.fhnau.org.NewUCUMBaseVisitor;
+import me.fhnau.org.NewUCUMParser;
 import me.fhnau.org.funcs.Validator.ParserException;
 import me.fhnau.org.model.UCUMExpression.ComponentExponent;
 import me.fhnau.org.model.UCUMExpression.Operator;
 import me.fhnau.org.util.ParseUtil;
 import me.fhnau.org.util.UCUMRegistry;
-import org.example.NewUCUMBaseVisitor;
-import org.example.NewUCUMParser;
 
 public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
 

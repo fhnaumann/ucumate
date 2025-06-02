@@ -26,7 +26,11 @@ public abstract class Printer {
          * Produces strings in the common math notation. Should be used when the term is used with a another tool that
          * does not use the UCUM syntax. I.e. it can be used to directly paste into WolframAlpha for term canonicalization.
          */
-        WOLFRAM_ALPHA_SYNTAX
+        WOLFRAM_ALPHA_SYNTAX,
+        /**
+         * Produces strings that are understood by LaTeX parsers. May be used in conjunction with a LaTeX renderer to render pretty expressions.
+         */
+        LATEX_SYNTAX
     }
 
     public String print(UCUMExpression UCUMExpression) {
@@ -51,7 +55,7 @@ public abstract class Printer {
 
     protected String printUCUMDef(UCUMDefinition ucumDefinition) {
         return switch (ucumDefinition) {
-            case UCUMDefinition.Concept concept -> concept.printSymbol();
+            case UCUMDefinition.Concept concept -> concept.code();
         };
     }
 
@@ -67,7 +71,7 @@ public abstract class Printer {
     }
 
     protected String printExponent(UCUMExpression.Exponent exponent) {
-        return String.valueOf(exponent.exponent());
+        return String.valueOf(Math.abs(exponent.exponent()));
     }
 
     protected String printPrefixSimpleUnit(UCUMExpression.PrefixSimpleUnit prefixSimpleUnit) {
@@ -111,7 +115,8 @@ public abstract class Printer {
     }
 
     protected String printComponentExponent(UCUMExpression.ComponentExponent componentExponent) {
-        return "%s%s".formatted(print(componentExponent.unit()), print(componentExponent.exponent()));
+        String sign = componentExponent.exponent().exponent() < 0 ? "-" : "+";
+        return "%s%s%s".formatted(print(componentExponent.unit()), sign, print(componentExponent.exponent()));
     }
 
     protected String printIntegerUnit(UCUMExpression.IntegerUnit integerUnit) {

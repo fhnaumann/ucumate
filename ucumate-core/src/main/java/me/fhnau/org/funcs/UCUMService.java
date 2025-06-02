@@ -6,11 +6,8 @@ import me.fhnau.org.funcs.Converter.ConversionResult;
 import me.fhnau.org.funcs.Validator.Failure;
 import me.fhnau.org.funcs.Validator.Success;
 import me.fhnau.org.funcs.Validator.ValidationResult;
-import me.fhnau.org.funcs.printer.ExpressiveUCUMSyntaxPrinter;
-import me.fhnau.org.funcs.printer.Printer;
+import me.fhnau.org.funcs.printer.*;
 import me.fhnau.org.funcs.printer.Printer.PrintType;
-import me.fhnau.org.funcs.printer.UCUMSyntaxPrinter;
-import me.fhnau.org.funcs.printer.WolframAlphaSyntaxPrinter;
 import me.fhnau.org.model.UCUMExpression;
 import me.fhnau.org.util.PreciseDecimal;
 import me.fhnau.org.util.UCUMEngine;
@@ -29,9 +26,10 @@ import java.util.concurrent.CompletableFuture;
 public class UCUMService {
 
     private static final Map<PrintType, Printer> printers = Map.of(
-        PrintType.UCUM_SYNTAX, new UCUMSyntaxPrinter(),
-        PrintType.EXPRESSIVE_UCUM_SYNTAX, new ExpressiveUCUMSyntaxPrinter(),
-        PrintType.WOLFRAM_ALPHA_SYNTAX, new WolframAlphaSyntaxPrinter()
+            PrintType.UCUM_SYNTAX, new UCUMSyntaxPrinter(),
+            PrintType.EXPRESSIVE_UCUM_SYNTAX, new ExpressiveUCUMSyntaxPrinter(),
+            PrintType.WOLFRAM_ALPHA_SYNTAX, new WolframAlphaSyntaxPrinter(),
+            PrintType.LATEX_SYNTAX, new LatexPrinter()
     );
 
     /**
@@ -78,7 +76,7 @@ public class UCUMService {
     private static UCUMExpression.Term parseOrError(String input) {
         return switch (validate(input)) {
             case Success success -> success.term();
-            case Failure failure -> throw new RuntimeException("Failed parsing input: %s".formatted(input));
+            case Failure failure -> throw new Validator.ParserException("Failed parsing input: %s".formatted(input));
         };
     }
 

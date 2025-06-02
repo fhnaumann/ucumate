@@ -7,11 +7,15 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ucumate-demo" />
-        <module name="ucum-test-utils" />
         <module name="ucumate-core" />
+        <module name="ucumate-persistence" />
         <module name="ucumate-core-exact-special-math" />
+        <module name="ucumate-test-utils" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ucum-test-utils" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
