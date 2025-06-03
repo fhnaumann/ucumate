@@ -40,6 +40,8 @@ build/
 /ucumate-persistence/target
 /ucumate-test-utils/target
 
+ucumate-demo.tar
+
 
 ### VS Code ###
 .vscode/
