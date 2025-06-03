@@ -11,12 +11,31 @@ public class Normalizer {
 
     public UCUMExpression.Term normalize(UCUMExpression.Term term) {
         return switch(term) {
-            case UCUMExpression.ComponentTerm componentTerm -> componentTerm;
+            case UCUMExpression.ComponentTerm componentTerm -> normalizeComponent(componentTerm);
             case UCUMExpression.ParenTerm parenTerm -> parenTerm;
             case UCUMExpression.AnnotTerm annotTerm -> annotTerm;
             case UCUMExpression.BinaryTerm binaryTerm -> normalizeBinaryTerm(binaryTerm);
             case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> annotOnlyTerm;
             case UCUMExpression.UnaryDivTerm unaryDivTerm -> normalizeUnaryDivTerm(unaryDivTerm);
+        };
+    }
+
+    private UCUMExpression.Term normalizeComponent(UCUMExpression.ComponentTerm componentTerm) {
+        return switch (componentTerm.component()) {
+            case UCUMExpression.ComponentNoExponent componentNoExponent -> componentTerm;
+            case UCUMExpression.ComponentExponent componentExponent -> {
+                int exp = componentExponent.exponent().exponent();
+                if(exp == 0) {
+                    yield SoloTermBuilder.UNITY; // X^0 -> 1
+                }
+                if(exp == -1 && isIntegerUnit1(componentExponent.unit())) { // 1^-1 -> 1
+                    yield switch (componentExponent) {
+                        case UCUMExpression.MixedComponentExponent mixedComponentExponent -> new UCUMExpression.MixedComponentTerm(new UCUMExpression.MixedComponentNoExponent(componentExponent.unit()));
+                        case UCUMExpression.CanonicalComponentExponent canonicalComponentExponent -> new UCUMExpression.CanonicalComponentTerm(new UCUMExpression.CanonicalComponentNoExponent(canonicalComponentExponent.unit()));
+                    };
+                }
+                yield componentTerm; // no normalization possible
+            }
         };
     }
 

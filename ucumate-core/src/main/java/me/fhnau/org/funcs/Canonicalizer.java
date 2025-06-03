@@ -147,10 +147,13 @@ public class Canonicalizer {
             }
             CanonicalTerm resultTerm = canonicalTerm;
             if(normalize) {
-                resultTerm = (CanonicalTerm) new Normalizer().normalize(canonicalTerm);
+                // resultTerm = (CanonicalTerm) new Normalizer().normalize(canonicalTerm);
             }
             if(flatten) {
                 resultTerm = Flattener.flattenAndCancel(resultTerm);
+            }
+            if(normalize) {
+                resultTerm = (CanonicalTerm) new Normalizer().normalize(resultTerm);
             }
             // explicitly cache the result after normalizing and flatten
             PersistenceRegistry.getInstance().saveCanonical(term, new CanonicalStepResult(

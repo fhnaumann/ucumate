@@ -73,4 +73,9 @@ public class LatexPrinter extends Printer {
     protected String printUnaryDivTerm(UCUMExpression.UnaryDivTerm unaryDivTerm) {
         return "\\frac{1}{%s}".formatted(print(unaryDivTerm.term()));
     }
+
+    @Override
+    protected String printComponentExponent(UCUMExpression.ComponentExponent componentExponent) {
+        return "%s%s".formatted(print(componentExponent.unit()), print(componentExponent.exponent()));
+    }
 }
