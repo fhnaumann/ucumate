@@ -37,6 +37,9 @@ build/
 /ucumate-demo/frontend/.vscode
 /ucumate-demo/frontend/node_modules
 
+/ucumate-persistence/target
+/ucumate-test-utils/target
+
 
 ### VS Code ###
 .vscode/

@@ -115,8 +115,8 @@ public class UCUMTests {
 
     @AfterAll
     public static void tearDown() {
-        System.out.println(Validator.cache.stats());
-        System.out.println(Canonicalizer.cache.stats());
+        //System.out.println(Validator.cache.stats());
+        //System.out.println(Canonicalizer.cache.stats());
         // System.out.println(GraphLayout.parseInstance(Canonicalizer.cache).toFootprint());
     }
 }

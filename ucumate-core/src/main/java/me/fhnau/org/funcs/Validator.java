@@ -6,6 +6,7 @@ import me.fhnau.org.NewUCUMParser;
 import me.fhnau.org.model.CanonicalUCUMSyntaxVisitor;
 import me.fhnau.org.model.UCUMSyntaxVisitor;
 import me.fhnau.org.model.UCUMDefinition.UCUMUnit;
+import me.fhnau.org.persistence.PersistenceRegistry;
 import me.fhnau.org.util.UCUMRegistry;
 import me.fhnau.org.builders.SoloTermBuilder;
 import me.fhnau.org.model.UCUMExpression;
@@ -19,8 +20,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.Optional;
 
 public class Validator {
-
-    public static final Cache<String, ValidationResult> cache = Caffeine.newBuilder().maximumSize(10_000).recordStats().build();
 
     public sealed interface ValidationResult {}
 
@@ -49,25 +48,36 @@ public class Validator {
         return (UCUMExpression.CanonicalTerm) validateImpl(input, new CanonicalUCUMSyntaxVisitor(UCUMRegistry.getInstance()));
     }
 
+    /**
+     * Internal use only!
+     * @param input The string input that
+     * @return The validation result. Avoids infinite recursion by bypassing registry here.
+     */
+    public static Term parseByPassChecks(String input) {
+        return validateImpl(input, new UCUMSyntaxVisitor(UCUMRegistry.getInstance()));
+    }
+
     public static ValidationResult validate(String input) {
-        ValidationResult cached = cache.getIfPresent(input);
+        ValidationResult cached = PersistenceRegistry.getInstance().getValidated(input);
         if(cached != null) {
             return cached;
         }
 
+        /*
         Optional<UCUMUnit> optionalUCUMUnit = UCUMRegistry.getInstance().getUCUMUnit(input);
         if(optionalUCUMUnit.isPresent()) {
             return new Success(SoloTermBuilder.builder().withoutPrefix(optionalUCUMUnit.get()).noExpNoAnnot().asTerm().build());
         }
+        */
         try {
             Term term = validateImpl(input, new UCUMSyntaxVisitor(UCUMRegistry.getInstance()));
             SpecialChecker.SpecialCheckResult specialCheckResult = SpecialChecker.checkForSpecialUnitInTerm(term, new SpecialChecker.SpecialCheckResult(false, false,false));
             ValidationResult result = specialCheckResult.isValid() ? new Success(term) : new Failure();
-            cache.put(input, result);
+            PersistenceRegistry.getInstance().saveValidated(input, result);
             return result;
         } catch (LexerException | ParserException e) {
             ValidationResult result = new Failure();
-            cache.put(input, result);
+            PersistenceRegistry.getInstance().saveValidated(input, result);
             return result;
         }
     }

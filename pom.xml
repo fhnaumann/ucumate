@@ -14,13 +14,27 @@
     <modules>
         <module>ucumate-core</module>
         <module>ucumate-core-exact-special-math</module>
+        <module>ucumate-persistence</module>
         <module>ucumate-test-utils</module>
         <module>ucumate-demo</module>
-        <module>ucumate-persistence</module>
+
     </modules>
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>2.0.13</version>
+            </dependency>
+            <!-- TODO REMOVE FROM PROD -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>2.0.13</version>
+                <scope>compile</scope>
+            </dependency>
             <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>

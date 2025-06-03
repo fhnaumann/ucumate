@@ -152,6 +152,15 @@ public class Canonicalizer {
             if(flatten) {
                 resultTerm = Flattener.flattenAndCancel(resultTerm);
             }
+            // explicitly cache the result after normalizing and flatten
+            PersistenceRegistry.getInstance().saveCanonical(term, new CanonicalStepResult(
+                    resultTerm,
+                    canonicalStep.magnitude,
+                    canonicalStep.cfPrefix,
+                    canonicalStep.specialHandlingActive,
+                    canonicalStep.specialFunction
+            ));
+
             boolean isSpecial = canonicalStep.specialHandlingActive() && canonicalStep.specialFunction() != null;
 
 
