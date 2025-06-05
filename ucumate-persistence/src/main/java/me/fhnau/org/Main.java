@@ -2,11 +2,8 @@ package me.fhnau.org;
 
 import com.zaxxer.hikari.HikariDataSource;
 import me.fhnau.org.funcs.UCUMService;
-import me.fhnau.org.persistence.InMemoryCanonicalizePersistenceProvider;
 import me.fhnau.org.persistence.PersistenceRegistry;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
@@ -25,7 +22,7 @@ public class Main {
         }*/
 
 
-        PersistenceRegistry.disableInMemoryCache(true);
+        // PersistenceRegistry.disableInMemoryCache(true);
 
         HikariDataSource ds = ConnectionPoolFactory.getOrCreate(jdbcUrl, username, pw);
         PersistenceRegistry.register("postgres", new PostgresPersistenceProvider(ds.getConnection(), null, null));

@@ -26,7 +26,7 @@ public abstract class Printer {
          * Produces strings in the common math notation. Should be used when the term is used with a another tool that
          * does not use the UCUM syntax. I.e. it can be used to directly paste into WolframAlpha for term canonicalization.
          */
-        WOLFRAM_ALPHA_SYNTAX,
+        COMMON_MATH_SYNTAX,
         /**
          * Produces strings that are understood by LaTeX parsers. May be used in conjunction with a LaTeX renderer to render pretty expressions.
          */

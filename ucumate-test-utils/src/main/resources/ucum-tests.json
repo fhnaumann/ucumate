@@ -1985,8 +1985,5 @@
     { "id":  "conv-special-71", "conversionFactor": "9", "from": "[m/s2/Hz^(1/2)]", "resultingConversionFactor": "81", "to": "m2/s4/Hz", "valid": true, "reason": ""},
     { "id":  "conv-special-72", "conversionFactor": "4", "from": "bit_s", "resultingConversionFactor": "16", "to": "1", "valid": true, "reason": ""}
 
-  ],
-  "canonicalize": [
-    { "id": "1", "inputExpression": "cm", "factor": "0.01","canonicalForm": "m" }
   ]
 }

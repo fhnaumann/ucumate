@@ -28,7 +28,7 @@ public class UCUMService {
     private static final Map<PrintType, Printer> printers = Map.of(
             PrintType.UCUM_SYNTAX, new UCUMSyntaxPrinter(),
             PrintType.EXPRESSIVE_UCUM_SYNTAX, new ExpressiveUCUMSyntaxPrinter(),
-            PrintType.WOLFRAM_ALPHA_SYNTAX, new WolframAlphaSyntaxPrinter(),
+            PrintType.COMMON_MATH_SYNTAX, new WolframAlphaSyntaxPrinter(),
             PrintType.LATEX_SYNTAX, new LatexPrinter()
     );
 
