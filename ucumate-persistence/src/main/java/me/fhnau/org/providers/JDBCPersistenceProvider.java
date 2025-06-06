@@ -25,7 +25,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JDBCPersistenceProvider.class);
 
-    protected final Connection connection;
+    public final Connection connection;
     protected final String canonicalTableName;
     protected final String validateTableName;
 
