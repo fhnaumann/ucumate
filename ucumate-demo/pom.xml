@@ -38,7 +38,7 @@
         <dependency>
             <groupId>com.github.fhnaumann.ucumate</groupId>
             <artifactId>ucumate-persistence</artifactId>
-            <version>8f7f374828</version>
+            <version>8c91f41191</version>
         </dependency>
         <!--dependency>
             <groupId>me.fhnau.org</groupId>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>com.github.fhnaumann.ucumate</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>ef9fddf316</version>
+            <version>8c91f41191</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
