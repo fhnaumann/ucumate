@@ -12,12 +12,24 @@
 
     <artifactId>ucumate-demo</artifactId>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
-        <dependency>
+        <!--dependency>
             <groupId>me.fhnau.org</groupId>
             <artifactId>ucumate-core</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
+        </dependency-->
+        <dependency>
+            <groupId>com.github.fhnaumann</groupId>
+            <artifactId>ucumate</artifactId>
+            <version>v1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
