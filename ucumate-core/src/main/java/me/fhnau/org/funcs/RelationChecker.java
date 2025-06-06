@@ -25,7 +25,7 @@ public class RelationChecker {
         Canonicalizer.CanonicalizationResult result1 = new Canonicalizer().canonicalize(term1);
         Canonicalizer.CanonicalizationResult result2 = new Canonicalizer().canonicalize(term2);
         if(!(result1 instanceof Canonicalizer.Success success1) || !(result2 instanceof Canonicalizer.Success success2)) {
-            return new NotCommensurable(Map.of()); // todo returning an empty map when in reality the canonicalization failed is probably confusing...
+            return new NotCommensurable(Map.of());
         }
         return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm());
 

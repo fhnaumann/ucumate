@@ -77,7 +77,7 @@ public class CanonicalizerSpecialTest {
     @DisplayName("")
     public void canonicalize_cf1_5_degF() {
         Canonicalizer.CanonicalizationResult result = canonicalizer.canonicalize(_5_degF_term());
-        assert_success(result, pd_l("258.1500"), kelvin_term()); // todo I should handle proper rounding and precision project-wide soon...
+        assert_success(result, pd_l("258.1500"), kelvin_term());
     }
 
     @Test
@@ -119,12 +119,6 @@ public class CanonicalizerSpecialTest {
     public void canonicalize_cf3_5_kelvin() {
         var result = (Success) canonicalizer.canonicalize(_5_kelvin_term());
         assertThat(print(result.canonicalTerm())).isEqualTo("K1");
-    }
-
-    @Test
-    public void canonicalize_cf1_bel_volt() {
-        Canonicalizer.CanonicalizationResult result = canonicalizer.canonicalize(bel_volt_term());
-        //assert_success(result, pd("3162.3"), volt_term()); todo canonical result is not volt but whatever it canonicalizes to
     }
 
 }

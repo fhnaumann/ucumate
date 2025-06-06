@@ -80,7 +80,7 @@ public class PreciseDecimal {
         }
         s = s.trim();
         // Check if the number is negative; ignore the leading '-' for parsing the digit counts.
-        boolean isNegative = s.startsWith("-"); // todo correct that if negative this information is later discarded?
+        boolean isNegative = s.startsWith("-");
         String abs = isNegative ? s.substring(1) : s;
         s = s.replaceFirst("^0+", ""); // remove leading 0s
         if(s.isEmpty()) {
@@ -371,7 +371,6 @@ public class PreciseDecimal {
 
             BigDecimal quotient = this.value.divide(other.value, 20, RoundingMode.HALF_UP);
             return unlimitedPrecision(quotient);
-            // return new PreciseDecimal(quotient, true, 20, quotient.scale()); // todo is scale really needed here or can it be -1?
         } else {
             MathContext mc = new MathContext(effectivePrecision, RoundingMode.HALF_UP);
             BigDecimal quotient = this.value.divide(other.value, mc);

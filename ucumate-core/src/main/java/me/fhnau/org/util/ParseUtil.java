@@ -84,7 +84,7 @@ public class ParseUtil {
                            );
     }
 
-    // todo redo this mess
+    // TODO Rework this when proper error handling/correction suggestion is implemented
     public sealed interface MatchResult {}
 
     sealed interface SuccessResult extends MatchResult {}

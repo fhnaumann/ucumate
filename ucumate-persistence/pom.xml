@@ -24,7 +24,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <scope>compile</scope> <!-- TODO should be test -->
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>

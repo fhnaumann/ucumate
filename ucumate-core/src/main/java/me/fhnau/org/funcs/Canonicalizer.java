@@ -169,16 +169,9 @@ public class Canonicalizer {
                     if (isSpecial) {
 
                         SpecialUnitsFunctionProvider.ConversionFunction specialConvFunc = SpecialUnits.getFunction(canonicalStep.specialFunction().name());
-                        //PreciseDecimal specialFactor = extractPrefixOrDimlessFactorFromSpecialUnit(canonicalStep.specialFunction().unit());
-                        //PreciseDecimal Q_0 = canonicalStep.specialFunction().value().multiply(specialFactor).multiply(canonicalStep.cfPrefix());
                         PreciseDecimal factorAsInputForSpecialFunc = factor.multiply(canonicalStep.cfPrefix());
                         PreciseDecimal scaledRatio = specialConvFunc.toCanonical(factorAsInputForSpecialFunc);
                         yield canonicalStep.magnitude().multiply(scaledRatio);
-
-
-                        //yield specialConvFunc.inverse(factor).multiply(Q_0.multiply(canonicalStep.cfPrefix()));
-                        //yield specialConvFunc.inverse(factor.multiply(canonicalStep.specialFunction().value()).multiply(canonicalStep.cfPrefix().multiply(specialFactor)).multiply(canonicalStep.magnitude()));
-                            //.multiply(canonicalStep.magnitude());
                     } else {
                         yield factor.multiply(canonicalStep.magnitude());
                     }
@@ -186,16 +179,10 @@ public class Canonicalizer {
                 case TO -> {
                     if (isSpecial) {
                         SpecialUnitsFunctionProvider.ConversionFunction specialConvFunc = SpecialUnits.getFunction(canonicalStep.specialFunction().name());
-                        //PreciseDecimal factorAsInputForSpecialFunc = factor.multiply(canonicalStep.cfPrefix());
                         PreciseDecimal factorAsInputForSpecialFunc = factor.divide(canonicalStep.magnitude());
                         PreciseDecimal scaledRatio = specialConvFunc.fromCanonical(factorAsInputForSpecialFunc);
                         scaledRatio = scaledRatio.multiply(PreciseDecimal.ONE.divide(canonicalStep.cfPrefix()));
                         yield scaledRatio;
-
-                        //PreciseDecimal specialFactor = extractPrefixOrDimlessFactorFromSpecialUnit(canonicalStep.specialFunction().unit());
-                        //yield specialConvFunc.convert(factor.divide(canonicalStep.magnitude())).divide(specialFactor).divide(canonicalStep.cfPrefix());
-                        //yield specialConvFunc.convert(factor.multiply(canonicalStep.specialFunction().value()).divide(canonicalStep.cfPrefix()).divide(specialFactor).divide(canonicalStep.magnitude()));
-                            //.divide(canonicalStep.magnitude());
                     } else {
                         yield factor.divide(canonicalStep.magnitude());
                     }
@@ -303,8 +290,6 @@ public class Canonicalizer {
         throws TermHasArbitraryUnitException {
         return switch (unit) {
             case IntegerUnit integerUnit -> {
-                //yield new CanonicalStepResult(SoloTermBuilder.UNITY, integerUnit.asPreciseDecimal(), PreciseDecimal.ONE, false, null);
-
                 if(canonicalStepResult.specialHandlingActive()) {
                     // We are inside the canonicalization part of a special unit, write to cfPrefix
                     yield new CanonicalStepResult(SoloTermBuilder.UNITY, PreciseDecimal.ONE, integerUnit.asPreciseDecimal(), true, canonicalStepResult.specialFunction());
@@ -313,10 +298,8 @@ public class Canonicalizer {
                 else {
                     // We are either on the same level as a special unit (i.e. "5.Cel") or there is no special unit involved at all
                     yield new CanonicalStepResult(SoloTermBuilder.UNITY, integerUnit.asPreciseDecimal(), canonicalStepResult.cfPrefix(), false, null);
-                    // Write to magnitude
                 }
             }
-            //case IntegerUnit integerUnit -> new CanonicalStepResult(SoloTermBuilder.UNITY, integerUnit.asPreciseDecimal(), PreciseDecimal.ONE, false, null);
             case NoPrefixSimpleUnit noPrefixSimpleUnit -> canonicalizeUCUMConcept(noPrefixSimpleUnit.ucumUnit(), canonicalStepResult);
             case PrefixSimpleUnit prefixSimpleUnit -> canonicalizePrefixSimpleUnit(prefixSimpleUnit, canonicalStepResult);
         };
@@ -327,17 +310,6 @@ public class Canonicalizer {
 
         PreciseDecimal factor = prefixSimpleUnit.prefix().value().conversionFactor();
         Term unitOnly = SoloTermBuilder.builder().withoutPrefix(prefixSimpleUnit.ucumUnit()).noExpNoAnnot().asTerm().build();
-        /*
-        return switch (prefixSimpleUnit.ucumUnit()) {
-            case BaseUnit baseUnit -> canonicalizeImpl(unitOnly, canonicalStep);
-            case DerivedUnit definedUnit -> canonicalizeImpl(unitOnly, canonicalStep);
-            case ArbitraryUnit arbitraryUnit -> canonicalizeImpl(unitOnly, canonicalStep);
-            case DimlessUnit dimlessUnit -> canonicalizeImpl(unitOnly, canonicalStep);
-            case SpecialUnit specialUnit -> canonicalizeImpl(unitOnly, canonicalStep);
-            //case SpecialUnit specialUnit -> new CanonicalStepResult(canonicalizeImpl(unitOnly, canonicalStep).term(), canonicalStep.magnitude(), canonicalStep.cfPrefix().multiply(factor), false, null);
-        };
-
-         */
         CanonicalStepResult unitOnlyStep = canonicalizeImpl(unitOnly, canonicalStep); // ? null
         return composeConsideringSpecial(unitOnlyStep, factor);
         //return canonicalizeUCUMConcept(prefixSimpleUnit.prefix(), canonicalStep);
@@ -346,7 +318,7 @@ public class Canonicalizer {
     private CanonicalStepResult canonicalizeUCUMConcept(Concept concept, CanonicalStepResult canonicalStep)
         throws TermHasArbitraryUnitException {
         return switch (concept) {
-            case UCUMPrefix ucumPrefix -> composeConsideringSpecial(canonicalStep, ucumPrefix.value().conversionFactor()); //new CanonicalStepResult(SoloTermBuilder.UNITY, ucumPrefix.value().conversionFactor(), PreciseDecimal.ONE, false, null);
+            case UCUMPrefix ucumPrefix -> composeConsideringSpecial(canonicalStep, ucumPrefix.value().conversionFactor());
             case BaseUnit baseUnit -> new CanonicalStepResult(SoloTermBuilder.builder().withoutPrefix(baseUnit).noExpNoAnnot().asTerm().build(), PreciseDecimal.ONE, PreciseDecimal.ONE, false, null);
             case DerivedUnit derivedUnit -> canonicalizeDerivedOrDimlessUnit(derivedUnit, canonicalStep);
             case DimlessUnit dimlessUnit -> canonicalizeDerivedOrDimlessUnit(dimlessUnit, canonicalStep);
@@ -376,7 +348,6 @@ public class Canonicalizer {
             inner,
             definedUnit.value().conversionFactor()
         );
-        //return inner.withTerm(inner.term());
     }
 
     private Term removePrefixes(Term term, int exponent) {
@@ -398,12 +369,10 @@ public class Canonicalizer {
                     case ComponentNoExponent componentNoExponent -> exponent;
                 };
                 Unit unit = componentTerm.component().unit();
-                var tmp = switch (unit) {
-                    case SimpleUnit simpleUnit -> SoloTermBuilder.builder().withoutPrefix(simpleUnit.ucumUnit()).asComponent().withExponent(existingExponent).withoutAnnotation().asTerm().build(); // todo do I need the exponent here?
+                yield switch (unit) {
+                    case SimpleUnit simpleUnit -> SoloTermBuilder.builder().withoutPrefix(simpleUnit.ucumUnit()).asComponent().withExponent(existingExponent).withoutAnnotation().asTerm().build();
                     case IntegerUnit integerUnit -> SoloTermBuilder.builder().withIntegerUnit(integerUnit.value()).asComponent().withExponent(existingExponent).withoutAnnotation().asTerm().build();
                 };
-                //System.out.println(new WolframAlphaSyntaxPrinter().print(tmp));
-                yield tmp;
             }
         };
     }

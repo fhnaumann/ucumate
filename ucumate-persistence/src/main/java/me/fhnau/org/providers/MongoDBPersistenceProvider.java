@@ -24,10 +24,12 @@ import static com.mongodb.client.model.Filters.eq;
  */
 public class MongoDBPersistenceProvider implements PersistenceProvider {
 
+    private final MongoClient client;
     private final MongoCollection<Document> canonicalColl;
     private final MongoCollection<Document> validationColl;
 
     public MongoDBPersistenceProvider(MongoClient client, String dbName) {
+        this.client = client;
         MongoDatabase db = client.getDatabase(dbName);
         this.canonicalColl = db.getCollection("ucumate_canonical");
         this.validationColl = db.getCollection("ucumate_validate");
@@ -152,6 +154,6 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
 
     @Override
     public void close() {
-        // todo figure out if handling necessary
+        client.close();
     }
 }
