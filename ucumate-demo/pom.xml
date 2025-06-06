@@ -20,17 +20,17 @@
     </repositories>
 
     <dependencies>
-        <!--dependency>
+        <dependency>
             <groupId>me.fhnau.org</groupId>
             <artifactId>ucumate-core</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
-        </dependency-->
-        <dependency>
-            <groupId>com.github.fhnaumann</groupId>
-            <artifactId>ucumate</artifactId>
-            <version>v1.0.0</version>
         </dependency>
+        <!--dependency>
+            <groupId>com.github.fhnaumann.ucumate</groupId>
+            <artifactId>ucumate-core</artifactId>
+            <version>660a02c735</version>
+        </dependency-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

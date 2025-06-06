@@ -50,9 +50,9 @@ public class PersistenceRegistry implements PersistenceProvider {
             boolean recordStats = (boolean) properties.getOrDefault("ucumate.cache.recordStats", false);
             boolean preHeat = (boolean) properties.getOrDefault("ucumate.cache.preheat", false);
             boolean overrideInsteadOfAdd = (boolean) properties.getOrDefault("ucumate.cache.preheat.override", false);
-            List<String> defaultPreHeatCodes = PropertiesUtil.readCodeFile(Path.of(PersistenceRegistry.class.getResource("/pre_heat_codes.json").toURI()));
+            List<String> defaultPreHeatCodes = PropertiesUtil.readCodeFile(PersistenceRegistry.class.getResourceAsStream("/pre_heat_codes.json"));
             String preHeatCodesFilename = (String) properties.getOrDefault("ucumate.cache.preheat.codes", "");
-            List<String> preHeatCodes = !preHeatCodesFilename.isBlank() ? PropertiesUtil.readCodeFile(Path.of(preHeatCodesFilename)) : List.of();
+            List<String> preHeatCodes = !preHeatCodesFilename.isBlank() ? PropertiesUtil.readCodeFile(preHeatCodesFilename) : List.of();
             if(cache != null) {
                 logger.warn("Overriding existing cache.");
                 cache.clearCache();
@@ -71,7 +71,7 @@ public class PersistenceRegistry implements PersistenceProvider {
                         .toList();
                 cache.preHeat(mergedCodes);
             }
-        } catch (IOException | URISyntaxException | ClassCastException e) {
+        } catch (IOException | ClassCastException e) {
             throw new RuntimeException(e);
         }
 
