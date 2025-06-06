@@ -75,8 +75,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
                 stmt.setNull(7, Types.VARCHAR);
                 stmt.setNull(8, Types.VARCHAR);
             }
-            int tmp = stmt.executeUpdate();
-            System.out.println(tmp);
+            stmt.executeUpdate();
             logger.debug("Saved key={}, canonStep={} to {}.", keyString, canonStep, connection.getMetaData());
         } catch (Exception e) {
             throw new RuntimeException("Failed to save canonical data", e);

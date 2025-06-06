@@ -8,7 +8,14 @@ is also possible to add another persistent data storage. If a persistent data st
 codes will be read into the cache (if the cache is enabled).
 
 Add the additional dependency:
-todo persistence module dependency.
+
+```xml
+<dependency>
+    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <artifactId>ucumate-persistence</artifactId>
+    <version>v1.0.0</version>
+</dependency>
+```
 
 The module defines 4 persistence providers out of the box:
 

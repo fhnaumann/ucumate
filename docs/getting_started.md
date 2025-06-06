@@ -5,7 +5,13 @@ order: 99
 
 ## Add dependency
 
-todo
+```xml
+<dependency>
+    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <artifactId>ucumate-core</artifactId>
+    <version>v1.0.0</version>
+</dependency>
+```
 
 ## Core Functionality
 

@@ -2,7 +2,13 @@
 
 If you work with special units and need high precision during canonicalization or conversion then you should use this additional module.
 
-todo maven part
+```xml
+<dependency>
+    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <artifactId>ucumate-core-exact-special-math</artifactId>
+    <version>v1.0.0</version>
+</dependency>
+```
 
 It is meant as a drop-in replacement for the default math precision in `ucumate-core`. On startup, you have set the provider once.
 
