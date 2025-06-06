@@ -1,8 +1,12 @@
 .idea
 /docs/.retype
-/ucumate-demo.iml
+/ucumate-demo-impl
+*.db
 
 ucumate-core/target/
+ucumate-core/.idea
+ucumate-core/precise_decimal.md
+
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -40,11 +44,16 @@ build/
 /ucumate-demo/frontend/.idea
 /ucumate-demo/frontend/.vscode
 /ucumate-demo/frontend/node_modules
+/ucumate-demo/frontend/dist
+/ucumate-demo/.mvn
+/ucumate-demo/mvnw
+/ucumate-demo/mvnw.cmd
 
 /ucumate-persistence/target
 /ucumate-test-utils/target
 
 ucumate-demo.tar
+ucumate-demo.iml
 
 
 ### VS Code ###
