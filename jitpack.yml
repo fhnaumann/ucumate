@@ -1,4 +1,4 @@
 jdk:
   - openjdk21
 install:
-  - mvn install -pl ucumate-core,ucumate-persistence,ucumate-test-utils -am -DskipTests
+  - mvn install -pl ucumate-core,ucumate-persistence,ucumate-core-exact-special-math,ucumate-test-utils -am -DskipTests
