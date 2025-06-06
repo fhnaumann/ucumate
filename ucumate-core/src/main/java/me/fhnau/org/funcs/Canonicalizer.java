@@ -146,9 +146,6 @@ public class Canonicalizer {
                 throw new RuntimeException("Expected CanonicalTerm, got " + canonicalStep.term());
             }
             CanonicalTerm resultTerm = canonicalTerm;
-            if(normalize) {
-                // resultTerm = (CanonicalTerm) new Normalizer().normalize(canonicalTerm);
-            }
             if(flatten) {
                 resultTerm = Flattener.flattenAndCancel(resultTerm);
             }

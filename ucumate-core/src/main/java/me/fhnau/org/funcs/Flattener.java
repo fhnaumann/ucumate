@@ -98,7 +98,12 @@ public class Flattener {
     }
 
     private static UCUMExpression.CanonicalTerm componentTerm(UCUMExpression.CanonicalUnit unit, int exponent) {
-        return new UCUMExpression.CanonicalComponentTerm(new UCUMExpression.CanonicalComponentExponent(unit, new UCUMExpression.Exponent(exponent)));
+        if(exponent == 1) {
+            return new UCUMExpression.CanonicalComponentTerm(new UCUMExpression.CanonicalComponentNoExponent(unit));
+        }
+        else {
+            return new UCUMExpression.CanonicalComponentTerm(new UCUMExpression.CanonicalComponentExponent(unit, new UCUMExpression.Exponent(exponent)));
+        }
     }
 
 }
