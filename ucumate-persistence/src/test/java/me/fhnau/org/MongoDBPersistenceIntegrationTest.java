@@ -3,12 +3,10 @@ package me.fhnau.org;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import me.fhnau.org.persistence.PersistenceRegistry;
+import me.fhnau.org.providers.MongoDBPersistenceProvider;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * @author Felix Naumann

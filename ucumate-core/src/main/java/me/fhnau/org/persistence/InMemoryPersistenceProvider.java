@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Felix Naumann
@@ -23,8 +24,8 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
 
     private boolean enabled;
 
-    public InMemoryPersistenceProvider() {
-        this.enabled = false;
+    public InMemoryPersistenceProvider(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public InMemoryPersistenceProvider(int canonCacheMaxSize, int valCacheMaxSize, boolean recordStats) {
@@ -62,6 +63,9 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
     public void saveCanonical(UCUMExpression key, Canonicalizer.CanonicalStepResult value) {
         if(isEnabled()) {
             canonCache.put(key, value);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Saved key={} in cache.", UCUMService.print(key)); // call to #print is expensive here
+            }
         }
     }
 
@@ -76,9 +80,15 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
+    public Map<UCUMExpression, Canonicalizer.CanonicalStepResult> getAllCanonical() {
+        return canonCache.asMap();
+    }
+
+    @Override
     public void saveValidated(String key, Validator.ValidationResult value) {
         if(isEnabled()) {
             valCache.put(key, value);
+            logger.debug("Saved key={} in cache.", key);
         }
     }
 
@@ -90,6 +100,11 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
         else {
             return null;
         }
+    }
+
+    @Override
+    public Map<String, Validator.ValidationResult> getAllValidated() {
+        return valCache.asMap();
     }
 
     @Override

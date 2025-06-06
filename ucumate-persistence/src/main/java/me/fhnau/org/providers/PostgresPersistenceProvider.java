@@ -1,23 +1,24 @@
-package me.fhnau.org;
+package me.fhnau.org.providers;
 
 import java.sql.Connection;
 
 /**
  * @author Felix Naumann
  */
-public class SQLitePersistenceProvider extends JDBCPersistenceProvider {
-    public SQLitePersistenceProvider(Connection connection, String canonicalTableName, String validateTableName) {
+public class PostgresPersistenceProvider extends JDBCPersistenceProvider {
+
+    public PostgresPersistenceProvider(Connection connection, String canonicalTableName, String validateTableName) {
         super(connection, canonicalTableName, validateTableName);
     }
 
     @Override
     public void createCanonicalTable() {
-        executeSQLFile("sqlite/canonical_table.sql");
+        executeSQLFile("postgres/canonical_table.sql");
     }
 
     @Override
     public void createValidateTable() {
-        executeSQLFile("sqlite/validate_table.sql");
+        executeSQLFile("postgres/validate_table.sql");
     }
 
     @Override

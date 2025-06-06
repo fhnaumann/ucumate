@@ -17,7 +17,7 @@
         <module>ucumate-persistence</module>
         <module>ucumate-test-utils</module>
         <module>ucumate-demo</module>
-        <module>ucumate-rest-api</module>
+        <module>ucumate-demo-impl</module>
 
     </modules>
 

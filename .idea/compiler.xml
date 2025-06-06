@@ -7,8 +7,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ucumate-demo" />
+        <module name="ucumate-demo-impl" />
         <module name="ucumate-core" />
-        <module name="ucumate-rest-api" />
         <module name="ucumate-persistence" />
         <module name="ucumate-core-exact-special-math" />
         <module name="ucumate-test-utils" />
@@ -16,6 +16,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="ucum-test-utils" target="21" />
+      <module name="ucumate-rest-api" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

@@ -1,9 +1,11 @@
 package me.fhnau.org;
 
 import com.mongodb.client.MongoClient;
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import me.fhnau.org.persistence.PersistenceProvider;
+import me.fhnau.org.providers.MongoDBPersistenceProvider;
+import me.fhnau.org.providers.MySQLPersistenceProvider;
+import me.fhnau.org.providers.PostgresPersistenceProvider;
+import me.fhnau.org.providers.SQLitePersistenceProvider;
 
 import java.io.File;
 import java.nio.file.Path;

@@ -11,6 +11,9 @@ If you enable preheating then you have to initialize the cache once on startup.
 PersistenceRegistry.initCache(props);
 ```
 
+If you want save the cache between restarts you can add the `ucumate-persistence` [module](persistence.md) that ships with a sqlite database
+by default. When the app starts everything from the data storage will be loaded into the cache.
+
 Below are the properties to control the cache behaviour.
 
 | Property Name                  | Default Value  | Description                                                                    |

@@ -1,3 +1,7 @@
+.idea
+/docs/.retype
+/ucumate-demo.iml
+
 ucumate-core/target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

@@ -1,4 +1,4 @@
-package me.fhnau.org;
+package me.fhnau.org.providers;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -13,6 +13,9 @@ import me.fhnau.org.model.UCUMExpression;
 import me.fhnau.org.persistence.PersistenceProvider;
 import me.fhnau.org.util.PreciseDecimal;
 import org.bson.Document;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -75,6 +78,39 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
+    public Map<UCUMExpression, Canonicalizer.CanonicalStepResult> getAllCanonical() {
+        Map<UCUMExpression, Canonicalizer.CanonicalStepResult> resultMap = new HashMap<>();
+
+        for (Document doc : canonicalColl.find()) {
+            String unitKey = doc.getString("unit_key");
+            String termStr = doc.getString("term");
+
+            UCUMExpression key = Validator.parseByPassChecks(unitKey);
+            UCUMExpression.Term term = Validator.parseCanonical(termStr);
+            PreciseDecimal magnitude = new PreciseDecimal(doc.getString("magnitude"));
+            PreciseDecimal cfPrefix = new PreciseDecimal(doc.getString("cfPrefix"));
+
+            boolean special = doc.getBoolean("special", false);
+            UCUMDefinition.UCUMFunction func = null;
+
+            if(special) {
+                String name = doc.getString("specialName");
+                String unit = doc.getString("specialUnit");
+                String value = doc.getString("specialValue");
+                func = new UCUMDefinition.UCUMFunction(name, new PreciseDecimal(value), unit);
+            }
+
+            Canonicalizer.CanonicalStepResult result = new Canonicalizer.CanonicalStepResult(
+                    term, magnitude, cfPrefix, special, func
+            );
+
+            resultMap.put(key, result);
+        }
+
+        return resultMap;
+    }
+
+    @Override
     public void saveValidated(String key, Validator.ValidationResult value) {
         Document doc = new Document("key", key)
                 .append("valid", value instanceof Validator.Success);
@@ -84,16 +120,34 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     @Override
     public Validator.ValidationResult getValidated(String key) {
         Document doc = validationColl.find(eq("key", key)).first();
-        if (doc == null) {
+        if(doc == null) {
             return null;
         }
 
         boolean valid = doc.getBoolean("valid", false);
-        if (valid) {
+        if(valid) {
             return new Validator.Success(Validator.parseByPassChecks(key));
         } else {
             return new Validator.Failure();
         }
+    }
+
+    @Override
+    public Map<String, Validator.ValidationResult> getAllValidated() {
+        Map<String, Validator.ValidationResult> resultMap = new HashMap<>();
+
+        for(Document doc : validationColl.find()) {
+            String key = doc.getString("unit_key");
+            boolean valid = doc.getBoolean("valid", false);
+
+            Validator.ValidationResult result = valid
+                    ? new Validator.Success(Validator.parseByPassChecks(key))
+                    : new Validator.Failure();
+
+            resultMap.put(key, result);
+        }
+
+        return resultMap;
     }
 
     @Override

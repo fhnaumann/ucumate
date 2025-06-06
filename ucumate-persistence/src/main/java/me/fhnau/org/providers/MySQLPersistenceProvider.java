@@ -1,4 +1,4 @@
-package me.fhnau.org;
+package me.fhnau.org.providers;
 
 import java.sql.Connection;
 

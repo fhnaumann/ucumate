@@ -1,6 +1,7 @@
 package me.fhnau.org;
 
 import me.fhnau.org.persistence.PersistenceRegistry;
+import me.fhnau.org.providers.MySQLPersistenceProvider;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;

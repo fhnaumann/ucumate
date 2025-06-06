@@ -3,6 +3,7 @@ package me.fhnau.org;
 import com.zaxxer.hikari.HikariDataSource;
 import me.fhnau.org.funcs.UCUMService;
 import me.fhnau.org.persistence.PersistenceRegistry;
+import me.fhnau.org.providers.PostgresPersistenceProvider;
 
 import java.sql.SQLException;
 

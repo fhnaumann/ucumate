@@ -25,17 +25,18 @@ public class PersistenceRegistry implements PersistenceProvider {
 
     private PersistenceRegistry() {}
 
+
+    private static InMemoryPersistenceProvider cache;
+    private static final Map<String, PersistenceProvider> additionalProviders = new HashMap<>();
+
     static {
         try {
-            Class.forName("me.fhnau.org.persistence.SQLiteAutoRegistrar");
+            initCache(); // initialize cache with default config
+            Class.forName("me.fhnau.org.SQLiteAutoRegistrar"); // try to auto-register sqlite provider if persistence module is on classpath, otherwise ignore
         } catch (ClassNotFoundException ignored) {
             // Persistence module not on classpath — ignore
         }
     }
-
-
-    private static InMemoryPersistenceProvider cache = new InMemoryPersistenceProvider();
-    private static final Map<String, PersistenceProvider> additionalProviders = new HashMap<>();
 
     public static void initCache() {
         initCache(new Properties());
@@ -58,8 +59,9 @@ public class PersistenceRegistry implements PersistenceProvider {
                 cache.close();
             }
             if(!enableCache) {
-                cache = null;
-                return;
+                if(cache != null) {
+                    cache.setEnabled(false);
+                }
             }
             cache = new InMemoryPersistenceProvider(maxCanonSize, maxValSize, recordStats);
             cache.setEnabled(true);
@@ -80,6 +82,12 @@ public class PersistenceRegistry implements PersistenceProvider {
             additionalProviders.remove("sqlite");
         }
         additionalProviders.put(name, provider);
+
+        // try and load saved data into cache if enabled
+        if(cache != null && cache.isEnabled()) {
+            provider.getAllValidated().forEach(cache::saveValidated);
+            provider.getAllCanonical().forEach(cache::saveCanonical);
+        }
     }
 
     public static boolean hasAny() {
@@ -121,6 +129,17 @@ public class PersistenceRegistry implements PersistenceProvider {
     }
 
     @Override
+    public Map<UCUMExpression, Canonicalizer.CanonicalStepResult> getAllCanonical() {
+        if(cache != null && cache.isEnabled()) {
+            return cache.getAllCanonical();
+        }
+        if(additionalProviders.isEmpty()) {
+            return Map.of();
+        }
+        return additionalProviders.entrySet().stream().findFirst().get().getValue().getAllCanonical();
+    }
+
+    @Override
     public void saveValidated(String key, Validator.ValidationResult value) {
         cache.saveValidated(key, value);
         additionalProviders.forEach((s, entry) -> entry.saveValidated(key, value));
@@ -139,6 +158,17 @@ public class PersistenceRegistry implements PersistenceProvider {
             }
         }
         return null;
+    }
+
+    @Override
+    public Map<String, Validator.ValidationResult> getAllValidated() {
+        if(cache != null && cache.isEnabled()) {
+            return cache.getAllValidated();
+        }
+        if(additionalProviders.isEmpty()) {
+            return Map.of();
+        }
+        return additionalProviders.entrySet().stream().findFirst().get().getValue().getAllValidated();
     }
 
     @Override

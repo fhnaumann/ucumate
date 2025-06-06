@@ -1,10 +1,8 @@
 package me.fhnau.org;
 
-import me.fhnau.org.persistence.PersistenceRegistry;
-import org.junit.jupiter.api.BeforeAll;
+import me.fhnau.org.providers.SQLitePersistenceProvider;
 
 import java.sql.*;
-import java.util.Enumeration;
 
 /**
  * @author Felix Naumann
@@ -17,6 +15,11 @@ public class SQLitePersistenceIntegrationTest extends DBPersistenceIntegrationTe
     protected void registerPersistenceProvider() {
         SQLitePersistenceProvider provider = PersistenceProviderFactory.createDefaultSQLiteProvider();
         connection = provider.connection;
+        try {
+            connection.setAutoCommit(true);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -1,0 +1,93 @@
+{
+  "version": "3.9.0",
+  "created": "2025-06-06T00:43:45Z",
+  "files": [
+    {
+      "path": ".nojekyll"
+    },
+    {
+      "path": "404.html"
+    },
+    {
+      "path": "cache/index.html"
+    },
+    {
+      "path": "CNAME"
+    },
+    {
+      "path": "core-lib/index.html"
+    },
+    {
+      "path": "exact_math/index.html"
+    },
+    {
+      "path": "favicon.png"
+    },
+    {
+      "path": "getting_started/index.html"
+    },
+    {
+      "path": "index.html"
+    },
+    {
+      "path": "persistence/index.html"
+    },
+    {
+      "path": "resources/css/retype.css"
+    },
+    {
+      "path": "resources/fonts/Inter-italic-latin-var.woff2"
+    },
+    {
+      "path": "resources/fonts/Inter-roman-latin-var.woff2"
+    },
+    {
+      "path": "resources/js/config.js"
+    },
+    {
+      "path": "resources/js/lunr.js"
+    },
+    {
+      "path": "resources/js/prism.js"
+    },
+    {
+      "path": "resources/js/retype.js"
+    },
+    {
+      "path": "resources/js/search.json"
+    },
+    {
+      "path": "resources/lunr.js.LICENSE.txt"
+    },
+    {
+      "path": "resources/mermaid.js.LICENSE.txt"
+    },
+    {
+      "path": "resources/prism.js.LICENSE.txt"
+    },
+    {
+      "path": "resources/retype.js.LICENSE.txt"
+    },
+    {
+      "path": "resources/retype.LICENSE.txt"
+    },
+    {
+      "path": "robots.txt"
+    },
+    {
+      "path": "sitemap.xml.gz"
+    },
+    {
+      "path": "static/favicon.png"
+    },
+    {
+      "path": "static/latex_example_img.png"
+    },
+    {
+      "path": "static/ucum-tests.json"
+    },
+    {
+      "path": "tests/index.html"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-package me.fhnau.org;
+package me.fhnau.org.providers;
 
 import me.fhnau.org.funcs.Canonicalizer;
 import me.fhnau.org.funcs.UCUMService;
@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Felix Naumann
@@ -73,8 +75,8 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
                 stmt.setNull(7, Types.VARCHAR);
                 stmt.setNull(8, Types.VARCHAR);
             }
-
-            stmt.executeUpdate();
+            int tmp = stmt.executeUpdate();
+            System.out.println(tmp);
             logger.debug("Saved key={}, canonStep={} to {}.", keyString, canonStep, connection.getMetaData());
         } catch (Exception e) {
             throw new RuntimeException("Failed to save canonical data", e);
@@ -146,6 +148,87 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to load validated data", e);
         }
+    }
+
+    @Override
+    public Map<String, Validator.ValidationResult> getAllValidated() {
+        Map<String, Validator.ValidationResult> resultMap = new HashMap<>();
+
+        String sql = "SELECT unit_key, valid FROM ucumate_validate";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String key = rs.getString("unit_key");
+                boolean valid = rs.getBoolean("valid");
+
+                Validator.ValidationResult result;
+                if (valid) {
+                    UCUMExpression.Term parsed = Validator.parseByPassChecks(key);
+                    result = new Validator.Success(parsed);
+                } else {
+                    result = new Validator.Failure();
+                }
+                resultMap.put(key, result);
+
+                logger.debug("Loaded {} from data source into cache", key);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to load validation entries", e);
+        }
+
+        return resultMap;
+    }
+
+    @Override
+    public Map<UCUMExpression, Canonicalizer.CanonicalStepResult> getAllCanonical() {
+        Map<UCUMExpression, Canonicalizer.CanonicalStepResult> resultMap = new HashMap<>();
+
+        String sql = "SELECT * FROM ucumate_canonical";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String unitKey = rs.getString("unit_key");
+                String magnitudeStr = rs.getString("magnitude");
+                String cfPrefixStr = rs.getString("cfPrefix");
+                String termStr = rs.getString("term");
+                boolean special = rs.getBoolean("special");
+
+                UCUMExpression inputKey = Validator.parseByPassChecks(unitKey);
+                UCUMExpression.Term term = Validator.parseCanonical(termStr);
+                PreciseDecimal magnitude = new PreciseDecimal(magnitudeStr);
+                PreciseDecimal cfPrefix = new PreciseDecimal(cfPrefixStr);
+
+                UCUMDefinition.UCUMFunction function = null;
+                if (special) {
+                    String name = rs.getString("specialName");
+                    String unit = rs.getString("specialUnit");
+                    String valueStr = rs.getString("specialValue");
+                    function = new UCUMDefinition.UCUMFunction(name, new PreciseDecimal(valueStr), unit);
+                }
+
+                Canonicalizer.CanonicalStepResult step = new Canonicalizer.CanonicalStepResult(
+                        term,
+                        magnitude,
+                        cfPrefix,
+                        special,
+                        function
+                );
+
+                logger.debug("Loaded {} from data source into cache.", unitKey);
+
+                resultMap.put(inputKey, step);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to load canonical entries", e);
+        }
+
+        return resultMap;
     }
 
     @Override

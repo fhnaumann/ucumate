@@ -14,15 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addViewControllers(ViewControllerRegistry registry) {
 
 
-        //registry.addViewController("/tool/{spring:\\w+}")
-        //        .setViewName("forward:/tool/index.html");
-        //registry.addViewController("/tool/**/{spring:\\w+}")
-        //        .setViewName("forward:/tool/index.html");
-
-        registry.addViewController("/doc")
-                .setViewName("forward:/doc/index.html");
-        registry.addViewController("/doc/**")
-                .setViewName("forward:/doc/index.html");
+        registry.addRedirectViewController("/doc", "/doc/index.html");
 
     }
 }
