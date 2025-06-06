@@ -8,6 +8,14 @@
     <artifactId>ucumate-demo</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <!--parent>
+        <groupId>me.fhnau.org</groupId>
+        <artifactId>ucumate-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>ucumate-demo</artifactId -->
+
     <repositories>
         <repository>
             <id>jitpack.io</id>
@@ -22,15 +30,15 @@
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency -->
-        <dependency>
+        <!--dependency>
             <groupId>com.github.fhnaumann.ucumate</groupId>
             <artifactId>ucumate-core-exact-special-math</artifactId>
             <version>ef9fddf316</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>com.github.fhnaumann.ucumate</groupId>
             <artifactId>ucumate-persistence</artifactId>
-            <version>660a02c735</version>
+            <version>8f7f374828</version>
         </dependency>
         <!--dependency>
             <groupId>me.fhnau.org</groupId>

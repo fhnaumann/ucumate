@@ -29,6 +29,7 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     private final MongoCollection<Document> validationColl;
 
     public MongoDBPersistenceProvider(MongoClient client, String dbName) {
+        System.out.println("CREATING MONGODB PROVIDER");
         this.client = client;
         MongoDatabase db = client.getDatabase(dbName);
         this.canonicalColl = db.getCollection("ucumate_canonical");

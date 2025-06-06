@@ -13,9 +13,9 @@ import java.util.Properties;
 @SpringBootApplication
 public class DemoApplication {
     public static void main(String[] args) {
-        Properties props = new Properties();
-        props.put("ucumate.cache.preheat", true);
-        PersistenceRegistry.initCache(props);
+        //Properties props = new Properties();
+        //props.put("ucumate.cache.preheat", true);
+        //PersistenceRegistry.initCache(props);
         SpringApplication.run(DemoApplication.class, args);
     }
 }

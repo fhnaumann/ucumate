@@ -16,6 +16,7 @@
         <module>ucumate-core-exact-special-math</module>
         <module>ucumate-persistence</module>
         <module>ucumate-test-utils</module>
+        <module>ucumate-demo</module>
     </modules>
 
     <dependencyManagement>
