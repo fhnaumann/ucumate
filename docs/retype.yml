@@ -1,7 +1,7 @@
 input: .
-output: ../ucumate-demo/src/resources/static/doc
+output: .retype
 
-url: docs.example.com # Use your website address here
+url: https://github.com/fhnaumann/ucumate/settings/pages
 
 start:
   # Uncomment the next line to try Retype Pro features
