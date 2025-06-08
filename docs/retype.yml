@@ -1,5 +1,5 @@
 input: .
-output: .retype
+output: ../ucumate-demo/src/resources/static/doc
 
 url: docs.example.com # Use your website address here
 
@@ -16,6 +16,8 @@ branding:
 links:
   - text: Getting Started
     link: https://retype.com/guides/getting-started/
+
+cleanUrls: true
 
 footer:
   copyright: "&copy; Copyright {{ year }}. All rights reserved."

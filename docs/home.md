@@ -1,12 +1,13 @@
 ---
 order: 100
 ---
-# Ucumate
+# ucumate
 
-Ucumate is a developer-friendly Java library for parsing, validating, canonicalizing, and converting units of measure 
+ucumate is a developer-friendly Java library for parsing, validating, canonicalizing, and converting units of measure 
 based on the [Unified Code for Units of Measure (UCUM)](https://ucum.org/) standard. It provides validation, canonicalization, and
 conversion support with high decimal precision if desired. Furthermore, all *special units* are supported. 
 
+This library requires Java 21 to run.
 Currently, all dependencies are hosted through jitpack so you need add their repository in the `pom.xml`.
 
 ```xml
