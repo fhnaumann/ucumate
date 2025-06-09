@@ -6,7 +6,7 @@ If you work with special units and need high precision during canonicalization o
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-core-exact-special-math</artifactId>
-    <version>v1.0.0</version>
+    <version>v1.0.1</version>
 </dependency>
 ```
 

@@ -55,6 +55,10 @@ build/
 ucumate-demo.tar
 ucumate-demo.iml
 
+benchmark*.csv
+benchmark*.json
+/benchmarks/target
+
 
 ### VS Code ###
 .vscode/
