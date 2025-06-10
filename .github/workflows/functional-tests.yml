@@ -6,6 +6,10 @@ on:
       - main
 jobs:
   functional-tests:
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
