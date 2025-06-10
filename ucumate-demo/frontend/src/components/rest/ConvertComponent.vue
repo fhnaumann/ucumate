@@ -6,10 +6,12 @@
           maximumFractionDigits: 100,
           useGrouping: false
         }">
-          <Label for="fromConversionFactor">From Conversion Factor</Label>
-          <NumberFieldContent>
-            <NumberFieldInput />
-          </NumberFieldContent>
+          <div class="flex flex-col space-y-2">
+            <Label for="fromConversionFactor">From Conversion Factor</Label>
+            <NumberFieldContent>
+              <NumberFieldInput />
+            </NumberFieldContent>
+          </div>
         </NumberField>
       </div>
       <div class="flex flex-col space-y-2">
