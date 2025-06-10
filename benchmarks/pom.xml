@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.github.fhnaumann.ucumate</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>0fe1b5617c</version>
+            <version>v1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.fhir</groupId>
