@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.fhnau.org</groupId>
+    <groupId>io.github.fhnaumann</groupId>
     <artifactId>benchmarks</artifactId>
-    <version>v1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -14,12 +14,32 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
+    <packaging>jar</packaging>
+
+    <name>ucumate-benchmarks</name>
+    <description>A library for working with UCUM.</description>
+    <url>https://github.com/fhnaumann/ucumate</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Felix Naumann</name>
+            <email>fhnaumann@t-online.de</email>
+            <organization>Personal</organization>
+            <organizationUrl>https://github.com/fhnaumann</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <url>https://github.com/fhnaumann/ucumate/tree/main</url>
+        <connection>scm:git:git://github.com/fhnaumann/ucumate.git</connection>
+        <developerConnection>scm:git:ssh://github.com:fhnaumann/ucumate.git</developerConnection>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -41,9 +61,9 @@
             <version>2.24.3</version>
         </dependency>
         <dependency>
-            <groupId>com.github.fhnaumann.ucumate</groupId>
+            <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>v1.0.1</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.fhir</groupId>
