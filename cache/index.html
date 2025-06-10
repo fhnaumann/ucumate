@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="turbo-root" content="/ucumate">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.0.802840617417">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.0.802846314658">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 3.10.0">
@@ -32,12 +32,12 @@
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
     <link href="../favicon.png" rel="icon">
-    <link href="../resources/css/retype.css?v=3.10.0.802840617417" rel="stylesheet">
+    <link href="../resources/css/retype.css?v=3.10.0.802846314658" rel="stylesheet">
 
-    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.0.802840617417" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.0.802846314658" data-turbo-eval="false" defer></script>
     <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.0" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.0.802840617417" data-turbo-eval="false" defer></script>
-    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.0.802840617417" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.0.802846314658" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.0.802846314658" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -195,9 +195,57 @@
 </doc-anchor-target>
 <p>By default, the <code v-pre>core</code> library has a built-in cache that is enabled. Any expression that is encountered during validation
 or canonicalization is being cached. If the cache is full then older entries will be removed.</p>
-<p>If you enable preheating then you have to initialize the cache once on startup.</p>
+<p>You can configure the cache through three ways:</p>
+<doc-anchor-target id="property-file">
+    <h3>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#property-file">#</doc-anchor-trigger>
+        <span>Property File</span>
+    </h3>
+</doc-anchor-target>
+<p>Create a <code v-pre>ucumate.properties</code> file in <code v-pre>src/main/resources</code>, i.e.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">PersistenceRegistry.initCache(props);</code></pre>
+<pre translate="no" class="language-properties"><code v-pre class="language-properties"># Inside a file called ucumate.properties
+ucumate.cache.enable=true
+ucumate.cache.maxCanonSize=10000
+ucumate.cache.maxValSize=10000
+ucumate.cache.recordStats=false
+ucumate.cache.preheat=true
+ucumate.cache.preheat.override=false</code></pre>
+</doc-codeblock></div>
+<doc-anchor-target id="properties-in-java-code">
+    <h3>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#properties-in-java-code">#</doc-anchor-trigger>
+        <span>Properties in Java Code</span>
+    </h3>
+</doc-anchor-target>
+<p>Create a <code v-pre>Properties</code> object and call <code v-pre>initCache</code>.</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre translate="no" class="language-java"><code v-pre class="language-java">Properties props = new Properties();
+props.put(&quot;ucumate.cache.enable&quot;, true);
+props.put(&quot;ucumate.cache.maxCanonSize&quot;, 10000);
+props.put(&quot;ucumate.cache.maxValSize&quot;, 10000);
+props.put(&quot;ucumate.cache.recordStats&quot;, false);
+props.put(&quot;ucumate.cache.preheat&quot;, true);
+props.put(&quot;ucumate.cache.preheat.override&quot;, false);
+
+PersistenceRegistry.initCache(props);</code></pre>
+</doc-codeblock></div>
+<doc-anchor-target id="builder-class">
+    <h3>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#builder-class">#</doc-anchor-trigger>
+        <span>Builder Class</span>
+    </h3>
+</doc-anchor-target>
+<p>There is a fluent builder class to construct cache settings.</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre translate="no" class="language-java"><code v-pre class="language-java">Properties props = CacheConfig.builder()
+        .enable()
+        .size(10000, 10000)
+        .recordStats(false)
+        .preHeat(true)
+        .build();
+
+PersistenceRegistry.initCache(props);</code></pre>
 </doc-codeblock></div>
 <p>If you want save the cache between restarts you can add the <code v-pre>ucumate-persistence</code> <a href="../persistence/">module</a> that ships with a sqlite database
 by default. When the app starts everything from the data storage will be loaded into the cache.</p>
