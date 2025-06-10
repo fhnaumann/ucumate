@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  * A precision‐aware decimal implementation for UCUM canonicalization.
@@ -44,6 +45,9 @@ import java.util.Objects;
  * </pre>
  */
 public class PreciseDecimal {
+
+    private static final int DEFAUlT_UNLIMITED_PRECISION = 50;
+    private static  int unlimitedPrecision = DEFAUlT_UNLIMITED_PRECISION;
 
     // The underlying BigDecimal value.
     private final BigDecimal value;
@@ -369,7 +373,7 @@ public class PreciseDecimal {
         if(effectivePrecision == Integer.MAX_VALUE) {
             // Both operands are unlimited; choose a default scale.
 
-            BigDecimal quotient = this.value.divide(other.value, 20, RoundingMode.HALF_UP);
+            BigDecimal quotient = this.value.divide(other.value, unlimitedPrecision, RoundingMode.HALF_UP);
             return unlimitedPrecision(quotient);
         } else {
             MathContext mc = new MathContext(effectivePrecision, RoundingMode.HALF_UP);
@@ -427,7 +431,7 @@ public class PreciseDecimal {
         if (exponent < 0) {
             MathContext mc = limited
                              ? new MathContext(resultPrecision, RoundingMode.HALF_UP)
-                             : new MathContext(20, RoundingMode.HALF_UP); // default if unlimited
+                             : new MathContext(unlimitedPrecision, RoundingMode.HALF_UP);
 
             BigDecimal powered = BigDecimal.ONE.divide(this.value.pow(-exponent, mc), mc);
             int resultScale = powered.scale();
@@ -456,7 +460,9 @@ public class PreciseDecimal {
             // Ensure the number is displayed with the original (or resulting) scale.
             return value.setScale(scale, RoundingMode.HALF_UP).toPlainString();
         } else {
-            return value.toPlainString();
+            BigDecimal rounded = value.round(new MathContext(100));
+            return rounded.toPlainString();
+            //return value.toPlainString();
         }
     }
 
@@ -516,5 +522,43 @@ public class PreciseDecimal {
             return new PreciseDecimal(bd.toPlainString(), true);
             //return new PreciseDecimal(bd, true, computePrecision(bd.toPlainString()), 4); // fixed sigfigs & scale
         }
+    }
+
+    static {
+        // Try loading from system property at startup
+        String systemProp = System.getProperty("ucumate.precision.unlimitedScale");
+        if (systemProp != null) {
+            try {
+                setUnlimitedPrecision(Integer.parseInt(systemProp));
+            } catch (NumberFormatException e) {
+                System.err.println("[PreciseDecimalConfig] Invalid system property: " + systemProp);
+            }
+        }
+    }
+
+    public static int getUnlimitedPrecision() {
+        return unlimitedPrecision;
+    }
+
+    public static void setUnlimitedPrecision(int scale) {
+        if (scale <= 0) {
+            throw new IllegalArgumentException("Scale must be positive");
+        }
+        unlimitedPrecision = scale;
+    }
+
+    public static void configureFromProperties(Properties props) {
+        String prop = props.getProperty("ucumate.precision.unlimitedScale");
+        if (prop != null) {
+            try {
+                setUnlimitedPrecision(Integer.parseInt(prop));
+            } catch (NumberFormatException e) {
+                System.err.println("[PreciseDecimalConfig] Invalid property: " + prop);
+            }
+        }
+    }
+
+    public static void resetToDefault() {
+        unlimitedPrecision = DEFAUlT_UNLIMITED_PRECISION;
     }
 }

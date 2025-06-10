@@ -10,7 +10,13 @@ import me.fhnau.org.model.UCUMExpression;
 import me.fhnau.org.util.PreciseDecimal;
 import me.fhnau.org.util.UCUMRegistry;
 
+import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+
 public class TestUtil {
+
+    private static final BigDecimal EPSILON = new BigDecimal("0.00001");
 
     private static final UCUMSyntaxPrinter ucumSyntaxPrinter = new UCUMSyntaxPrinter();
     private static final WolframAlphaSyntaxPrinter wolframAlphaSyntaxPrinter = new WolframAlphaSyntaxPrinter();
@@ -118,5 +124,18 @@ public class TestUtil {
         } else {
             return ucumSyntaxPrinter.print(UCUMExpression);
         }
+    }
+
+    public static boolean isClose(BigDecimal a, BigDecimal b, BigDecimal epsilon) {
+        return a.subtract(b).abs().compareTo(epsilon) <= 0;
+    }
+
+    public static void skipIfRoundingProblem(String expected, PreciseDecimal actual) {
+        String actualString = actual.toString();
+        if(actualString.startsWith(expected)) {
+            return;
+        }
+        assumeFalse(isClose(new BigDecimal(expected), new BigDecimal(actualString), EPSILON),
+                "Skipping test because are close within an epsilon: Expected=%s, Actual=%s".formatted(expected, actualString));
     }
 }

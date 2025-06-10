@@ -47,6 +47,11 @@ public class BenchmarkFunctionalJSONTests {
 
         service = new UcumEssenceService(BenchmarkFunctionalXMLTests.class.getResourceAsStream("/ucum-essence.xml"));
 
+        if(ucumateCaching == null) {
+            System.out.println("caching not configured!");
+            return;
+        }
+
         if(ucumateCaching.equals("disable")) {
             PersistenceRegistry.disableInMemoryCache(true);
         }
@@ -56,6 +61,18 @@ public class BenchmarkFunctionalJSONTests {
             properties.put("ucumate.cache.preheat", ucumateCaching.equals("enableWithPreHeat"));
             PersistenceRegistry.initCache(properties);
         }
+    }
+
+    public List<String> aggregateWhereUcumJavaDiffers() {
+        List<String> diff = new ArrayList<>();
+        for (TestCase.ValidateTestCase testCase : validateCases) {
+            boolean ucumJavaValid = service.validate(testCase.inputExpression()) == null;
+            boolean ucumateValid = UCUMService.validateToBool(testCase.inputExpression());
+            if(ucumJavaValid != ucumateValid) {
+                diff.add("id %s: Input %s: ucum-java says %s but ucumate says %s.".formatted(testCase.id(), testCase.inputExpression(), ucumJavaValid, ucumateValid));
+            }
+        }
+        return diff;
     }
 
     @Benchmark

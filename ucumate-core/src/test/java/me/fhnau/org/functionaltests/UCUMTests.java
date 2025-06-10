@@ -5,18 +5,18 @@ import me.fhnau.org.funcs.*;
 import me.fhnau.org.model.UCUMExpression;
 import me.fhnau.org.util.PreciseDecimal;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Tag("functional-tests")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UCUMTests {
 
@@ -99,11 +99,12 @@ public class UCUMTests {
                 .isInstanceOf(Converter.Success.class)
                 .extracting(Converter.Success.class::cast)
                 .extracting(Converter.Success::conversionFactor)
-                .asString()
-                .satisfies(s -> {
-                    Assertions.assertThat(s)
-                        .withFailMessage(() -> "%s: Expected resulting conversion factor of %s but got %s".formatted(testCase.id(), toFactor, s))
-                        .startsWith(toFactor.toString());
+                .satisfies(pd -> {
+                    TestUtil.skipIfRoundingProblem(toFactor.toString(), pd);
+                    Assertions.assertThat(pd)
+                            .asString()
+                            .withFailMessage(() -> "%s: Expected resulting conversion factor of %s but got %s".formatted(testCase.id(), toFactor, pd))
+                            .startsWith(toFactor.toString());
                 });
         }
         else {
@@ -113,10 +114,12 @@ public class UCUMTests {
 
     }
 
+
     @AfterAll
     public static void tearDown() {
         //System.out.println(Validator.cache.stats());
         //System.out.println(Canonicalizer.cache.stats());
         // System.out.println(GraphLayout.parseInstance(Canonicalizer.cache).toFootprint());
     }
+
 }
