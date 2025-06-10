@@ -22,6 +22,6 @@ jobs:
         if: always()
         with:
           name: Maven Tests
-          path: ucumate/ucumate-core/target/surefire-reports/*.xml
+          path: ucumate-core/target/surefire-reports/*.xml
           reporter: java-junit
           fail-on-error: true
