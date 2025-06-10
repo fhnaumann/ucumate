@@ -8,15 +8,22 @@ based on the [Unified Code for Units of Measure (UCUM)](https://ucum.org/) stand
 conversion support with high decimal precision if desired. Furthermore, all *special units* are supported. 
 
 This library requires Java 21 to run.
-Currently, all dependencies are hosted through jitpack so you need add their repository in the `pom.xml`.
+Currently, all dependencies are hosted on the maven central snapshot repository, you need to add it to your `pom.xml`
 
 ```xml
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
+<repositories>
+    <repository>
+        <name>Central Portal Snapshots</name>
+        <id>central-portal-snapshots</id>
+        <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        <releases>
+            <enabled>false</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+</repositories>
 ```
 
 You will need the core implementation.
@@ -25,7 +32,7 @@ You will need the core implementation.
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-core</artifactId>
-    <version>v1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -35,7 +42,7 @@ If you need high precision (especially when special units are involved) then you
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-core-exact-special-math</artifactId>
-    <version>v1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -45,6 +52,6 @@ If you need data persistence across restarts you can use the [ucumate-persistenc
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-persistence</artifactId>
-    <version>v1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
 </dependency>
 ```

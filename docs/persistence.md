@@ -13,7 +13,7 @@ Add the additional dependency:
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-persistence</artifactId>
-    <version>v1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
 </dependency>
 ```
 
