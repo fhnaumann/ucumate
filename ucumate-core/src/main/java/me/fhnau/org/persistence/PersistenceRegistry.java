@@ -50,8 +50,6 @@ public class PersistenceRegistry implements PersistenceProvider {
             boolean recordStats = (boolean) properties.getOrDefault("ucumate.cache.recordStats", false);
             boolean preHeat = (boolean) properties.getOrDefault("ucumate.cache.preheat", false);
             boolean overrideInsteadOfAdd = (boolean) properties.getOrDefault("ucumate.cache.preheat.override", false);
-            System.out.println("ABC DEF");
-            System.out.println(PersistenceRegistry.class.getClassLoader().getResourceAsStream("pre_heat_codes.json"));
             List<String> defaultPreHeatCodes = PropertiesUtil.readCodeFile(PersistenceRegistry.class.getClassLoader().getResourceAsStream("pre_heat_codes.json"));
             String preHeatCodesFilename = (String) properties.getOrDefault("ucumate.cache.preheat.codes", "");
             List<String> preHeatCodes = !preHeatCodesFilename.isBlank() ? PropertiesUtil.readCodeFile(preHeatCodesFilename) : List.of();

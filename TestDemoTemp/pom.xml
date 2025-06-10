@@ -6,7 +6,7 @@
 
     <groupId>me.fhnau.org</groupId>
     <artifactId>TestDemoTemp</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>v1.0.1</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
