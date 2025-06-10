@@ -2,5 +2,13 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "dependencyDashboard": true,
+  "groupName": "All dependencies",
+  "packageRules": [
+    {
+      "groupName": "All updates",
+      "matchPackagePatterns": [".*"]
+    }
   ]
 }
