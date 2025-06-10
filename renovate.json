@@ -8,7 +8,9 @@
   "packageRules": [
     {
       "groupName": "All updates",
-      "matchPackagePatterns": [".*"]
+      "matchPackageNames": [
+        "/.*/"
+      ]
     }
   ]
 }
