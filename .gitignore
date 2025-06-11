@@ -67,3 +67,6 @@ benchmark*.json
 .DS_Store
 
 /target
+ucumate-demo/src/main/resources/static
+
+/ucumate-ucumjava-bridge/target

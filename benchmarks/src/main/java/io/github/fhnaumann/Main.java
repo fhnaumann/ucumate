@@ -20,16 +20,19 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws IOException, UcumException, ParserConfigurationException, SAXException {
+        UCUMService.validate("g.m2-1");
         //org.openjdk.jmh.Main.main(args);
+
+
         //logger.debug("TEST");
-        Properties properties = new Properties();
-        properties.put("ucumate.cache.preheat", true);
-        PersistenceRegistry.initCache(properties);
+        //Properties properties = new Properties();
+        //properties.put("ucumate.cache.preheat", true);
+        //PersistenceRegistry.initCache(properties);
         //UCUMService.validate("/cm[H2O]");
-        var obj = new BenchmarkFunctionalJSONTests();
-        obj.loadData();
-        List<String> diff = obj.aggregateWhereUcumJavaDiffers();
-        System.out.println(String.join("\n", diff));
+        //var obj = new BenchmarkFunctionalJSONTests();
+        //obj.loadData();
+        //List<String> diff = obj.aggregateWhereUcumJavaDiffers();
+        //System.out.println(String.join("\n", diff));
     }
 
     public void runCode() {

@@ -255,6 +255,51 @@ public class UCUMService {
         return new Canonicalizer().canonicalize(term);
     }
 
+    // todo write javadoc
+
+    public static CanonicalizationResult canonicalize(PreciseDecimal factor, String term) {
+        return canonicalize(factor, parseOrError(term));
+    }
+
+    public static CanonicalizationResult canonicalize(String factor, UCUMExpression.Term term) {
+        return canonicalize(new PreciseDecimal(factor), term);
+    }
+
+    public static CanonicalizationResult canonicalize(String factor, String term) {
+        return canonicalize(new PreciseDecimal(factor), term);
+    }
+
+    public static CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term) {
+        return new Canonicalizer().canonicalize(factor, term);
+    }
+
+    /**
+     * Test if a given string term is canonical.
+     *
+     * @param term A term as a string.
+     * @return true if canonical, false otherwise.
+     *
+     * @see UCUMService#isCanonical(UCUMExpression.Term)
+     */
+    public static boolean isCanonical(String term) {
+        return isCanonical(parseOrError(term));
+    }
+
+    /**
+     * Test if a given term is canonical.
+     *
+     * @param term A term.
+     * @return true if canonical, false otherwise.
+     *
+     * @see UCUMService#isCanonical(String)
+     */
+    public static boolean isCanonical(UCUMExpression.Term term) {
+        return switch (term) {
+            case UCUMExpression.CanonicalTerm canonicalTerm -> true;
+            case UCUMExpression.MixedTerm mixedTerm -> false;
+        };
+    }
+
     /**
      * Creates a string representation of a given UCUMExpression as a string.
      *

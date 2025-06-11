@@ -9,8 +9,8 @@ import java.util.Map;
 public class DimensionAnalyzer {
 
     public sealed interface ComparisonResult {}
-    record Success() implements ComparisonResult {}
-    record Failure(Map<Dimension, Integer> difference) implements ComparisonResult {}
+    public record Success() implements ComparisonResult {}
+    public record Failure(Map<Dimension, Integer> difference) implements ComparisonResult {}
 
 
     public static ComparisonResult compare(UCUMExpression.CanonicalTerm term, UCUMExpression.CanonicalTerm otherTerm) {

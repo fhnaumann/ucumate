@@ -6,6 +6,8 @@ import org.fhir.ucum.Decimal;
 import org.fhir.ucum.UcumEssenceService;
 import org.fhir.ucum.UcumException;
 import org.openjdk.jmh.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,12 +22,13 @@ import java.util.concurrent.TimeUnit;
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 3, time = 1)
-@Measurement(iterations = 2, time = 1)
-@Fork(2)
+@Warmup(iterations = 1, time = 1)
+@Measurement(iterations = 1, time = 1)
+@Fork(0)
 @State(Scope.Thread)
 public class BenchmarkFunctionalJSONTests {
 
+    private static final Logger logger = LoggerFactory.getLogger(BenchmarkFunctionalJSONTests.class);
     private List<TestCase.ValidateTestCase> validateCases;
     private List<TestCase.CommensurableTestCase> commensurableCases;
     private List<TestCase.ConvertTestCase> convertCases;
@@ -37,27 +40,7 @@ public class BenchmarkFunctionalJSONTests {
 
     @Setup(Level.Iteration)
     public void loadData() throws IOException, ParserConfigurationException, SAXException, UcumException {
-        TestSuite suite = TestCaseLoader.load();
-        validateCases = suite.validate;
-        commensurableCases = suite.commensurable;
-        convertCases = suite.convert;
 
-        service = new UcumEssenceService(BenchmarkFunctionalXMLTests.class.getResourceAsStream("/ucum-essence.xml"));
-
-        if(ucumateCaching == null) {
-            System.out.println("caching not configured!");
-            return;
-        }
-
-        if(ucumateCaching.equals("disable")) {
-            PersistenceRegistry.disableInMemoryCache(true);
-        }
-        else {
-            Properties properties = new Properties();
-            properties.put("ucumate.cache.enable", true);
-            properties.put("ucumate.cache.preheat", ucumateCaching.equals("enableWithPreHeat"));
-            PersistenceRegistry.initCache(properties);
-        }
     }
 
     public List<String> aggregateWhereUcumJavaDiffers() {
@@ -103,9 +86,11 @@ public class BenchmarkFunctionalJSONTests {
 
     @Benchmark
     public void benchmarkUcumateValidation() {
+        logger.warn("Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
         for (TestCase.ValidateTestCase testCase : validateCases) {
             UCUMService.validateToBool(testCase.inputExpression());
         }
+        logger.warn("After Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
     }
 
     @Benchmark
