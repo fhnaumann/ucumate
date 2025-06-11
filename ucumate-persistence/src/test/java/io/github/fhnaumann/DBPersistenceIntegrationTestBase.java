@@ -54,7 +54,7 @@ public abstract class DBPersistenceIntegrationTestBase {
         ((Canonicalizer.Success) UCUMService.canonicalize(parsedTerm)).canonicalTerm();
         Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(parsedTerm);
         assertThat(canonicalStepResult).isNotNull();
-        assertThat("g+1").isEqualTo(UCUMService.print(canonicalStepResult.term()));
+        assertThat("g").isEqualTo(UCUMService.print(canonicalStepResult.term()));
         assertThat(new PreciseDecimal("1")).isEqualTo(canonicalStepResult.magnitude());
         assertThat(new PreciseDecimal("1")).isEqualTo(canonicalStepResult.cfPrefix());
         assertFalse(canonicalStepResult.specialHandlingActive());
@@ -65,7 +65,7 @@ public abstract class DBPersistenceIntegrationTestBase {
         UCUMService.canonicalize("S");
         Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(parse("S"));
         assertThat(canonicalStepResult).isNotNull();
-        assertThat("C+2.m-2.s+1.g-1").isEqualTo(UCUMService.print(canonicalStepResult.term()));
+        assertThat("C+2.m-2.s.g-1").isEqualTo(UCUMService.print(canonicalStepResult.term()));
         assertThat(new PreciseDecimal("0.001")).isEqualTo(canonicalStepResult.magnitude());
         assertThat(new PreciseDecimal("1")).isEqualTo(canonicalStepResult.cfPrefix());
         assertFalse(canonicalStepResult.specialHandlingActive());
@@ -75,7 +75,7 @@ public abstract class DBPersistenceIntegrationTestBase {
     public void can_persist_canonicalization_special_unit() {
         UCUMService.canonicalize("Cel");
         Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(parse("Cel"));
-        assertEquals("K+1", print(canonicalStepResult.term()));
+        assertEquals("K", print(canonicalStepResult.term()));
         assertTrue(canonicalStepResult.specialHandlingActive());
         assertNotNull(canonicalStepResult.specialFunction());
         assertEquals("Cel", canonicalStepResult.specialFunction().name());
@@ -91,7 +91,7 @@ public abstract class DBPersistenceIntegrationTestBase {
         boolean actualValid = switch (fromCache) {
             case Validator.Failure failure -> false;
             case Validator.Success success -> true;
-            case null -> fail("Cache return null");
+            case null -> fail("Storage return null");
         };
         assertEquals(valid, actualValid);
     }
