@@ -175,7 +175,15 @@ public class UCUMService {
      * @see UCUMService#convert(UCUMExpression.Term, UCUMExpression.Term)
      */
     public static ConversionResult convert(PreciseDecimal factor, UCUMExpression.Term from, UCUMExpression.Term to) {
-        return new Converter().convert(new Conversion(factor, from), to);
+        return new Converter().convert(new Conversion(factor, from), to, null);
+    }
+
+    public static ConversionResult convert(String factor, String from, String to, String substanceMolMassCoeff) {
+        return new Converter().convert(new Conversion(new PreciseDecimal(factor), parseOrError(from)), parseOrError(to), substanceMolMassCoeff != null ? new PreciseDecimal(substanceMolMassCoeff) : null);
+    }
+
+    public static ConversionResult convert(PreciseDecimal factor, UCUMExpression.Term from, UCUMExpression.Term to, PreciseDecimal substanceMolMassCoeff) {
+        return new Converter().convert(new Conversion(factor, from), to, substanceMolMassCoeff);
     }
 
     /**

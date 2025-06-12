@@ -111,7 +111,7 @@ public class TestUtil {
     }
 
     public static UCUMExpression.CanonicalTerm parse_canonical(String input) {
-        return ((Canonicalizer.Success) new Canonicalizer().canonicalize(PreciseDecimal.ONE, parse(input), false, false, Canonicalizer.UnitDirection.FROM)).canonicalTerm();
+        return ((Canonicalizer.Success) new Canonicalizer().canonicalize(PreciseDecimal.ONE, parse(input), false, false, Canonicalizer.UnitDirection.FROM, PreciseDecimal.ONE)).canonicalTerm();
     }
 
     public static String print(UCUMExpression UCUMExpression) {

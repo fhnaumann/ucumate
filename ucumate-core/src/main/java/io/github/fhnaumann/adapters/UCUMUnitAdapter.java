@@ -1,5 +1,6 @@
 package io.github.fhnaumann.adapters;
 
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.model.UCUMDefinition;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
