@@ -363,4 +363,12 @@ public class UCUMService {
     public static String print(UCUMExpression ucumExpression) {
         return print(ucumExpression, PrintType.UCUM_SYNTAX);
     }
+
+    public static String print(UCUMExpression ucumExpression, Printer printer) {
+        return printer.print(ucumExpression);
+    }
+
+    public static String print(String ucumExpression, Printer printer) {
+        return printer.print(parseOrError(ucumExpression));
+    }
 }

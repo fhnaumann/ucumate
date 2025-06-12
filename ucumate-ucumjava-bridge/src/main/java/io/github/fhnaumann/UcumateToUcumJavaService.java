@@ -22,13 +22,16 @@ public class UcumateToUcumJavaService implements UcumService {
 
     private static final Logger log = LoggerFactory.getLogger(UcumateToUcumJavaService.class);
     private final UcumEssenceService legacy;
+    private final UcumJavaLegacyPrinter legacyPrinter;
 
     public UcumateToUcumJavaService(InputStream stream) throws UcumException {
         legacy = new UcumEssenceService(stream);
+        this.legacyPrinter = new UcumJavaLegacyPrinter();
     }
 
     public UcumateToUcumJavaService(String filename) throws UcumException {
         legacy = new UcumEssenceService(filename);
+        this.legacyPrinter = new UcumJavaLegacyPrinter();
     }
 
     @Override
@@ -94,8 +97,7 @@ public class UcumateToUcumJavaService implements UcumService {
 
     @Override
     public String analyse(String unit) throws UcumException {
-        // todo does not print exactly the same
-        return UCUMService.print(unit, Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX);
+        return UCUMService.print(unit, legacyPrinter);
     }
 
     @Override
