@@ -1,5 +1,6 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.builders.CombineTermBuilder;
 import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.model.UCUMExpression;
 
@@ -28,7 +29,7 @@ public class Normalizer {
                 if(exp == 0) {
                     yield SoloTermBuilder.UNITY; // X^0 -> 1
                 }
-                if(exp == -1 && isIntegerUnit1(componentExponent.unit())) { // 1^-1 -> 1
+                if(isIntegerUnit1(componentExponent.unit())) { // 1^X -> 1
                     yield switch (componentExponent) {
                         case UCUMExpression.MixedComponentExponent mixedComponentExponent -> new UCUMExpression.MixedComponentTerm(new UCUMExpression.MixedComponentNoExponent(componentExponent.unit()));
                         case UCUMExpression.CanonicalComponentExponent canonicalComponentExponent -> new UCUMExpression.CanonicalComponentTerm(new UCUMExpression.CanonicalComponentNoExponent(canonicalComponentExponent.unit()));
@@ -64,9 +65,10 @@ public class Normalizer {
         if(binaryTerm.operator() == UCUMExpression.Operator.DIV) {
             //DimensionAnalyzer.compare(normalizedLeft, normalizedRight);
         }
-
-
-        return binaryTerm; // no normalization is possible
+        return switch (binaryTerm.operator()) {
+            case MUL -> CombineTermBuilder.builder().left(normalizedLeft).multiplyWith().right(normalizedRight).build();
+            case DIV -> CombineTermBuilder.builder().left(normalizedLeft).divideBy().right(normalizedRight).build();
+        };
     }
 
 

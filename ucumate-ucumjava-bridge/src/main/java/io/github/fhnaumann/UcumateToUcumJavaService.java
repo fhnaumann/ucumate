@@ -23,15 +23,18 @@ public class UcumateToUcumJavaService implements UcumService {
     private static final Logger log = LoggerFactory.getLogger(UcumateToUcumJavaService.class);
     private final UcumEssenceService legacy;
     private final UcumJavaLegacyPrinter legacyPrinter;
+    private final UcumJavaCanonicalUnitsLegacyPrinter canonicalUnitsLegacyPrinter;
 
     public UcumateToUcumJavaService(InputStream stream) throws UcumException {
         legacy = new UcumEssenceService(stream);
         this.legacyPrinter = new UcumJavaLegacyPrinter();
+        this.canonicalUnitsLegacyPrinter = new UcumJavaCanonicalUnitsLegacyPrinter();
     }
 
     public UcumateToUcumJavaService(String filename) throws UcumException {
         legacy = new UcumEssenceService(filename);
         this.legacyPrinter = new UcumJavaLegacyPrinter();
+        this.canonicalUnitsLegacyPrinter = new UcumJavaCanonicalUnitsLegacyPrinter();
     }
 
     @Override
@@ -129,7 +132,7 @@ public class UcumateToUcumJavaService implements UcumService {
     public String getCanonicalUnits(String unit) throws UcumException {
         return switch (UCUMService.canonicalize(unit)) {
             case Canonicalizer.FailedCanonicalization failedCanonicalization -> throw new UcumException(failedCanonicalization.toString());
-            case Canonicalizer.Success success -> UCUMService.print(success.canonicalTerm(), Printer.PrintType.UCUM_SYNTAX);
+            case Canonicalizer.Success success -> UCUMService.print(success.canonicalTerm(), canonicalUnitsLegacyPrinter);
         };
     }
 
@@ -177,7 +180,22 @@ public class UcumateToUcumJavaService implements UcumService {
             }
         }
         return result.stream()
-                .map(definedUnit -> new DefinedUnit(definedUnit.code(), definedUnit.codeCaseInsensitive()))
+                .map(definedUnit -> {
+                    DefinedUnit fhirDefinedUnit = new DefinedUnit(definedUnit.code(), definedUnit.codeCaseInsensitive());
+                    fhirDefinedUnit.setMetric(definedUnit.isMetric());
+                    fhirDefinedUnit.setSpecial(definedUnit instanceof UCUMDefinition.SpecialUnit);
+                    fhirDefinedUnit.setProperty(definedUnit.property());
+                    fhirDefinedUnit.setPrintSymbol(definedUnit.printSymbol());
+                    fhirDefinedUnit.getNames().addAll(definedUnit.names());
+                    try {
+                        Value value = new Value(definedUnit.value().unit(), definedUnit.value().unitAlt(), new Decimal(definedUnit.value().conversionFactor().toString()));
+                        value.setText(value.getValue().asDecimal());
+                        fhirDefinedUnit.setValue(value);
+                        return fhirDefinedUnit;
+                    } catch (UcumException e) {
+                        return null;
+                    }
+                })
                 .toList();
     }
 
