@@ -178,10 +178,32 @@ public class UCUMService {
         return new Converter().convert(new Conversion(factor, from), to, null);
     }
 
+    /**
+     * Convert a UCUMTerm to another UCUMTerm.
+     * Essentially solves
+     * <code>1 * from = x * to</code> and returns <code>x</code>. Or it fails with additional information provided in the return object.
+     *
+     * @param factor The factor for the <code>from</code> term.
+     * @param from The term that is converted from as a string. Will be validated first.
+     * @param to The term that is converted to as a string. Will be validated first.
+     * @param substanceMolMassCoeff The additional substance's molar mass coefficient. If not null (and globally enabled), then it will convert mole to a mass unit.
+     * @return A ConversionResult either containing the resulting conversion factor or an error with more details.
+     */
     public static ConversionResult convert(String factor, String from, String to, String substanceMolMassCoeff) {
         return new Converter().convert(new Conversion(new PreciseDecimal(factor), parseOrError(from)), parseOrError(to), substanceMolMassCoeff != null ? new PreciseDecimal(substanceMolMassCoeff) : null);
     }
 
+    /**
+     * Convert a UCUMTerm to another UCUMTerm.
+     * Essentially solves
+     * <code>1 * from = x * to</code> and returns <code>x</code>. Or it fails with additional information provided in the return object.
+     *
+     * @param factor The factor for the <code>from</code> term.
+     * @param from The term that is converted from as a string. Will be validated first.
+     * @param to The term that is converted to as a string. Will be validated first.
+     * @param substanceMolMassCoeff The additional substance's molar mass coefficient. If not null (and globally enabled), then it will convert mole to a mass unit.
+     * @return A ConversionResult either containing the resulting conversion factor or an error with more details.
+     */
     public static ConversionResult convert(PreciseDecimal factor, UCUMExpression.Term from, UCUMExpression.Term to, PreciseDecimal substanceMolMassCoeff) {
         return new Converter().convert(new Conversion(factor, from), to, substanceMolMassCoeff);
     }
