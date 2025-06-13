@@ -3,8 +3,8 @@ order: 80
 ---
 # Data Persistence
 
-The `core` library ships with a default caffeine cache for validation and canonicalization results. On top of that it
-is also possible to add another persistent data storage. If a persistent data storage is setup, then on startup all saved
+The `core` library ships with a default caffeine cache for validation and canonicalization results ([except for mol units](mol_mass_conversion.md#caching-and-storing-behaviour). On top of that it
+is also possible to add another persistent data storage. If a persistent data storage is set up, then on startup all saved
 codes will be read into the cache (if the cache is enabled).
 
 Add the additional dependency:
