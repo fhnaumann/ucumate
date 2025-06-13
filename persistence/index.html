@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="turbo-root" content="/ucumate">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.0.802916279432">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.0.803105277123">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 3.10.0">
@@ -12,7 +12,7 @@
     <!-- Primary Meta Tags -->
     <title>Data Persistence</title>
     <meta name="title" content="Data Persistence">
-    <meta name="description" content="The core library ships with a default caffeine cache for validation and canonicalization results. On top of that it">
+    <meta name="description" content="The core library ships with a default caffeine cache for validation and canonicalization results ( except for mol units">
 
     <!-- Canonical -->
     <link rel="canonical" href="https://fhnaumann.github.io/ucumate/persistence/">
@@ -21,23 +21,23 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://fhnaumann.github.io/ucumate/persistence/">
     <meta property="og:title" content="Data Persistence">
-    <meta property="og:description" content="The core library ships with a default caffeine cache for validation and canonicalization results. On top of that it">
+    <meta property="og:description" content="The core library ships with a default caffeine cache for validation and canonicalization results ( except for mol units">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/persistence/">
     <meta property="twitter:title" content="Data Persistence">
-    <meta property="twitter:description" content="The core library ships with a default caffeine cache for validation and canonicalization results. On top of that it">
+    <meta property="twitter:description" content="The core library ships with a default caffeine cache for validation and canonicalization results ( except for mol units">
 
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
     <link href="../favicon.png" rel="icon">
-    <link href="../resources/css/retype.css?v=3.10.0.802916279432" rel="stylesheet">
+    <link href="../resources/css/retype.css?v=3.10.0.803105277123" rel="stylesheet">
 
-    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.0.802916279432" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.0.803105277123" data-turbo-eval="false" defer></script>
     <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.0" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.0.802916279432" data-turbo-eval="false" defer></script>
-    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.0.802916279432" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.0.803105277123" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.0.803105277123" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -193,8 +193,8 @@
         <span>Data Persistence</span>
     </h1>
 </doc-anchor-target>
-<p>The <code v-pre>core</code> library ships with a default caffeine cache for validation and canonicalization results. On top of that it
-is also possible to add another persistent data storage. If a persistent data storage is setup, then on startup all saved
+<p>The <code v-pre>core</code> library ships with a default caffeine cache for validation and canonicalization results (<a href="../mol_mass_conversion/#caching-and-storing-behaviour">except for mol units</a>. On top of that it
+is also possible to add another persistent data storage. If a persistent data storage is set up, then on startup all saved
 codes will be read into the cache (if the cache is enabled).</p>
 <p>Add the additional dependency:</p>
 <div class="codeblock-wrapper"><doc-codeblock>
