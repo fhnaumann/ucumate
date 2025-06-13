@@ -1,5 +1,7 @@
 package io.github.fhnaumann;
 
+import java.lang.module.Configuration;
+
 public sealed interface TestCase {
 
     String id();
@@ -16,8 +18,16 @@ public sealed interface TestCase {
         }
     }
 
-    public record ConvertTestCase(String id, String conversionFactor, String from, String to, String resultingConversionFactor, boolean valid, String reason) implements TestCase {
+    public record ConvertTestCase(String id, String conversionFactor, String from, String to, String resultingConversionFactor, String substanceMolarMassCoeff, boolean valid, String reason) implements TestCase {
+
+        private ConvertTestCase(String id, String conversionFactor, String from, String to, String resultingConversionFactor, boolean valid, String reason) {
+            this(id, conversionFactor, from, to, resultingConversionFactor, null, valid, reason);
+        }
+
         @Override public String toString() {
+            if(substanceMolarMassCoeff != null) {
+                return id + ": " + conversionFactor + ": " + from + " -> " + resultingConversionFactor + ": " + to + " with " + substanceMolarMassCoeff  +  (!reason.isEmpty() ? " Reason: " + reason : "");
+            }
             return id + ": " + conversionFactor + ": " + from + " -> " + resultingConversionFactor + ": " + to + (!reason.isEmpty() ? " Reason: " + reason : "");
         }
     }

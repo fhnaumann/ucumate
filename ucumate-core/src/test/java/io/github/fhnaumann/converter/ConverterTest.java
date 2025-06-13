@@ -1,11 +1,23 @@
 package io.github.fhnaumann.converter;
 
 import io.github.fhnaumann.builders.SoloTermBuilder;
+import io.github.fhnaumann.configuration.Configuration;
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.Converter;
+import io.github.fhnaumann.funcs.RelationChecker;
+import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.util.PreciseDecimal;
+import io.github.fhnaumann.util.UCUMRegistry;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static io.github.fhnaumann.TestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,9 +26,52 @@ public class ConverterTest {
 
     private Converter converter;
 
+    @BeforeAll
+    public static void init() {
+        ConfigurationRegistry.initialize(Configuration.builder().enableMolMassConversion(true).build());
+        PersistenceRegistry.disableInMemoryCache(true); // todo mole mass stuff messes up the caching, inspect
+    }
+
     @BeforeEach
     public void setUp() {
         converter = new Converter();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provide_mol_mass_conversion")
+    public void test_can_convert_mol_to_mass(String factor, String from, String to, String substanceMolarMassCoeff, String expected) {
+        Converter.ConversionResult convResult = UCUMService.convert(factor, from, to, substanceMolarMassCoeff);
+        assertThat(convResult)
+                .isInstanceOf(Converter.Success.class)
+                .extracting(Converter.Success.class::cast)
+                .extracting(Converter.Success::conversionFactor)
+                .asString()
+                .startsWith(expected);
+    }
+
+    @Test
+    public void delete() {
+        System.out.println(UCUMService.convert("[pH]", "mol/L"));
+    }
+
+    // todo incorporate into json tests
+    private static Stream<Arguments> provide_mol_mass_conversion() {
+        return Stream.of(
+                Arguments.of("1", "mol", "g", "5", "5"),
+                Arguments.of("3", "5.mol", "2.g", "10", "75"),
+                Arguments.of("1", "g", "mol", "5", "0.2"),
+                Arguments.of("3", "5.g", "2.mol", "10", "0.75"),
+                Arguments.of("1", "mol2", "g2", "5", "25"),
+                Arguments.of("3", "5.mol2", "2.g2", "10", "750"),
+                Arguments.of("3", "5.g2", "2.mol2", "10", "0.075"),
+                Arguments.of("1", "osm", "g", "5", "5"),
+                Arguments.of("1", "g", "osm", "5", "0.2"),
+                Arguments.of("1", "kat", "g/s", "5", "5"),
+                Arguments.of("1", "g/s", "kat", "5", "0.2"),
+                //Arguments.of("1", "[pH]", "g/L", "5", "0.5"),
+                Arguments.of("1", "mol", "1", null, "602214076000000000000000")
+                //Arguments.of("3", "5.[pH]", "2.g/L", "10", "7.5")
+        );
     }
 
     @Test

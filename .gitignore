@@ -65,3 +65,6 @@ benchmark*.json
 
 ### Mac OS ###
 .DS_Store
+
+ucumate-mol-support/target
+ucumate-spi-tests/target

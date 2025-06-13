@@ -1,7 +1,10 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.compounds.CompoundUtil;
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.model.UCUMDefinition.*;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
+import io.github.fhnaumann.util.MolMassUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.builders.CombineTermBuilder;
 import io.github.fhnaumann.builders.SoloTermBuilder;
@@ -10,10 +13,13 @@ import io.github.fhnaumann.model.UCUMExpression.*;
 import io.github.fhnaumann.model.special.SpecialUnits;
 import io.github.fhnaumann.model.special.SpecialUnitsFunctionProvider;
 import io.github.fhnaumann.util.PreciseDecimal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Canonicalizer {
 
     private static final UCUMRegistry registry = UCUMRegistry.getInstance();
+    private static final Logger log = LoggerFactory.getLogger(Canonicalizer.class);
 
     public record CanonicalStepResult(
         Term term,
@@ -118,7 +124,7 @@ public class Canonicalizer {
                 PreciseDecimal.ONE,
                 false,
                 null
-            );
+        );
     }
 
     public enum UnitDirection {
@@ -129,13 +135,22 @@ public class Canonicalizer {
         return canonicalize(PreciseDecimal.ONE, term);
     }
 
-    public CanonicalizationResult canonicalize(PreciseDecimal factor, Term term) {
-        return canonicalize(factor, term, true, true, UnitDirection.FROM);
+    public CanonicalizationResult canonicalize(Term term, boolean allowMolMassConversion) {
+        /*
+        A bit weird here with the molMassConversion flag:
+        If false, use null because it will canonicalize mol->1
+        If true, use any non-null value because it will canonicalize mol->g (+ coefficient, but that is irrelevant here, otherwise a different method would have been called)
+         */
+        return canonicalize(PreciseDecimal.ONE, term, true, true, UnitDirection.FROM, allowMolMassConversion ? PreciseDecimal.ONE : null);
     }
 
-    public CanonicalizationResult canonicalize(PreciseDecimal factor, Term term, boolean normalize, boolean flatten, UnitDirection unitDirection) {
+    public CanonicalizationResult canonicalize(PreciseDecimal factor, Term term) {
+        return canonicalize(factor, term, true, true, UnitDirection.FROM, null);
+    }
+
+    public CanonicalizationResult canonicalize(PreciseDecimal factor, Term term, boolean normalize, boolean flatten, UnitDirection unitDirection, PreciseDecimal substanceMolarMassCoeff) {
         try {
-            CanonicalStepResult canonicalStep = canonicalizeImpl(term, new CanonicalStepResult(term, PreciseDecimal.ONE, PreciseDecimal.ONE, false, null));
+            CanonicalStepResult canonicalStep = canonicalizeImpl(term, new CanonicalStepResult(term, PreciseDecimal.ONE, PreciseDecimal.ONE, false, null), substanceMolarMassCoeff);
             if(!(canonicalStep.term() instanceof CanonicalTerm canonicalTerm)) {
                 throw new RuntimeException("Expected CanonicalTerm, got " + canonicalStep.term());
             }
@@ -147,21 +162,39 @@ public class Canonicalizer {
                 resultTerm = (CanonicalTerm) new Normalizer().normalize(resultTerm);
             }
             // explicitly cache the result after normalizing and flatten
-            PersistenceRegistry.getInstance().saveCanonical(term, new CanonicalStepResult(
-                    resultTerm,
-                    canonicalStep.magnitude,
-                    canonicalStep.cfPrefix,
-                    canonicalStep.specialHandlingActive,
-                    canonicalStep.specialFunction
-            ));
+            //if(substanceMolarMassCoeff == null) {
+
 
             boolean isSpecial = canonicalStep.specialHandlingActive() && canonicalStep.specialFunction() != null;
+            boolean isMolInvolved = MolMassUtil.containsMol(term);
+            if(isSpecial && isMolInvolved && substanceMolarMassCoeff != null && ConfigurationRegistry.get().isEnableMolMassConversion()) {
+                // as for UCUM version 2.2 this only affects "[pH]"
+                log.warn("Conversion involving the special unit '[pH]' to a mass unit is not supported.");
+                return new TermContainsPHAndCanonicalizingToMass();
+            }
 
+            /*
+            Only save the canonical form if no mol is involved. When the key term contains the mole unit, then it depends on dynamic properties such as whether
+            mol<->mass conversion is active and the provided substanceMolarMassCoefficient.
+            In theory, it's possible to cache these, but that would require preserving these information in the key. Currently, only
+            the term is being saved there, and it would require severe restructuring so it's easier to just skip caching in these instances.
+             */
+            if(!isMolInvolved) {
+                PersistenceRegistry.getInstance().saveCanonical(term, new CanonicalStepResult(
+                        resultTerm,
+                        canonicalStep.magnitude,
+                        canonicalStep.cfPrefix,
+                        canonicalStep.specialHandlingActive,
+                        canonicalStep.specialFunction
+                ));
+            }
+            else if(log.isDebugEnabled() && PersistenceRegistry.hasAny()){
+                log.debug("Not saving {} in cache because the mole unit requires additional properties to be stored in the key, which is not currently implemented.", UCUMService.print(term));
+            }
 
             PreciseDecimal resultFactor = switch (unitDirection) {
                 case FROM -> {
                     if (isSpecial) {
-
                         SpecialUnitsFunctionProvider.ConversionFunction specialConvFunc = SpecialUnits.getFunction(canonicalStep.specialFunction().name());
                         PreciseDecimal factorAsInputForSpecialFunc = factor.multiply(canonicalStep.cfPrefix());
                         PreciseDecimal scaledRatio = specialConvFunc.toCanonical(factorAsInputForSpecialFunc);
@@ -182,6 +215,7 @@ public class Canonicalizer {
                     }
                 }
             };
+
             return new Success(resultFactor, resultTerm);
         } catch (TermHasArbitraryUnitException e) {
             return new TermHasArbitraryUnit(e.arbitraryUnit);
@@ -230,29 +264,29 @@ public class Canonicalizer {
         };
     }
 
-    private CanonicalStepResult canonicalizeImpl(Term term, CanonicalStepResult canonicalStep)
+    private CanonicalStepResult canonicalizeImpl(Term term, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
         CanonicalStepResult cached = PersistenceRegistry.getInstance().getCanonical(term);
         if(cached != null) {
             return cached;
         }
         CanonicalStepResult result = switch (term) {
-            case ComponentTerm componentTerm -> handleCompTerm(componentTerm, canonicalStep);
-            case BinaryTerm binaryTerm -> handleBinaryTerm(binaryTerm, canonicalStep);
+            case ComponentTerm componentTerm -> handleCompTerm(componentTerm, canonicalStep, substanceMolarMassCoeff);
+            case BinaryTerm binaryTerm -> handleBinaryTerm(binaryTerm, canonicalStep, substanceMolarMassCoeff);
             case UnaryDivTerm unaryDivTerm -> canonicalizeImpl(
-                CombineTermBuilder.builder().left(SoloTermBuilder.UNITY).divideBy().right(unaryDivTerm.term()).build(), canonicalStep);
-            case ParenTerm parenTerm -> canonicalizeImpl(parenTerm.term(), canonicalStep);
-            case AnnotTerm annotTerm -> canonicalizeImpl(annotTerm.term(), canonicalStep);
+                CombineTermBuilder.builder().left(SoloTermBuilder.UNITY).divideBy().right(unaryDivTerm.term()).build(), canonicalStep, substanceMolarMassCoeff);
+            case ParenTerm parenTerm -> canonicalizeImpl(parenTerm.term(), canonicalStep, substanceMolarMassCoeff);
+            case AnnotTerm annotTerm -> canonicalizeImpl(annotTerm.term(), canonicalStep, substanceMolarMassCoeff);
             case AnnotOnlyTerm annotOnlyTerm -> new CanonicalStepResult(SoloTermBuilder.UNITY, PreciseDecimal.ONE, PreciseDecimal.ONE, canonicalStep.specialHandlingActive(), canonicalStep.specialFunction());
         };
-        PersistenceRegistry.getInstance().saveCanonical(term, result);
+        //PersistenceRegistry.getInstance().saveCanonical(term, result);
         return result;
     }
 
-    private CanonicalStepResult handleBinaryTerm(BinaryTerm binaryTerm, CanonicalStepResult canonicalStep)
+    private CanonicalStepResult handleBinaryTerm(BinaryTerm binaryTerm, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
-        CanonicalStepResult leftStep = canonicalizeImpl(binaryTerm.left(), canonicalStep);
-        CanonicalStepResult rightStep = canonicalizeImpl(binaryTerm.right(), canonicalStep);
+        CanonicalStepResult leftStep = canonicalizeImpl(binaryTerm.left(), canonicalStep, substanceMolarMassCoeff);
+        CanonicalStepResult rightStep = canonicalizeImpl(binaryTerm.right(), canonicalStep, substanceMolarMassCoeff);
         CanonicalStepResult combineValue = switch (binaryTerm.operator()) {
             case MUL -> multiplyValues(leftStep, rightStep);
             case DIV -> divideValues(leftStep, rightStep);
@@ -267,9 +301,9 @@ public class Canonicalizer {
         return combineValue.withTerm(resultTerm);
     }
 
-    private CanonicalStepResult handleCompTerm(ComponentTerm componentTerm, CanonicalStepResult canonicalStep)
+    private CanonicalStepResult handleCompTerm(ComponentTerm componentTerm, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
-        CanonicalStepResult unitStep = canonicalizeUnit(componentTerm.component().unit(), canonicalStep);
+        CanonicalStepResult unitStep = canonicalizeUnit(componentTerm.component().unit(), canonicalStep, substanceMolarMassCoeff);
         return switch (componentTerm.component()) {
             case ComponentNoExponent componentNoExponent -> unitStep;
             case ComponentExponent componentExponent -> {
@@ -280,7 +314,7 @@ public class Canonicalizer {
         };
     }
 
-    private CanonicalStepResult canonicalizeUnit(Unit unit, CanonicalStepResult canonicalStepResult)
+    private CanonicalStepResult canonicalizeUnit(Unit unit, CanonicalStepResult canonicalStepResult, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
         return switch (unit) {
             case IntegerUnit integerUnit -> {
@@ -294,38 +328,38 @@ public class Canonicalizer {
                     yield new CanonicalStepResult(SoloTermBuilder.UNITY, integerUnit.asPreciseDecimal(), canonicalStepResult.cfPrefix(), false, null);
                 }
             }
-            case NoPrefixSimpleUnit noPrefixSimpleUnit -> canonicalizeUCUMConcept(noPrefixSimpleUnit.ucumUnit(), canonicalStepResult);
-            case PrefixSimpleUnit prefixSimpleUnit -> canonicalizePrefixSimpleUnit(prefixSimpleUnit, canonicalStepResult);
+            case NoPrefixSimpleUnit noPrefixSimpleUnit -> canonicalizeUCUMConcept(noPrefixSimpleUnit.ucumUnit(), canonicalStepResult, substanceMolarMassCoeff);
+            case PrefixSimpleUnit prefixSimpleUnit -> canonicalizePrefixSimpleUnit(prefixSimpleUnit, canonicalStepResult, substanceMolarMassCoeff);
         };
     }
 
-    private CanonicalStepResult canonicalizePrefixSimpleUnit(PrefixSimpleUnit prefixSimpleUnit, CanonicalStepResult canonicalStep)
+    private CanonicalStepResult canonicalizePrefixSimpleUnit(PrefixSimpleUnit prefixSimpleUnit, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
 
         PreciseDecimal factor = prefixSimpleUnit.prefix().value().conversionFactor();
         Term unitOnly = SoloTermBuilder.builder().withoutPrefix(prefixSimpleUnit.ucumUnit()).noExpNoAnnot().asTerm().build();
-        CanonicalStepResult unitOnlyStep = canonicalizeImpl(unitOnly, canonicalStep); // ? null
+        CanonicalStepResult unitOnlyStep = canonicalizeImpl(unitOnly, canonicalStep, substanceMolarMassCoeff); // ? null
         return composeConsideringSpecial(unitOnlyStep, factor);
         //return canonicalizeUCUMConcept(prefixSimpleUnit.prefix(), canonicalStep);
     }
 
-    private CanonicalStepResult canonicalizeUCUMConcept(Concept concept, CanonicalStepResult canonicalStep)
+    private CanonicalStepResult canonicalizeUCUMConcept(Concept concept, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
         return switch (concept) {
             case UCUMPrefix ucumPrefix -> composeConsideringSpecial(canonicalStep, ucumPrefix.value().conversionFactor());
             case BaseUnit baseUnit -> new CanonicalStepResult(SoloTermBuilder.builder().withoutPrefix(baseUnit).noExpNoAnnot().asTerm().build(), PreciseDecimal.ONE, PreciseDecimal.ONE, false, null);
-            case DerivedUnit derivedUnit -> canonicalizeDerivedOrDimlessUnit(derivedUnit, canonicalStep);
-            case DimlessUnit dimlessUnit -> canonicalizeDerivedOrDimlessUnit(dimlessUnit, canonicalStep);
-            case SpecialUnit specialUnit -> canonicalizeSpecialUnit(specialUnit, canonicalStep);
+            case DerivedUnit derivedUnit -> canonicalizeDerivedOrDimlessUnit(derivedUnit, canonicalStep, substanceMolarMassCoeff);
+            case DimlessUnit dimlessUnit -> canonicalizeDerivedOrDimlessUnit(dimlessUnit, canonicalStep, substanceMolarMassCoeff);
+            case SpecialUnit specialUnit -> canonicalizeSpecialUnit(specialUnit, canonicalStep, substanceMolarMassCoeff);
             case ArbitraryUnit arbitraryUnit -> throw new TermHasArbitraryUnitException(arbitraryUnit);
         };
 
     }
 
-    private CanonicalStepResult canonicalizeSpecialUnit(SpecialUnit specialUnit, CanonicalStepResult canonicalStep)
+    private CanonicalStepResult canonicalizeSpecialUnit(SpecialUnit specialUnit, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
-        Term sourceDef = registry.getDefinedUnitSourceDefinition(specialUnit);
-        CanonicalStepResult inner = canonicalizeImpl(sourceDef, new CanonicalStepResult(canonicalStep.term(), canonicalStep.magnitude(), canonicalStep.cfPrefix(), false, null));
+        Term sourceDef = registry.getDefinedUnitSourceDefinition(specialUnit, substanceMolarMassCoeff != null);
+        CanonicalStepResult inner = canonicalizeImpl(sourceDef, new CanonicalStepResult(canonicalStep.term(), canonicalStep.magnitude(), canonicalStep.cfPrefix(), false, null), substanceMolarMassCoeff);
         return new CanonicalStepResult(
             inner.term(),
             inner.magnitude().multiply(specialUnit.value().function().value()),
@@ -335,12 +369,12 @@ public class Canonicalizer {
         );
     }
 
-    private CanonicalStepResult canonicalizeDerivedOrDimlessUnit(DefinedUnit definedUnit, CanonicalStepResult canonicalStep)
+    private CanonicalStepResult canonicalizeDerivedOrDimlessUnit(DefinedUnit definedUnit, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
-        CanonicalStepResult inner = canonicalizeImpl(registry.getDefinedUnitSourceDefinition(definedUnit), canonicalStep);
+        CanonicalStepResult inner = canonicalizeImpl(registry.getDefinedUnitSourceDefinition(definedUnit, substanceMolarMassCoeff != null), canonicalStep, substanceMolarMassCoeff);
         return composeConsideringSpecial(
             inner,
-            definedUnit.value().conversionFactor()
+            definedUnit.code().equals("mol") && substanceMolarMassCoeff != null ? substanceMolarMassCoeff : definedUnit.value().conversionFactor()
         );
     }
 
@@ -378,7 +412,8 @@ public class Canonicalizer {
                 canonicalStepResult.magnitude(),
                 canonicalStepResult.cfPrefix().multiply(factor),
                 true,
-                canonicalStepResult.specialFunction());
+                canonicalStepResult.specialFunction()
+            );
         }
         else {
             return new CanonicalStepResult(
@@ -424,5 +459,12 @@ public class Canonicalizer {
      */
     public record TermHasArbitraryUnit(ArbitraryUnit arbitraryUnit) implements
         FailedCanonicalization {}
+
+    /**
+     * The canonicalization failed because the input term is the special unit '[pH]' and it's trying to be converted
+     * to mass and mol to mass conversion is enabled in the configuration. This is just not supported (and this conversion
+     * does not make any sense either).
+     */
+    public record TermContainsPHAndCanonicalizingToMass() implements FailedCanonicalization {}
 
 }
