@@ -26,7 +26,7 @@ public class PersistenceRegistry implements PersistenceProvider {
 
     private static final String CACHE_SETTINGS_PROPERTY_FILE_NAME = "ucumate.properties";
 
-    private static InMemoryPersistenceProvider cache;
+    public static InMemoryPersistenceProvider cache;
     private static final Map<String, PersistenceProvider> additionalProviders = new HashMap<>();
 
     static {
