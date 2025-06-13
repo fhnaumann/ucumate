@@ -27,3 +27,9 @@ Read more about the usage in the [documentation](https://virtuous-respect-produc
 1. Build docks, retype build. Copy .retype into demo/src/resources/doc
 2. Build frontend, npm build. Copy /dist into demo/src/resources
 3. Deploy demo, railway up (builds docker image)
+
+# License
+
+This project includes data from [NistChemData](https://github.com/IvanChernyshov/NistChemData),
+licensed under the MIT License.
+Copyright © 2023 Ivan Chernyshov.
