@@ -123,7 +123,7 @@ public class Canonicalizer {
                 PreciseDecimal.ONE,
                 false,
                 null
-            );
+        );
     }
 
     public enum UnitDirection {
@@ -152,33 +152,45 @@ public class Canonicalizer {
                 resultTerm = (CanonicalTerm) new Normalizer().normalize(resultTerm);
             }
             // explicitly cache the result after normalizing and flatten
-            PersistenceRegistry.getInstance().saveCanonical(term, new CanonicalStepResult(
-                    resultTerm,
-                    canonicalStep.magnitude,
-                    canonicalStep.cfPrefix,
-                    canonicalStep.specialHandlingActive,
-                    canonicalStep.specialFunction
-            ));
+            //if(substanceMolarMassCoeff == null) {
+
 
             boolean isSpecial = canonicalStep.specialHandlingActive() && canonicalStep.specialFunction() != null;
             boolean isMolInvolved = MolMassUtil.containsMol(term);
-            if(isSpecial && isMolInvolved && ConfigurationRegistry.get().isEnableMolMassConversion()) {
+            if(isSpecial && isMolInvolved && substanceMolarMassCoeff != null && ConfigurationRegistry.get().isEnableMolMassConversion()) {
                 // as for UCUM version 2.2 this only affects "[pH]"
                 log.warn("Conversion involving the special unit '[pH]' to a mass unit is not supported.");
                 return new TermContainsPHAndCanonicalizingToMass();
             }
 
+            /*
+            Only save the canonical form if no mol is involved. When the key term contains the mole unit, then it depends on dynamic properties such as whether
+            mol<->mass conversion is active and the provided substanceMolarMassCoefficient.
+            In theory, it's possible to cache these, but that would require preserving these information in the key. Currently, only
+            the term is being saved there, and it would require severe restructuring so it's easier to just skip caching in these instances.
+             */
+            if(!isMolInvolved) {
+                PersistenceRegistry.getInstance().saveCanonical(term, new CanonicalStepResult(
+                        resultTerm,
+                        canonicalStep.magnitude,
+                        canonicalStep.cfPrefix,
+                        canonicalStep.specialHandlingActive,
+                        canonicalStep.specialFunction
+                ));
+            }
+            else if(log.isDebugEnabled() && PersistenceRegistry.hasAny()){
+                log.debug("Not saving {} in cache because the mole unit requires additional properties to be stored in the key, which is not currently implemented.", UCUMService.print(term));
+            }
+
             PreciseDecimal resultFactor = switch (unitDirection) {
                 case FROM -> {
                     if (isSpecial) {
-
                         SpecialUnitsFunctionProvider.ConversionFunction specialConvFunc = SpecialUnits.getFunction(canonicalStep.specialFunction().name());
                         PreciseDecimal factorAsInputForSpecialFunc = factor.multiply(canonicalStep.cfPrefix());
-                        //factorAsInputForSpecialFunc = factorAsInputForSpecialFunc.divide(substanceMolarMassCoeff); // account for mass -> mol: mol = factor / coeff
                         PreciseDecimal scaledRatio = specialConvFunc.toCanonical(factorAsInputForSpecialFunc);
                         yield canonicalStep.magnitude().multiply(scaledRatio);
                     } else {
-                        yield factor.multiply(canonicalStep.magnitude());//.multiply(substanceMolarMassCoeff);
+                        yield factor.multiply(canonicalStep.magnitude());
                     }
                 }
                 case TO -> {
@@ -186,11 +198,10 @@ public class Canonicalizer {
                         SpecialUnitsFunctionProvider.ConversionFunction specialConvFunc = SpecialUnits.getFunction(canonicalStep.specialFunction().name());
                         PreciseDecimal factorAsInputForSpecialFunc = factor.divide(canonicalStep.magnitude());
                         PreciseDecimal scaledRatio = specialConvFunc.fromCanonical(factorAsInputForSpecialFunc);
-                        //scaledRatio = scaledRatio.multiply(substanceMolarMassCoeff); // account for mol -> mass: mass = factor * coeff;
                         scaledRatio = scaledRatio.multiply(PreciseDecimal.ONE.divide(canonicalStep.cfPrefix()));
                         yield scaledRatio;
                     } else {
-                        yield factor.divide(canonicalStep.magnitude());//.divide(substanceMolarMassCoeff);
+                        yield factor.divide(canonicalStep.magnitude());
                     }
                 }
             };
@@ -258,7 +269,7 @@ public class Canonicalizer {
             case AnnotTerm annotTerm -> canonicalizeImpl(annotTerm.term(), canonicalStep, substanceMolarMassCoeff);
             case AnnotOnlyTerm annotOnlyTerm -> new CanonicalStepResult(SoloTermBuilder.UNITY, PreciseDecimal.ONE, PreciseDecimal.ONE, canonicalStep.specialHandlingActive(), canonicalStep.specialFunction());
         };
-        PersistenceRegistry.getInstance().saveCanonical(term, result);
+        //PersistenceRegistry.getInstance().saveCanonical(term, result);
         return result;
     }
 
@@ -391,7 +402,8 @@ public class Canonicalizer {
                 canonicalStepResult.magnitude(),
                 canonicalStepResult.cfPrefix().multiply(factor),
                 true,
-                canonicalStepResult.specialFunction());
+                canonicalStepResult.specialFunction()
+            );
         }
         else {
             return new CanonicalStepResult(

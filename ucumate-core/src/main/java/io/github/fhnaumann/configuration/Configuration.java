@@ -33,7 +33,7 @@ public class Configuration {
     public static Configuration fromProps(Properties properties) {
         return new Configuration(
                 (boolean) properties.getOrDefault("ucumate.enablePrefixOnNonMetricUnits", true),
-                (boolean) properties.getOrDefault("ucumte.enableMolMassConversion", true),
+                (boolean) properties.getOrDefault("ucumate.enableMolMassConversion", true),
                 (boolean) properties.getOrDefault("ucumate.allowAnnotAfterParens", true)
         );
     }

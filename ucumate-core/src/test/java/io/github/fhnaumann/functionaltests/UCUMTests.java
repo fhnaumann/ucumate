@@ -1,6 +1,8 @@
 package io.github.fhnaumann.functionaltests;
 
 import io.github.fhnaumann.*;
+import io.github.fhnaumann.configuration.Configuration;
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
@@ -91,7 +93,7 @@ public class UCUMTests {
         PreciseDecimal toFactor = new PreciseDecimal(testCase.resultingConversionFactor());
         UCUMExpression.Term from = TestUtil.parse(testCase.from());
         UCUMExpression.Term to = TestUtil.parse(testCase.to());
-        Converter.ConversionResult result = UCUMService.convert(fromFactor, from, to);
+        Converter.ConversionResult result = UCUMService.convert(fromFactor, from, to, testCase.substanceMolarMassCoeff() != null ? new PreciseDecimal(testCase.substanceMolarMassCoeff()) : null);
         if(testCase.valid()) {
             Assertions.assertThat(result)
                 .withFailMessage("%s: Unexpected validation error while testing the conversion: %s".formatted(testCase.id(), result))
