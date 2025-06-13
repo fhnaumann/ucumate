@@ -66,7 +66,5 @@ benchmark*.json
 ### Mac OS ###
 .DS_Store
 
-/target
-ucumate-demo/src/main/resources/static
-
-/ucumate-ucumjava-bridge/target
+ucumate-mol-support/target
+ucumate-spi-tests/target

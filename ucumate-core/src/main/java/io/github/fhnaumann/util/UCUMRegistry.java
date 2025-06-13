@@ -1,5 +1,7 @@
 package io.github.fhnaumann.util;
 
+import io.github.fhnaumann.builders.SoloTermBuilder;
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.model.UCUMDefinition;
@@ -7,6 +9,8 @@ import io.github.fhnaumann.funcs.printer.PrettyPrinter;
 import io.github.fhnaumann.model.UCUMExpression;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +22,7 @@ import java.util.stream.Stream;
 public class UCUMRegistry {
 
     private static final UCUMRegistry instance = loadFromUCUMEssence(UCUMRegistry.class.getClassLoader().getResourceAsStream("ucum-essence.xml"));
+    private static final Logger log = LoggerFactory.getLogger(UCUMRegistry.class);
 
     static {
         // instance.translateValueDefinitions();
@@ -123,14 +128,22 @@ public class UCUMRegistry {
         return Optional.ofNullable(definedUnits.get(definedUnit));
     }
 
-    public UCUMExpression.Term getDefinedUnitSourceDefinition(UCUMDefinition.DefinedUnit definedUnit) {
+    public UCUMExpression.Term getDefinedUnitSourceDefinition(UCUMDefinition.DefinedUnit definedUnit, boolean enableMolarMassConversion) {
         UCUMExpression.Term term = definedUnitSourceDefinitions.get(definedUnit);
-        if(term != null) {
-            return term;
+        if(term == null) {
+            term = translateUnitInsideDefinedUnitToTerm(definedUnit);
+            //System.out.println("translated " + definedUnit.code() + " to " + new PrettyPrinter(false, false, false).print(term));
+            definedUnitSourceDefinitions.put(definedUnit, term);
         }
-        term = translateUnitInsideDefinedUnitToTerm(definedUnit);
-        //System.out.println("translated " + definedUnit.code() + " to " + new PrettyPrinter(false, false, false).print(term));
-        definedUnitSourceDefinitions.put(definedUnit, term);
+        if(definedUnit.code().equals("mol") && (enableMolarMassConversion && ConfigurationRegistry.get().isEnableMolMassConversion())) {
+            log.debug("Changed the definition of mol (dimless) to have to point to g (mass). The required substance's molar mass has to be provided from the outer scope.");
+            /*
+            If the mol unit requested and mol<->mass conversion is enabled, then convert mol to gram instead.
+            The substance's molar mass has to be provided from outside.
+            mol = X * g, where X is provided by the user
+             */
+            return SoloTermBuilder.builder().withoutPrefix(getBaseUnit("g").orElseThrow()).noExpNoAnnot().asTerm().build();
+        }
         return term;
     }
 
@@ -178,7 +191,7 @@ public class UCUMRegistry {
         prefixes.forEach((s, ucumPrefix) -> getPrefix(s));
         baseUnits.forEach((s, baseUnit) -> getBaseUnit(s));
         definedUnits.forEach((s, definedUnit) -> getDefinedUnit(s));
-        definedUnits.forEach((s, definedUnit) -> getDefinedUnitSourceDefinition(definedUnit));
+        definedUnits.forEach((s, definedUnit) -> getDefinedUnitSourceDefinition(definedUnit, ConfigurationRegistry.get().isEnableMolMassConversion()));
     }
 
     public static UCUMRegistry getInstance() {

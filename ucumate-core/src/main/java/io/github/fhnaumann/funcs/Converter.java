@@ -1,11 +1,17 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.Canonicalizer.UnitDirection;
 import io.github.fhnaumann.funcs.DimensionAnalyzer.Failure;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.util.MolMassUtil;
 import io.github.fhnaumann.util.PreciseDecimal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Converter {
+
+    private static final Logger log = LoggerFactory.getLogger(Converter.class);
 
     public record Conversion(PreciseDecimal factor, UCUMExpression.Term term) {}
 
@@ -14,16 +20,26 @@ public class Converter {
     }
 
     public ConversionResult convert(PreciseDecimal factor, UCUMExpression.Term from, UCUMExpression.Term to) {
-        return convert(new Conversion(factor, from), to);
+        return convert(new Conversion(factor, from), to, null);
     }
 
     public ConversionResult convert(Conversion from, UCUMExpression.Term to) {
+        return convert(from, to, null);
+    }
+
+    public ConversionResult convert(Conversion from, UCUMExpression.Term to, PreciseDecimal substanceMolarMassCoeff) {
+        boolean fromContainsMol = MolMassUtil.containsMol(from.term());
+        boolean toContainsMol = MolMassUtil.containsMol(to);
+        if(ConfigurationRegistry.get().isEnableMolMassConversion() && (fromContainsMol || toContainsMol) && PreciseDecimal.ONE.equals(substanceMolarMassCoeff)) {
+            log.warn("Mol <-> Mass conversion enabled and either from or to contains mol but no substanceMolarMassCoeff has been given. It is highly unlikely that a coefficient of 1 is desired.");
+        }
         Canonicalizer canonicalizer = new Canonicalizer();
-        Canonicalizer.CanonicalizationResult fromResult = canonicalizer.canonicalize(from.factor(), from.term(), true, true, UnitDirection.FROM);
+        Canonicalizer.CanonicalizationResult fromResult = canonicalizer.canonicalize(from.factor(), from.term(), true, true, UnitDirection.FROM, toContainsMol ? null : substanceMolarMassCoeff);
         return switch (fromResult) {
             case Canonicalizer.FailedCanonicalization failedCanonicalization -> new FailedCanonicalization(failedCanonicalization);
             case Canonicalizer.Success fromSuccess -> {
-                Canonicalizer.CanonicalizationResult toResult = canonicalizer.canonicalize(fromSuccess.magnitude(), to, true, true, UnitDirection.TO);
+
+                Canonicalizer.CanonicalizationResult toResult = canonicalizer.canonicalize(fromSuccess.magnitude(), to, true, true, UnitDirection.TO, fromContainsMol ? null : substanceMolarMassCoeff);
                 yield switch (toResult) {
                     case Canonicalizer.FailedCanonicalization failedCanonicalization -> new FailedCanonicalization(failedCanonicalization);
                     case Canonicalizer.Success toSuccess -> {

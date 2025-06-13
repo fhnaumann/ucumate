@@ -4,52 +4,62 @@ import java.util.Properties;
 
 public class Configuration {
 
-    private boolean enablePersistence = false;
-    private Properties jpaProperties;
+    private final boolean enablePrefixOnNonMetricUnits;
+    private final boolean enableMolMassConversion;
+    private final boolean allowAnnotAfterParens;
 
-    public boolean isPersistenceEnabled() {
-        return enablePersistence;
+    private Configuration(boolean enablePrefixOnNonMetricUnits, boolean enableMolMassConversion, boolean allowAnnotAfterParens) {
+        this.enablePrefixOnNonMetricUnits = enablePrefixOnNonMetricUnits;
+        this.enableMolMassConversion = enableMolMassConversion;
+        this.allowAnnotAfterParens = allowAnnotAfterParens;
     }
 
-    public void setEnablePersistence(boolean enablePersistence) {
-        this.enablePersistence = enablePersistence;
+    public boolean isEnablePrefixOnNonMetricUnits() {
+        return enablePrefixOnNonMetricUnits;
     }
 
-    public Properties getJpaProperties() {
-        return jpaProperties;
+    public boolean isEnableMolMassConversion() {
+        return enableMolMassConversion;
     }
 
-    public void setJpaProperties(Properties jpaProperties) {
-        this.jpaProperties = jpaProperties;
-    }
-
-    public static Configuration defaultConfig() {
-        return new Configuration();
+    public boolean isAllowAnnotAfterParens() {
+        return allowAnnotAfterParens;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder {
-        private final Properties props = new Properties();
-        private boolean persistence;
+    public static Configuration fromProps(Properties properties) {
+        return new Configuration(
+                (boolean) properties.getOrDefault("ucumate.enablePrefixOnNonMetricUnits", true),
+                (boolean) properties.getOrDefault("ucumate.enableMolMassConversion", true),
+                (boolean) properties.getOrDefault("ucumate.allowAnnotAfterParens", true)
+        );
+    }
 
-        public Builder enablePersistence(boolean enabled) {
-            this.persistence = enabled;
+    public static class Builder {
+        private boolean enablePrefixOnNonMetricUnits = true;
+        private boolean enableMolMassConversion = true;
+        private boolean allowAnnotAfterParens = true;
+
+        public Builder enablePrefixOnNonMetricUnits(boolean value) {
+            this.enablePrefixOnNonMetricUnits = value;
             return this;
         }
 
-        public Builder dbProperty(String key, String value) {
-            props.setProperty(key, value);
+        public Builder enableMolMassConversion(boolean value) {
+            this.enableMolMassConversion = value;
+            return this;
+        }
+
+        public Builder allowAnnotAfterParens(boolean value) {
+            this.allowAnnotAfterParens = value;
             return this;
         }
 
         public Configuration build() {
-            Configuration config = new Configuration();
-            config.enablePersistence = persistence;
-            config.jpaProperties = props;
-            return config;
+            return new Configuration(enablePrefixOnNonMetricUnits, enableMolMassConversion, allowAnnotAfterParens);
         }
     }
 }

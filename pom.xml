@@ -40,7 +40,8 @@
         <module>ucumate-core-exact-special-math</module>
         <module>ucumate-persistence</module>
         <module>ucumate-test-utils</module>
-        <module>ucumate-ucumjava-bridge</module>
+        <module>ucumate-mol-support</module>
+        <module>ucumate-spi-tests</module>
         <!--module>ucumate-demo</module-->
     </modules>
 
