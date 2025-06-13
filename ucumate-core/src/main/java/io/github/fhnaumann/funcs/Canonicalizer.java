@@ -1,5 +1,6 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.compounds.CompoundUtil;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.model.UCUMDefinition.*;
 import io.github.fhnaumann.persistence.PersistenceRegistry;

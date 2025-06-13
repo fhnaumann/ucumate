@@ -42,6 +42,26 @@ Conversely, if `ucumate.enableMolMassConversion` is set to `false`, then convert
 UCUMService.convert("1", "mol", "g", "18.01528"); // yields a BaseDimensionMismatch because mol<->mass conversion is disabled application-wide
 ```
 
+### Substance's Molar Mass Values
+
+If you don't want to provide decimal number for the substance's molar mass coefficient you can add the `ucumate-mol-support` dependency.
+
+```xml
+<dependency>
+    <groupId>io.github.fhnaumann</groupId>
+    <artifactId>ucumate-mol-support</artifactId>
+    <version>1.0.2-SNAPSHOT</version>
+</dependency>
+```
+
+This lets you define the coefficient optionally by a different `name`, `casNr`, `formular`, etc.
+
+```java
+// Use a casNr instead of a decimal number.
+Converter.ConversionResult result = UCUMService.convert("1", "mol", "g", "1309-37-1");
+System.out.println(result); // conversionFactor=159.688
+```
+
 ### Special `[pH]` unit
 
 The `[pH]` unit is unique in the sense that it is the only unit defined in UCUM that is a special unit and defined on the mole unit.
