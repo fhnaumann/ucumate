@@ -135,8 +135,17 @@ public class Canonicalizer {
         return canonicalize(PreciseDecimal.ONE, term);
     }
 
+    public CanonicalizationResult canonicalize(Term term, boolean allowMolMassConversion) {
+        /*
+        A bit weird here with the molMassConversion flag:
+        If false, use null because it will canonicalize mol->1
+        If true, use any non-null value because it will canonicalize mol->g (+ coefficient, but that is irrelevant here, otherwise a different method would have been called)
+         */
+        return canonicalize(PreciseDecimal.ONE, term, true, true, UnitDirection.FROM, allowMolMassConversion ? PreciseDecimal.ONE : null);
+    }
+
     public CanonicalizationResult canonicalize(PreciseDecimal factor, Term term) {
-        return canonicalize(factor, term, true, true, UnitDirection.FROM, PreciseDecimal.ONE);
+        return canonicalize(factor, term, true, true, UnitDirection.FROM, null);
     }
 
     public CanonicalizationResult canonicalize(PreciseDecimal factor, Term term, boolean normalize, boolean flatten, UnitDirection unitDirection, PreciseDecimal substanceMolarMassCoeff) {

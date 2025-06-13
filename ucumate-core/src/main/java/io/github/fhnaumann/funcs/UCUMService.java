@@ -1,5 +1,6 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.compounds.CompoundUtil;
 import io.github.fhnaumann.funcs.Canonicalizer.CanonicalizationResult;
 import io.github.fhnaumann.funcs.Converter.Conversion;
 import io.github.fhnaumann.funcs.Converter.ConversionResult;
@@ -190,6 +191,10 @@ public class UCUMService {
      * @return A ConversionResult either containing the resulting conversion factor or an error with more details.
      */
     public static ConversionResult convert(String factor, String from, String to, String substanceMolMassCoeff) {
+        /*
+        The string may optionally be something other than a number. In this case the current CompoundProvider is asked for a mapping to a number.
+         */
+        substanceMolMassCoeff = CompoundUtil.resolveMolarMass(substanceMolMassCoeff);
         return new Converter().convert(new Conversion(new PreciseDecimal(factor), parseOrError(from)), parseOrError(to), substanceMolMassCoeff != null ? new PreciseDecimal(substanceMolMassCoeff) : null);
     }
 
@@ -213,14 +218,12 @@ public class UCUMService {
      *
      * @param term1 The first term in the relation.
      * @param term2 The second term in the relation.
+     * @param allowMolMassConversion If true, allows mol->g, otherwise mol->1. If the property ucumate.enableMolMassConversion=false then this value is ignored.
      * @return A RelationResult containing information about the relation between the two terms.
      *
-     * @see RelationChecker.RelationResult
-     * @see UCUMService#checkCommensurable(UCUMExpression.Term, UCUMExpression.Term)
-     * @see UCUMService#checkCommensurable(String, String)
      */
-    public static RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2) {
-        return RelationChecker.checkRelation(term1, term2);
+    public static RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2, boolean allowMolMassConversion) {
+        return RelationChecker.checkRelation(term1, term2, allowMolMassConversion);
     }
 
     /**
@@ -228,13 +231,13 @@ public class UCUMService {
      *
      * @param term1 The first term in the relation as a string. Will be validated first.
      * @param term2 The second term in the relation. Will be validated first.
+     * @param allowMolMassConversion If true, allows mol->g, otherwise mol->1. If the property ucumate.enableMolMassConversion=false then this value is ignored.
      * @return A CommensurableResult containing information about the relation between the two terms.
      *
      * @see RelationChecker.CommensurableResult
-     * @see UCUMService#checkCommensurable(UCUMExpression.Term, UCUMExpression.Term)
      */
-    public static RelationChecker.CommensurableResult checkCommensurable(String term1, String term2) {
-        return checkCommensurable(parseOrError(term1), parseOrError(term2));
+    public static RelationChecker.CommensurableResult checkCommensurable(String term1, String term2, boolean allowMolMassConversion) {
+        return checkCommensurable(parseOrError(term1), parseOrError(term2), allowMolMassConversion);
     }
 
     /**
@@ -242,13 +245,13 @@ public class UCUMService {
      *
      * @param term1 The first term in the relation.
      * @param term2 The second term in the relation.
+     * @param allowMolMassConversion If true, allows mol->g, otherwise mol->1. If the property ucumate.enableMolMassConversion=false then this value is ignored.
      * @return A CommensurableResult containing information about the relation between the two terms.
      *
      * @see RelationChecker.CommensurableResult
-     * @see UCUMService#checkCommensurable(String, String)
      */
-    public static RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2) {
-        return RelationChecker.checkCommensurable(term1, term2);
+    public static RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2, boolean allowMolMassConversion) {
+        return RelationChecker.checkCommensurable(term1, term2, allowMolMassConversion);
     }
 
     /**

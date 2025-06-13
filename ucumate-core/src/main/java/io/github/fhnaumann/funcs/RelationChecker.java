@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class RelationChecker {
 
-    public static RelationResult checkRelation(Term term1, Term term2) {
+    public static RelationResult checkRelation(Term term1, Term term2, boolean allowMolMassConversion) {
         Canonicalizer.CanonicalizationResult result1 = new Canonicalizer().canonicalize(term1);
         Canonicalizer.CanonicalizationResult result2 = new Canonicalizer().canonicalize(term2);
         if(!(result1 instanceof Canonicalizer.Success success1) || !(result2 instanceof Canonicalizer.Success success2)) {
@@ -19,20 +19,20 @@ public class RelationChecker {
         if(strictEqual || equalAfterProcessing) {
             return new IsEqual(strictEqual, equalAfterProcessing);
         }
-        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm());
+        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm(), allowMolMassConversion);
     }
 
-    public static CommensurableResult checkCommensurable(Term term1, Term term2) {
+    public static CommensurableResult checkCommensurable(Term term1, Term term2, boolean allowMolMassConversion) {
         Canonicalizer.CanonicalizationResult result1 = new Canonicalizer().canonicalize(term1);
         Canonicalizer.CanonicalizationResult result2 = new Canonicalizer().canonicalize(term2);
         if(!(result1 instanceof Canonicalizer.Success success1) || !(result2 instanceof Canonicalizer.Success success2)) {
             return new NotCommensurable(Map.of());
         }
-        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm());
+        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm(), allowMolMassConversion);
 
     }
 
-    private static CommensurableResult checkCommensurable(CanonicalTerm term1, CanonicalTerm term2) {
+    private static CommensurableResult checkCommensurable(CanonicalTerm term1, CanonicalTerm term2, boolean allowMolMassConversion) {
         DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(term1, term2);
         return switch (comparisonResult) {
             case DimensionAnalyzer.Failure failure -> new NotCommensurable(failure.difference());
