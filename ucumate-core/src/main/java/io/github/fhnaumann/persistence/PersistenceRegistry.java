@@ -1,5 +1,6 @@
 package io.github.fhnaumann.persistence;
 
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -112,6 +113,10 @@ public class PersistenceRegistry implements PersistenceProvider {
         if(!"sqlite".equals(name)) {
             additionalProviders.remove("sqlite");
         }
+        PersistenceProvider old = additionalProviders.get(name);
+        if(old != null) {
+            old.close();
+        }
         additionalProviders.put(name, provider);
 
         // try and load saved data into cache if enabled
@@ -126,14 +131,15 @@ public class PersistenceRegistry implements PersistenceProvider {
     }
 
     public static void searchSPI() {
-        ServiceLoader.load(PersistenceProvider.class).forEach(persistenceProvider -> {
-            String name = persistenceProvider.getClass().getSimpleName();
-            // don't overwrite if already exists
-            if(additionalProviders.get(name) == null) {
-                register(name, persistenceProvider);
-            }
-
-        });
+        if(ConfigurationRegistry.get().isEnableSQLitePersistence()) {
+            ServiceLoader.load(PersistenceProvider.class).forEach(persistenceProvider -> {
+                String name = persistenceProvider.getClass().getSimpleName();
+                // don't overwrite if already exists
+                if(additionalProviders.get(name) == null) {
+                    register(name, persistenceProvider);
+                }
+            });
+        }
     }
 
     public static void disableInMemoryCache(boolean deleteCacheEntries) {

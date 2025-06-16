@@ -35,9 +35,10 @@ public abstract class DBPersistenceIntegrationTestBase {
     @BeforeEach
     public void setup() throws SQLException {
         //connection = getConnection();
+        ConnectionPoolFactory.shutdownAll();
+        registerPersistenceProvider();
         PersistenceRegistry.disableInMemoryCache(true);
         //PersistenceRegistry.register("postgres", new PostgresPersistenceProvider(connection, null, null));
-        registerPersistenceProvider();
 
         clearDatabaseState();
     }

@@ -17,6 +17,7 @@ public class ConnectionPoolFactory {
         if (existing != null) {
             if (existing.isClosed()) {
                 pools.remove(key);
+                existing.close();
             } else {
                 return existing;
             }
