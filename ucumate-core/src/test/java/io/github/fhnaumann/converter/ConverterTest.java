@@ -49,11 +49,6 @@ public class ConverterTest {
                 .startsWith(expected);
     }
 
-    @Test
-    public void delete() {
-        System.out.println(UCUMService.convert("[pH]", "mol/L"));
-    }
-
     // todo incorporate into json tests
     private static Stream<Arguments> provide_mol_mass_conversion() {
         return Stream.of(

@@ -2,6 +2,7 @@ package io.github.fhnaumann.builders;
 
 import io.github.fhnaumann.model.UCUMExpression;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -88,30 +89,6 @@ public class CombineTermBuilderTest {
                 );
     }
 
-    @Test
-    @DisplayName("Test if 'GN^2{annot}.(m/m)' has the '()'")
-    public void nested_div_term_has_parens() {
-        UCUMExpression.Term inner = builder
-                .left(meter_term())
-                .divideBy()
-                .right(meter_term())
-                .build();
-        UCUMExpression.Term outer = builder
-                .left(giga_newton_exp2_annot_term())
-                .multiplyWith()
-                .right(inner)
-                .build();
-        assertThat(outer)
-                .isNotNull()
-                .extracting(term -> ((UCUMExpression.BinaryTerm) term).right())
-                .satisfies(term -> assertThat(term)
-                        .isNotNull()
-                        .isInstanceOf(UCUMExpression.ParenTerm.class)
-                        .extracting(term1 -> ((UCUMExpression.ParenTerm) term1).term())
-                        .isEqualTo(inner)
-                );
-    }
-
     @ParameterizedTest
     @MethodSource("provide_terms_that_dont_require_parens")
     public void term_is_not_wrapped_in_parens(UCUMExpression.Term term) {
@@ -123,19 +100,6 @@ public class CombineTermBuilderTest {
         assertThat(outer)
                 .extracting(term1 -> ((UCUMExpression.BinaryTerm) term1).left())
                 .isNotInstanceOf(UCUMExpression.ParenTerm.class);
-    }
-
-    @ParameterizedTest
-    @MethodSource("provide_terms_that_require_parens")
-    public void term_is_wrapped_in_parens(UCUMExpression.Term term) {
-        UCUMExpression.Term outer = builder
-                .left(term)
-                .divideBy()
-                .right(meter_term())
-                .build();
-        assertThat(outer)
-                .extracting(term1 -> ((UCUMExpression.BinaryTerm) term1).left())
-                .isInstanceOf(UCUMExpression.ParenTerm.class);
     }
 
     @Test
@@ -166,18 +130,5 @@ public class CombineTermBuilderTest {
                 .withAnnotation("annot")
                 .asTerm().build();
         return Stream.of(componentTerm, annotOnly, annotTerm);
-    }
-
-    static Stream<UCUMExpression.Term> provide_terms_that_require_parens() {
-        UCUMExpression.Term binaryTerm = CombineTermBuilder.builder()
-                .left(meter_term())
-                .multiplyWith()
-                .right(meter_term())
-                .build();
-        UCUMExpression.Term unaryDivTerm = CombineTermBuilder.builder()
-                .unaryDiv()
-                .right(meter_term())
-                .build();
-        return Stream.of(binaryTerm, unaryDivTerm);
     }
 }

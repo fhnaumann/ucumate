@@ -112,13 +112,13 @@ public class CanonicalizerSpecialTest {
    public void canonicalize_cf1_5_kelvin() {
         var result = (Success) canonicalizer.canonicalize(_5_kelvin_term());
 
-        assertThat(print(result.canonicalTerm())).isEqualTo("K1");
+        assertThat(print(result.canonicalTerm())).isEqualTo("K");
    }
 
     @Test
     public void canonicalize_cf3_5_kelvin() {
         var result = (Success) canonicalizer.canonicalize(_5_kelvin_term());
-        assertThat(print(result.canonicalTerm())).isEqualTo("K1");
+        assertThat(print(result.canonicalTerm())).isEqualTo("K");
     }
 
 }

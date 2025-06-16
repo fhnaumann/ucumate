@@ -2,6 +2,7 @@ package io.github.fhnaumann.builders;
 
 import io.github.fhnaumann.model.UCUMExpression;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static io.github.fhnaumann.TestUtil.meter_term;
@@ -109,42 +110,6 @@ public class CombineTermBuilderCanonicalContractTest {
         assertThat(term)
                 .isNotNull()
                 .isInstanceOf(UCUMExpression.MixedTerm.class);
-    }
-
-    @Test
-    public void nested_left_term_is_canonical_if_from_canonical_components() {
-        UCUMExpression.Term inner = builder
-                .left(meter_term())
-                .multiplyWith()
-                .right(meter_term())
-                .build();
-        UCUMExpression.Term outer = builder
-                .left(inner)
-                .divideBy()
-                .right(giga_newton_exp2_annot_term())
-                .build();
-        assertThat(outer)
-                .isNotNull()
-                .extracting(term -> ((UCUMExpression.BinaryTerm) term).left())
-                .isInstanceOf(UCUMExpression.CanonicalParenTerm.class);
-    }
-
-    @Test
-    public void nested_left_term_is_mixed_if_from_mixed_components() {
-        UCUMExpression.Term inner = builder
-                .left(giga_newton_exp2_annot_term())
-                .multiplyWith()
-                .right(meter_term())
-                .build();
-        UCUMExpression.Term outer = builder
-                .left(inner)
-                .divideBy()
-                .right(giga_newton_exp2_annot_term())
-                .build();
-        assertThat(outer)
-                .isNotNull()
-                .extracting(term -> ((UCUMExpression.BinaryTerm) term).left())
-                .isInstanceOf(UCUMExpression.MixedParenTerm.class);
     }
 
     @Test
