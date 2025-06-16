@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="turbo-root" content="/ucumate">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.0.803361223010">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.803431597845">
 
     <!-- See retype.com -->
-    <meta name="generator" content="Retype 3.10.0">
+    <meta name="generator" content="Retype 3.10.1">
 
     <!-- Primary Meta Tags -->
     <title>UCUM Tests</title>
@@ -32,15 +32,15 @@
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
     <link href="../favicon.png" rel="icon">
-    <link href="../resources/css/retype.css?v=3.10.0.803361223010" rel="stylesheet">
+    <link href="../resources/css/retype.css?v=3.10.1.803431597845" rel="stylesheet">
 
-    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.0.803361223010" data-turbo-eval="false" defer></script>
-    <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.0" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.0.803361223010" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.803431597845" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.1" data-turbo-eval="false" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.803431597845" data-turbo-eval="false" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
-        <div class="absolute bottom-0 left-0 bg-gray-100 dark:bg-dark-800" style="top: 5rem; right: 50%"></div>
+        <div class="absolute bottom-0 left-0 dark:bg-dark-800" style="top: 5rem; right: 50%"></div>
     
         <header id="retype-header" class="sticky top-0 z-30 flex w-full h-16 bg-white border-b border-gray-200 md:h-20 dark:bg-dark-850 dark:border-dark-650">
             <div class="container relative flex items-center justify-between pr-6 grow md:justify-start">
@@ -237,14 +237,10 @@ the encountered problems and decisions made regarding conversion factor precisio
 <li>1-108: <code v-pre>10+3/ul</code> is expected to be invalid but ucumate says it&#x27;s valid. In ucumate any positive integer unit may have an exponent.</li>
 <li>3-115: <code v-pre>6.3</code> * <code v-pre>s/4/m</code> = <code v-pre>1.6</code> * <code v-pre>s/m</code>. ucumate is more precise and does not round in this case. It returns <code v-pre>1.575</code>.</li>
 <li>3-121: 1 * <code v-pre>10*-7.s</code> = <code v-pre>1e-7</code> * <code v-pre>s</code>. Just a string mismatch, ucumate returns <code v-pre>0.0000001</code> instead of <code v-pre>1e-7</code></li>
-<li>3-122: 1 * <code v-pre>4.[pi].10*-7.s</code> = <code v-pre>0.00000125663706143591729538506</code> * <code v-pre>s</code>. ucumate is more precise by default and returns
-<code v-pre>0.00000125663706143591729538505735331180115367886776</code>. The last digit (<code v-pre>6</code>) is rounded and causes the problem.
-You can configure the desired precision through the <code v-pre>PreciseDecimal</code> class.</li>
+<li>3-122: 1 * <code v-pre>4.[pi].10*-7.s</code> = <code v-pre>0.00000125663706143591729538506</code> * <code v-pre>s</code>. ucumate is more precise by default and returns<code v-pre>0.00000125663706143591729538505735331180115367886776</code>. The last digit (<code v-pre>6</code>) is rounded and causes the problem.You can configure the desired precision through the <code v-pre>PreciseDecimal</code> class.</li>
 <li>3-123: Same problem as 3-122.</li>
-<li>3-124: 1 * <code v-pre>[mu_0]</code> = <code v-pre>0.00125663706143591729538506</code> * <code v-pre>g.m.C-2</code>. ucumate is more precise by default returns
-<code v-pre>0.00125663706143591729538505735331180115367886775975</code>.</li>
-<li>3-128: 1 * <code v-pre>1/[ly]</code> = <code v-pre>1.05700083402461546370946e-18</code> <code v-pre>cm-1</code>. ucumate is more precise and does not output conversion
-factors in scientific notation. It returns <code v-pre>0.00000000000000000105700083402461546370946052448513</code>.</li>
+<li>3-124: 1 * <code v-pre>[mu_0]</code> = <code v-pre>0.00125663706143591729538506</code> * <code v-pre>g.m.C-2</code>. ucumate is more precise by default returns<code v-pre>0.00125663706143591729538505735331180115367886775975</code>.</li>
+<li>3-128: 1 * <code v-pre>1/[ly]</code> = <code v-pre>1.05700083402461546370946e-18</code> <code v-pre>cm-1</code>. ucumate is more precise and does not output conversionfactors in scientific notation. It returns <code v-pre>0.00000000000000000105700083402461546370946052448513</code>.</li>
 </ul>
 
                                 
