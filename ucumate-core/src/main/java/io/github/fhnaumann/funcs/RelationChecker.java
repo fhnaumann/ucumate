@@ -55,6 +55,13 @@ public class RelationChecker {
     sealed interface Success extends RelationResult {}
 
     /**
+     * The relation check failed. The subclasses provide more details.
+     */
+    sealed interface FailedRelationCheck extends RelationResult permits Validator.ParserError {}
+
+    sealed interface FailedCommensurableCheck extends CommensurableResult permits Validator.ParserError {}
+
+    /**
      * The two given terms are (semantically) equal.
      * @param strictEqual True if the two terms are exactly identical (same brackets, etc.), false otherwise.
      * @param equalAfterProcessing True if the two terms are equal in their canonical form (normalized, only multiplication and exponents), false otherwise.

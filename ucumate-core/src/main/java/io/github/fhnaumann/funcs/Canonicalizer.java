@@ -444,7 +444,7 @@ public class Canonicalizer {
     /**
      * Represents a failed canonicalization. The subclasses provide more details.
      */
-    public sealed interface FailedCanonicalization extends CanonicalizationResult {}
+    public sealed interface FailedCanonicalization extends CanonicalizationResult permits TermContainsPHAndCanonicalizingToMass, TermHasArbitraryUnit, Validator.ParserError {}
 
     /**
      * The canonicalization was successful.

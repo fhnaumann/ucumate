@@ -17,10 +17,40 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <description>A library for working with UCUM.</description>
+    <url>https://github.com/fhnaumann/ucumate</url>
+
+    <name>ucumate ucum-java bridge</name>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Felix Naumann</name>
+            <email>fhnaumann@t-online.de</email>
+            <organization>Personal</organization>
+            <organizationUrl>https://github.com/fhnaumann</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <url>https://github.com/fhnaumann/ucumate/tree/main</url>
+        <connection>scm:git:git://github.com/fhnaumann/ucumate.git</connection>
+        <developerConnection>scm:git:ssh://github.com:fhnaumann/ucumate.git</developerConnection>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
+            <version>1.0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.fhnaumann</groupId>
+            <artifactId>ucumate-test-utils</artifactId>
             <version>1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>

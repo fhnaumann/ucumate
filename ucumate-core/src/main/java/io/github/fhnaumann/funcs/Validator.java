@@ -33,6 +33,12 @@ public class Validator {
         public ParserException(ParseUtil.InvalidResults invalidResults) {}
     }
 
+    public record ParserError() implements
+            Canonicalizer.FailedCanonicalization,
+            Converter.FailedConversion, RelationChecker.FailedRelationCheck,
+            RelationChecker.FailedCommensurableCheck
+    {}
+
     /**
      * Internal use only!
      * @param input The string input that is definitely in a canonical form

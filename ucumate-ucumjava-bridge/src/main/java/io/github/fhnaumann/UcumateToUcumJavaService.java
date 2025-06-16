@@ -51,6 +51,8 @@ public class UcumateToUcumJavaService implements UcumService {
     public List<String> validateUCUM() {
         /*
         Calling the registry instance itself automatically checks for malformed syntax because it will just error out.
+
+        This returns an empty list because it implements all special units.
          */
         UCUMRegistry registry = UCUMRegistry.getInstance();
         return registry.getAll().stream()
@@ -69,20 +71,45 @@ public class UcumateToUcumJavaService implements UcumService {
         });
         return poolOfConceptsToSearchFrom
                 .stream()
-                .filter(concept -> matches(concept.code(), text, isRegex) || matches(concept.codeCaseInsensitive(), text, isRegex) || matches(concept.printSymbol(), text, isRegex))
-                .map(concept -> new Concept(fromUcumateInstance(concept), concept.code(), concept.codeCaseInsensitive()))
+                .filter(concept -> matchConcept(concept, text, isRegex))
+                .map(UcumateToUcumJavaService::fromUcumateConceptToUcumJavaConcept)
                 .toList();
     }
 
-    private ConceptKind fromUcumateInstance(UCUMDefinition.Concept concept) {
-        return switch (concept) {
-            case UCUMDefinition.UCUMPrefix prefix -> ConceptKind.PREFIX;
-            case UCUMDefinition.BaseUnit baseUnit -> ConceptKind.BASEUNIT;
-            case UCUMDefinition.DefinedUnit definedUnit -> ConceptKind.UNIT;
-        };
+    private static boolean matchConcept(UCUMDefinition.Concept concept, String text, boolean isRegex) {
+        return concept.names().stream().anyMatch(name -> matches(name, text, isRegex))
+                || matches(concept.code(), text, isRegex)
+                || matches(concept.codeCaseInsensitive(), text, isRegex)
+                || matches(concept.printSymbol(), text, isRegex)
+                || concept instanceof UCUMDefinition.UCUMUnit unit && matches(unit.property(), text, isRegex);
     }
 
-    private boolean matches(String value, String text, boolean isRegex) {
+    private static Concept fromUcumateConceptToUcumJavaConcept(UCUMDefinition.Concept ucumateConcept) {
+        Concept ucumJavaConcept =  switch (ucumateConcept) {
+            case UCUMDefinition.UCUMPrefix prefix -> {
+                Prefix ucumJavaPrefix = new Prefix(ucumateConcept.code(), ucumateConcept.codeCaseInsensitive());
+                try {
+                    ucumJavaPrefix.setValue(new Decimal(prefix.value().conversionFactor().toString()));
+                    yield ucumJavaPrefix;
+                } catch (UcumException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            case UCUMDefinition.BaseUnit baseUnit -> {
+                BaseUnit ucumJavaBaseUnit = new BaseUnit(ucumateConcept.code(), ucumateConcept.codeCaseInsensitive());
+                // ucum-java uses the first char of the dim string from the essence xml
+                ucumJavaBaseUnit.setDim(baseUnit.dim().charAt(0));
+                ucumJavaBaseUnit.setProperty(baseUnit.property());
+                yield ucumJavaBaseUnit;
+            }
+            case UCUMDefinition.DefinedUnit definedUnit -> getUcumJavaDefinedUnitFromUcumateDefinedUnit(definedUnit);
+        };
+        ucumJavaConcept.setPrintSymbol(ucumateConcept.printSymbol());
+        ucumJavaConcept.getNames().addAll(ucumateConcept.names());
+        return ucumJavaConcept;
+    }
+
+    private static boolean matches(String value, String text, boolean isRegex) {
         return (value != null) && ((isRegex  && value.matches(text)) || (!isRegex && value.toLowerCase().contains(text.toLowerCase())));
     }
 
@@ -114,14 +141,20 @@ public class UcumateToUcumJavaService implements UcumService {
         if(!(canonResult instanceof Canonicalizer.Success success)) {
             return "%s is not a valid unit.".formatted(unit);
         }
-        Validator.ValidationResult canonicalInputResult = UCUMService.validate(unit);
-        if(!(canonicalInputResult instanceof Validator.Success canonicalInputSuccess)) {
+        Validator.ValidationResult canonicalValResult = UCUMService.validate(canonical);
+        if(!(canonicalValResult instanceof Validator.Success canonicalParsedSuccess)) {
             return "%s is not a valid unit.".formatted(canonical);
         }
-        if(!UCUMService.isCanonical(canonical)) {
-            return "%s is not in canonical form.".formatted(canonical);
+        if(!CanonicalChecker.containsOnlyCanonicalExpressions(canonicalParsedSuccess.term())) {
+            return "%s is not a canonical unit.".formatted(canonical);
         }
-        DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(success.canonicalTerm(), (UCUMExpression.CanonicalTerm) canonicalInputSuccess.term());
+        // It is safe to canonicalize now because if it is not a canonical unit, the CanonicalChecker would have returned false
+        Canonicalizer.CanonicalizationResult canonicalizationResult = UCUMService.canonicalize(canonicalParsedSuccess.term());
+        if(!(canonicalizationResult instanceof Canonicalizer.Success success1)) {
+            throw new RuntimeException("Canonicalized failed but CanonicalChecker said it should work.");
+        }
+
+        DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(success.canonicalTerm(), success1.canonicalTerm());
         return switch (comparisonResult) {
             case DimensionAnalyzer.Success comparisonSuccess -> null;
             case DimensionAnalyzer.Failure failure -> "The provided unit '%s' and the desired canonical form '%s' do not match. This is their difference: %s".formatted(unit, canonical, failure.difference());
@@ -180,23 +213,25 @@ public class UcumateToUcumJavaService implements UcumService {
             }
         }
         return result.stream()
-                .map(definedUnit -> {
-                    DefinedUnit fhirDefinedUnit = new DefinedUnit(definedUnit.code(), definedUnit.codeCaseInsensitive());
-                    fhirDefinedUnit.setMetric(definedUnit.isMetric());
-                    fhirDefinedUnit.setSpecial(definedUnit instanceof UCUMDefinition.SpecialUnit);
-                    fhirDefinedUnit.setProperty(definedUnit.property());
-                    fhirDefinedUnit.setPrintSymbol(definedUnit.printSymbol());
-                    fhirDefinedUnit.getNames().addAll(definedUnit.names());
-                    try {
-                        Value value = new Value(definedUnit.value().unit(), definedUnit.value().unitAlt(), new Decimal(definedUnit.value().conversionFactor().toString()));
-                        value.setText(value.getValue().asDecimal());
-                        fhirDefinedUnit.setValue(value);
-                        return fhirDefinedUnit;
-                    } catch (UcumException e) {
-                        return null;
-                    }
-                })
+                .map(UcumateToUcumJavaService::getUcumJavaDefinedUnitFromUcumateDefinedUnit)
                 .toList();
+    }
+
+    private static DefinedUnit getUcumJavaDefinedUnitFromUcumateDefinedUnit(UCUMDefinition.DefinedUnit definedUnit) {
+        DefinedUnit fhirDefinedUnit = new DefinedUnit(definedUnit.code(), definedUnit.codeCaseInsensitive());
+        fhirDefinedUnit.setMetric(definedUnit.isMetric());
+        fhirDefinedUnit.setSpecial(definedUnit instanceof UCUMDefinition.SpecialUnit);
+        fhirDefinedUnit.setProperty(definedUnit.property());
+        fhirDefinedUnit.setPrintSymbol(definedUnit.printSymbol());
+        fhirDefinedUnit.getNames().addAll(definedUnit.names());
+        try {
+            Value value = new Value(definedUnit.value().unit(), definedUnit.value().unitAlt(), new Decimal(definedUnit.value().conversionFactor().toString()));
+            value.setText(value.getValue().asDecimal());
+            fhirDefinedUnit.setValue(value);
+            return fhirDefinedUnit;
+        } catch (UcumException e) {
+            return null;
+        }
     }
 
     @Override

@@ -131,7 +131,7 @@ public class Converter {
     /**
      * Represents a failed conversion. The subclasses provide more details.
      */
-    public sealed interface FailedConversion extends ConversionResult {}
+    public sealed interface FailedConversion extends ConversionResult permits BaseDimensionMismatch, FailedCanonicalization, Validator.ParserError {}
 
     /**
      * The conversion was successful.
