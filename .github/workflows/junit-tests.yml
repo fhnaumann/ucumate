@@ -8,7 +8,7 @@ on:
     branches:
       - main
 jobs:
-  functional-tests:
+  junit-tests:
     permissions:
       id-token: write
       contents: read
@@ -29,6 +29,6 @@ jobs:
         if: always()
         with:
           name: Maven Tests
-          path: '**/target/surefire-reports/*.xml'
+          path: '**/target/surefire-reports/TEST-*.xml'
           reporter: java-junit
           fail-on-error: true
