@@ -2,6 +2,7 @@ package io.github.fhnaumann;
 
 import com.mongodb.client.MongoClient;
 import com.zaxxer.hikari.HikariDataSource;
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.providers.MongoDBPersistenceProvider;
 import io.github.fhnaumann.providers.MySQLPersistenceProvider;
 import io.github.fhnaumann.providers.PostgresPersistenceProvider;
@@ -36,7 +37,7 @@ public class PersistenceProviderFactory {
     }
 
     public static SQLitePersistenceProvider createDefaultSQLiteProvider() {
-        Path defaultSQLitePath = Paths.get(System.getProperty("user.dir")).resolve("ucumate.db");
+        Path defaultSQLitePath = Paths.get(ConfigurationRegistry.get().getSqliteDBPath());
         String jdbcUrl = "jdbc:sqlite:" + defaultSQLitePath.toAbsolutePath();
         HikariDataSource ds = ConnectionPoolFactory.getOrCreate(jdbcUrl, "", "");
         try {

@@ -18,8 +18,6 @@ public class DimAnalyzerTest {
         //Expression.Term term = CombineTermBuilder.builder().left(CombineTermBuilder.builder().left(meter_term()).divideBy().right(second_term()).build()).divideBy().right(gram_term()).build();
         Map<Dimension, Integer> result = DimensionAnalyzer.analyze(parse_canonical("s/4/m"));
         Map<Dimension, Integer> result2 = DimensionAnalyzer.analyze(parse_canonical("s/m"));
-        System.out.println(result);
-        System.out.println(result2);
     }
 
     @Test

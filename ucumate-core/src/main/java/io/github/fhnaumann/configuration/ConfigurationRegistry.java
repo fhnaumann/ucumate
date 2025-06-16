@@ -1,5 +1,6 @@
 package io.github.fhnaumann.configuration;
 
+import io.github.fhnaumann.util.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,13 @@ public class ConfigurationRegistry {
     private static final String DEFAULT_CONFIG_FILE = "ucumate.properties";
 
     public static void initialize(Configuration configuration) {
+        boolean persistenceModuleOnClassPath = ReflectionUtil.isClassPresent("io.github.fhnaumann.providers.SQLitePersistenceProvider");
+        if(configuration.isEnableSQLitePersistence() && !persistenceModuleOnClassPath) {
+            log.warn("SQLite Persistence enabled but SQLitePersistenceProvider was not found. Did you include the 'ucumate-persistence' module in your pom.xml?");
+        }
+        if(!configuration.isEnableSQLitePersistence() && persistenceModuleOnClassPath) {
+            log.warn("SQLite Persistence disabled but SQLitePersistenceProvider was found. Did you miss to enable SQLite Persistence at 'ucumate.persistence.sqlite.enable'? If you already use a different persistent storage you can safely ignore this message.");
+        }
         instance = configuration;
     }
 
@@ -24,7 +32,7 @@ public class ConfigurationRegistry {
             synchronized (ConfigurationRegistry.class) {
                 if(instance == null) {
                     // use default configuration
-                    instance = loadDefault();
+                    initialize(loadDefault());
                 }
             }
         }

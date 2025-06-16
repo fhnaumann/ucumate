@@ -28,6 +28,26 @@
             <artifactId>ucumate-mol-support</artifactId>
             <version>1.0.2-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.fhnaumann</groupId>
+            <artifactId>ucumate-persistence</artifactId>
+            <version>1.0.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.3</version>
+                <configuration>
+                    <argLine>${argLine}</argLine>
+                    <!-- Use its own JVM Instance for SPI Tests to mimic "true first start" -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -5,11 +5,12 @@ import io.github.fhnaumann.persistence.PersistenceRegistry;
 /**
  * @author Felix Naumann
  */
+@Deprecated
 public class SQLiteAutoRegistrar {
     static {
         if (!PersistenceRegistry.hasAny()) {
             try {
-                PersistenceRegistry.register("sqlite", PersistenceProviderFactory.createDefaultSQLiteProvider());
+                // PersistenceRegistry.register("sqlite", PersistenceProviderFactory.createDefaultSQLiteProvider());
             } catch (Exception e) {
                 throw new RuntimeException("Failed to initialize default SQLite storage", e);
             }
