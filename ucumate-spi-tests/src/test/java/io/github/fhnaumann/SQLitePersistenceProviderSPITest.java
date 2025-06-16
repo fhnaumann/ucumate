@@ -35,6 +35,7 @@ public class SQLitePersistenceProviderSPITest {
 
     @BeforeEach
     public void setup() throws IOException {
+        System.setProperty("ucumate.persistence.sqlite.enable", "true");
         dbPath = sqliteFile.resolve("ucumate.db").toString();
         System.setProperty("ucumate.persistence.sqlite.dbpath", dbPath);
         PersistenceRegistry.searchSPI();
