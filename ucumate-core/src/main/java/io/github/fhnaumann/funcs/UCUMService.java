@@ -98,7 +98,11 @@ public class UCUMService {
      * @see UCUMService#convert(UCUMExpression.Term, UCUMExpression.Term)
      */
     public static ConversionResult convert(PreciseDecimal factor, String from, String to) {
-        return convert(factor, parseOrError(from), parseOrError(to));
+        try {
+            return convert(factor, parseOrError(from), parseOrError(to));
+        } catch (Validator.ParserException e) {
+            return new Validator.ParserError();
+        }
     }
 
     /**
@@ -195,7 +199,12 @@ public class UCUMService {
         The string may optionally be something other than a number. In this case the current CompoundProvider is asked for a mapping to a number.
          */
         substanceMolMassCoeff = CompoundUtil.resolveMolarMass(substanceMolMassCoeff);
-        return new Converter().convert(new Conversion(new PreciseDecimal(factor), parseOrError(from)), parseOrError(to), substanceMolMassCoeff != null ? new PreciseDecimal(substanceMolMassCoeff) : null);
+        try {
+            return new Converter().convert(new Conversion(new PreciseDecimal(factor), parseOrError(from)), parseOrError(to), substanceMolMassCoeff != null ? new PreciseDecimal(substanceMolMassCoeff) : null);
+        } catch (Validator.ParserException e) {
+            return new Validator.ParserError();
+        }
+
     }
 
     /**
@@ -237,7 +246,11 @@ public class UCUMService {
      * @see RelationChecker.CommensurableResult
      */
     public static RelationChecker.CommensurableResult checkCommensurable(String term1, String term2, boolean allowMolMassConversion) {
-        return checkCommensurable(parseOrError(term1), parseOrError(term2), allowMolMassConversion);
+        try {
+            return checkCommensurable(parseOrError(term1), parseOrError(term2), allowMolMassConversion);
+        } catch (Validator.ParserException e) {
+            return new Validator.ParserError();
+        }
     }
 
     /**
@@ -268,7 +281,11 @@ public class UCUMService {
      * @see UCUMService#canonicalize(UCUMExpression.Term)
      */
     public static CanonicalizationResult canonicalize(String term) {
-        return canonicalize(parseOrError(term));
+        try {
+            return canonicalize(parseOrError(term));
+        } catch (Validator.ParserException e) {
+            return new Validator.ParserError();
+        }
     }
 
     /**
@@ -288,12 +305,67 @@ public class UCUMService {
         return new Canonicalizer().canonicalize(term);
     }
 
+    // todo write javadoc
+
+    public static CanonicalizationResult canonicalize(PreciseDecimal factor, String term) {
+        try {
+            return canonicalize(factor, parseOrError(term));
+        } catch (Validator.ParserException e) {
+            return new Validator.ParserError();
+        }
+    }
+
+    public static CanonicalizationResult canonicalize(String factor, UCUMExpression.Term term) {
+        return canonicalize(new PreciseDecimal(factor), term);
+    }
+
+    public static CanonicalizationResult canonicalize(String factor, String term) {
+        return canonicalize(new PreciseDecimal(factor), term);
+    }
+
+    public static CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term) {
+        return new Canonicalizer().canonicalize(factor, term);
+    }
+
+    /**
+     * Test if a given string term is canonical.
+     *
+     * @param term A term as a string.
+     * @return true if canonical, false otherwise.
+     *
+     * @see UCUMService#isCanonical(UCUMExpression.Term)
+     */
+    public static boolean isCanonical(String term) {
+        CanonicalizationResult canonResult = canonicalize(term);
+        return switch (canonResult) {
+            case Canonicalizer.FailedCanonicalization failedCanonicalization -> false;
+            case Canonicalizer.Success success -> true;
+        };
+    }
+
+    /**
+     * Test if a given term is canonical.
+     *
+     * @param term A term.
+     * @return true if canonical, false otherwise.
+     *
+     * @see UCUMService#isCanonical(String)
+     */
+    public static boolean isCanonical(UCUMExpression.Term term) {
+        return switch (term) {
+            case UCUMExpression.CanonicalTerm canonicalTerm -> true;
+            case UCUMExpression.MixedTerm mixedTerm -> false;
+        };
+    }
+
     /**
      * Creates a string representation of a given UCUMExpression as a string.
      *
      * @param ucumExpression Any UCUMExpression (includes Terms) as a string. Will be validated first.
      * @param printType The type of the printer.
      * @return A String representation of the given UCUMExpression.
+     *
+     * @throws io.github.fhnaumann.funcs.Validator.ParserException A ParserException if the input could not be parsed.
      *
      * @see PrintType
      * @see UCUMService#print(UCUMExpression, PrintType)
@@ -311,6 +383,8 @@ public class UCUMService {
      *
      * @param ucumExpression Any UCUMExpression (includes Terms).
      * @return A String representation of the given UCUMExpression that is a valid UCUM code.
+     *
+     * @throws io.github.fhnaumann.funcs.Validator.ParserException A ParserException if the input could not be parsed.
      *
      * @see UCUMService#print(String, PrintType)
      * @see UCUMService#print(UCUMExpression, PrintType)
@@ -350,5 +424,13 @@ public class UCUMService {
      */
     public static String print(UCUMExpression ucumExpression) {
         return print(ucumExpression, PrintType.UCUM_SYNTAX);
+    }
+
+    public static String print(UCUMExpression ucumExpression, Printer printer) {
+        return printer.print(ucumExpression);
+    }
+
+    public static String print(String ucumExpression, Printer printer) {
+        return printer.print(parseOrError(ucumExpression));
     }
 }

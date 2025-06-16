@@ -68,3 +68,6 @@ benchmark*.json
 
 ucumate-mol-support/target
 ucumate-spi-tests/target
+
+**/target
+target

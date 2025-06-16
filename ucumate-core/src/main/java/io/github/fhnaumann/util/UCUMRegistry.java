@@ -14,12 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UCUMRegistry {
 
@@ -43,6 +41,26 @@ public class UCUMRegistry {
         this.baseUnits = identityFromList(ucumEssence.baseUnits());
         this.definedUnits = identityFromList(ucumEssence.definedUnits());
         this.definedUnitSourceDefinitions = new HashMap<>();
+    }
+
+    public List<UCUMDefinition.Concept> getAll() {
+        List<UCUMDefinition.Concept> all = new ArrayList<>();
+        all.addAll(prefixes.values());
+        all.addAll(baseUnits.values());
+        all.addAll(definedUnits.values());
+        return all;
+    }
+
+    public Collection<UCUMDefinition.UCUMPrefix> getPrefixes() {
+        return prefixes.values();
+    }
+
+    public Collection<UCUMDefinition.BaseUnit> getBaseUnits() {
+        return baseUnits.values();
+    }
+
+    public Collection<UCUMDefinition.DefinedUnit> getDefinedUnits() {
+        return definedUnits.values();
     }
 
     private UCUMExpression.Term translateUnitInsideDefinedUnitToTerm(UCUMDefinition.DefinedUnit definedUnit) {

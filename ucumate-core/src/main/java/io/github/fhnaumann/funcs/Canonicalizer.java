@@ -2,6 +2,7 @@ package io.github.fhnaumann.funcs;
 
 import io.github.fhnaumann.compounds.CompoundUtil;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
+import io.github.fhnaumann.funcs.sorter.AlphabeticalSorter;
 import io.github.fhnaumann.model.UCUMDefinition.*;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.util.MolMassUtil;
@@ -161,6 +162,7 @@ public class Canonicalizer {
             if(normalize) {
                 resultTerm = (CanonicalTerm) new Normalizer().normalize(resultTerm);
             }
+            resultTerm = new AlphabeticalSorter().sort(resultTerm);
             // explicitly cache the result after normalizing and flatten
             //if(substanceMolarMassCoeff == null) {
 
@@ -442,7 +444,7 @@ public class Canonicalizer {
     /**
      * Represents a failed canonicalization. The subclasses provide more details.
      */
-    public sealed interface FailedCanonicalization extends CanonicalizationResult {}
+    public sealed interface FailedCanonicalization extends CanonicalizationResult permits TermContainsPHAndCanonicalizingToMass, TermHasArbitraryUnit, Validator.ParserError {}
 
     /**
      * The canonicalization was successful.
