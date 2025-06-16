@@ -184,9 +184,9 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <includes>
+                <!--includes>
                     <include>**/*.json</include>
-                </includes>
+                </includes-->
             </resource>
         </resources>
     </build>

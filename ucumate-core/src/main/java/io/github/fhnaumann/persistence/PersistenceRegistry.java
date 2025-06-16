@@ -30,12 +30,13 @@ public class PersistenceRegistry implements PersistenceProvider {
     private static final Map<String, PersistenceProvider> additionalProviders = new HashMap<>();
 
     static {
-        try {
+        //try {
             initCache(); // initialize cache with default config or from property file on classpath
-            Class.forName("io.github.fhnaumann.SQLiteAutoRegistrar"); // try to auto-register sqlite provider if persistence module is on classpath, otherwise ignore
-        } catch (ClassNotFoundException ignored) {
+            // Class.forName("io.github.fhnaumann.SQLiteAutoRegistrar"); // try to auto-register sqlite provider if persistence module is on classpath, otherwise ignore
+            searchSPI();
+        //} catch (ClassNotFoundException ignored) {
             // Persistence module not on classpath — ignore
-        }
+        //}
     }
 
     /**
@@ -122,6 +123,17 @@ public class PersistenceRegistry implements PersistenceProvider {
 
     public static boolean hasAny() {
         return !additionalProviders.isEmpty();
+    }
+
+    public static void searchSPI() {
+        ServiceLoader.load(PersistenceProvider.class).forEach(persistenceProvider -> {
+            String name = persistenceProvider.getClass().getSimpleName();
+            // don't overwrite if already exists
+            if(additionalProviders.get(name) == null) {
+                register(name, persistenceProvider);
+            }
+
+        });
     }
 
     public static void disableInMemoryCache(boolean deleteCacheEntries) {

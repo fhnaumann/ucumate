@@ -65,7 +65,7 @@ public abstract class DBPersistenceIntegrationTestBase {
         UCUMService.canonicalize("S");
         Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(parse("S"));
         assertThat(canonicalStepResult).isNotNull();
-        assertThat("C+2.m-2.s.g-1").isEqualTo(UCUMService.print(canonicalStepResult.term()));
+        assertThat("C+2.g-1.m-2.s").isEqualTo(UCUMService.print(canonicalStepResult.term()));
         assertThat(new PreciseDecimal("0.001")).isEqualTo(canonicalStepResult.magnitude());
         assertThat(new PreciseDecimal("1")).isEqualTo(canonicalStepResult.cfPrefix());
         assertFalse(canonicalStepResult.specialHandlingActive());
