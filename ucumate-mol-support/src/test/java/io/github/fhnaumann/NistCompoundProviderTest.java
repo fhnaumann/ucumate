@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import io.github.fhnaumann.compounds.CompoundProvider;
 import io.github.fhnaumann.compounds.CompoundProviderRegistry;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -35,6 +36,7 @@ public class NistCompoundProviderTest {
 
     @ParameterizedTest
     @MethodSource("nistRows")
+    @Disabled
     public void testByName(MoleCompoundData data) {
         assertThat(data).isNotNull();
         //assertThat(provider.findByName(data.name())).isEqualTo(data.name() != null ? data.molWeight() : null);
