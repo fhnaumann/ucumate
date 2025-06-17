@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         include = JsonTypeInfo.As.PROPERTY,
         property = "@type"
 )
-public sealed interface UCUMExpression permits UCUMExpression.Operator, UCUMExpression.Annotation, UCUMExpression.CanoncialUCUMExpression, UCUMExpression.Component, UCUMExpression.Exponent, UCUMExpression.MixedUCUMExpression, UCUMExpression.Term, UCUMExpression.Unit {
+public sealed interface UCUMExpression permits UCUMDefinition, UCUMExpression.Annotation, UCUMExpression.CanoncialUCUMExpression, UCUMExpression.Component, UCUMExpression.Exponent, UCUMExpression.MixedUCUMExpression, UCUMExpression.Operator, UCUMExpression.Term, UCUMExpression.Unit {
 
     sealed interface CanoncialUCUMExpression extends UCUMExpression {}
     sealed interface MixedUCUMExpression extends UCUMExpression {}

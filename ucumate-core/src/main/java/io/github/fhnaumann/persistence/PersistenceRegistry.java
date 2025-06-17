@@ -1,6 +1,8 @@
 package io.github.fhnaumann.persistence;
 
+import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
+import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -57,14 +59,14 @@ public class PersistenceRegistry implements PersistenceProvider {
      */
     public static void initCache(Properties properties) {
         try {
-            boolean enableCache = (boolean) properties.getOrDefault("ucumate.cache.enable", true);
-            int maxCanonSize = (int) properties.getOrDefault("ucumate.cache.maxCanonSize", 10_000);
-            int maxValSize = (int) properties.getOrDefault("ucumate.cache.maxValSize", 10_000);
-            boolean recordStats = (boolean) properties.getOrDefault("ucumate.cache.recordStats", false);
-            boolean preHeat = (boolean) properties.getOrDefault("ucumate.cache.preheat", false);
-            boolean overrideInsteadOfAdd = (boolean) properties.getOrDefault("ucumate.cache.preheat.override", false);
+            boolean enableCache = Boolean.parseBoolean(properties.getProperty("ucumate.cache.enable", "true"));
+            int maxCanonSize = Integer.parseInt(properties.getProperty("ucumate.cache.maxCanonSize", "10000"));
+            int maxValSize = Integer.parseInt(properties.getProperty("ucumate.cache.maxValSize", "10000"));
+            boolean recordStats = Boolean.parseBoolean(properties.getProperty("ucumate.cache.recordStats", "false"));
+            boolean preHeat = Boolean.parseBoolean(properties.getProperty("ucumate.cache.preheat", "true"));
+            boolean overrideInsteadOfAdd = Boolean.parseBoolean(properties.getProperty("ucumate.cache.preheat.override", "false"));
             List<String> defaultPreHeatCodes = PropertiesUtil.readCodeFile(PersistenceRegistry.class.getClassLoader().getResourceAsStream("pre_heat_codes.json"));
-            String preHeatCodesFilename = (String) properties.getOrDefault("ucumate.cache.preheat.codes", "");
+            String preHeatCodesFilename = properties.getProperty("ucumate.cache.preheat.codes", "");
             List<String> preHeatCodes = !preHeatCodesFilename.isBlank() ? PropertiesUtil.readCodeFile(preHeatCodesFilename) : List.of();
             if(cache != null) {
                 logger.warn("Overriding existing cache.");
@@ -156,13 +158,13 @@ public class PersistenceRegistry implements PersistenceProvider {
     }
 
     @Override
-    public void saveCanonical(UCUMExpression key, Canonicalizer.CanonicalStepResult value) {
+    public void saveCanonical(CanonKey key, Canonicalizer.CanonicalStepResult value) {
         cache.saveCanonical(key, value);
         additionalProviders.forEach((s, entry) -> entry.saveCanonical(key, value));
     }
 
     @Override
-    public Canonicalizer.CanonicalStepResult getCanonical(UCUMExpression key) {
+    public Canonicalizer.CanonicalStepResult getCanonical(CanonKey key) {
         Canonicalizer.CanonicalStepResult canonicalStepResult = cache.getCanonical(key);
         if(canonicalStepResult != null) {
             return canonicalStepResult;
@@ -177,7 +179,7 @@ public class PersistenceRegistry implements PersistenceProvider {
     }
 
     @Override
-    public Map<UCUMExpression, Canonicalizer.CanonicalStepResult> getAllCanonical() {
+    public Map<CanonKey, Canonicalizer.CanonicalStepResult> getAllCanonical() {
         if(cache != null && cache.isEnabled()) {
             return cache.getAllCanonical();
         }
@@ -188,13 +190,13 @@ public class PersistenceRegistry implements PersistenceProvider {
     }
 
     @Override
-    public void saveValidated(String key, Validator.ValidationResult value) {
+    public void saveValidated(ValKey key, Validator.ValidationResult value) {
         cache.saveValidated(key, value);
         additionalProviders.forEach((s, entry) -> entry.saveValidated(key, value));
     }
 
     @Override
-    public Validator.ValidationResult getValidated(String key) {
+    public Validator.ValidationResult getValidated(ValKey key) {
         Validator.ValidationResult validationResult = cache.getValidated(key);
         if(validationResult != null) {
             return validationResult;
@@ -209,7 +211,7 @@ public class PersistenceRegistry implements PersistenceProvider {
     }
 
     @Override
-    public Map<String, Validator.ValidationResult> getAllValidated() {
+    public Map<ValKey, Validator.ValidationResult> getAllValidated() {
         if(cache != null && cache.isEnabled()) {
             return cache.getAllValidated();
         }

@@ -21,6 +21,10 @@ public class Configuration {
         this.sqliteDBPath = sqliteDBPath;
     }
 
+    public FeatureFlags asFeatureFlags() {
+        return ConfigurationRegistry.getFeatureFlags(this);
+    }
+
     public boolean isEnablePrefixOnNonMetricUnits() {
         return enablePrefixOnNonMetricUnits;
     }
@@ -39,6 +43,17 @@ public class Configuration {
 
     public String getSqliteDBPath() {
         return sqliteDBPath;
+    }
+
+    @Override
+    public String toString() {
+        return "Configuration{" +
+                "enablePrefixOnNonMetricUnits=" + enablePrefixOnNonMetricUnits +
+                ", enableMolMassConversion=" + enableMolMassConversion +
+                ", allowAnnotAfterParens=" + allowAnnotAfterParens +
+                ", enableSQLitePersistence=" + enableSQLitePersistence +
+                ", sqliteDBPath='" + sqliteDBPath + '\'' +
+                '}';
     }
 
     public static Builder builder() {

@@ -178,6 +178,8 @@ public class UCUMRegistry {
             JacksonXmlModule module = new JacksonXmlModule();
             module.setDefaultUseWrapper(false);
             XmlMapper mapper = new XmlMapper(module);
+            mapper.deactivateDefaultTyping();
+            mapper.addMixIn(UCUMExpression.class, UCUMDefinition.UCUMExpressionMixIn.class);
             // mapper.disable(MapperFeature.USE_GETTERS_AS_SETTERS);
             // mapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             UCUMDefinition.UCUMEssence ucumEssence = mapper.readValue(ucumEssenceXML, UCUMDefinition.UCUMEssence.class);

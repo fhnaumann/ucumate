@@ -1,5 +1,9 @@
 package io.github.fhnaumann.providers;
 
+import io.github.fhnaumann.configuration.CanonKey;
+import io.github.fhnaumann.configuration.FeatureFlags;
+import io.github.fhnaumann.configuration.FeatureFlagsContext;
+import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
@@ -56,9 +60,9 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
 
     @Override
-    public void saveCanonical(UCUMExpression key, Canonicalizer.CanonicalStepResult value) {
+    public void saveCanonical(CanonKey key, Canonicalizer.CanonicalStepResult value) {
         try (PreparedStatement stmt = connection.prepareStatement(getCanonicalUpsertQuery())) {
-            String keyString  = UCUMService.print(key, Printer.PrintType.UCUM_SYNTAX);
+            String keyString  = key.toStorageKey(FeatureFlagsContext.get());
             stmt.setString(1, keyString);
             stmt.setString(2, value.magnitude().toString());
             stmt.setString(3, value.cfPrefix().toString());
@@ -83,10 +87,10 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public Canonicalizer.CanonicalStepResult getCanonical(UCUMExpression key) {
+    public Canonicalizer.CanonicalStepResult getCanonical(CanonKey key) {
         try (PreparedStatement stmt = connection.prepareStatement(
                 "SELECT * FROM " + canonicalTableName + " WHERE unit_key = ?")) {
-            String keyString = UCUMService.print(key, Printer.PrintType.UCUM_SYNTAX);
+            String keyString = key.toStorageKey(FeatureFlagsContext.get());
             stmt.setString(1, keyString);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -113,9 +117,9 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public void saveValidated(String key, Validator.ValidationResult value) {
+    public void saveValidated(ValKey key, Validator.ValidationResult value) {
         try (PreparedStatement stmt = connection.prepareStatement(getValidateUpsertQuery())) {
-            stmt.setString(1, key);
+            stmt.setString(1, key.toStorageKey(FeatureFlagsContext.get()));
             stmt.setBoolean(2, switch (value) {
                 case Validator.Failure failure -> false;
                 case Validator.Success success -> true;
@@ -128,15 +132,15 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
 
     @Override
-    public Validator.ValidationResult getValidated(String key) {
+    public Validator.ValidationResult getValidated(ValKey key) {
         try (PreparedStatement stmt = connection.prepareStatement(
                 "SELECT valid FROM " + validateTableName + " WHERE unit_key = ?")) {
-            stmt.setString(1, key);
+            stmt.setString(1, key.toStorageKey(FeatureFlagsContext.get()));
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 boolean valid = rs.getBoolean("valid");
                 if(valid) {
-                    UCUMExpression.Term parsedKey = Validator.parseByPassChecks(key);
+                    UCUMExpression.Term parsedKey = Validator.parseByPassChecks(key.expression());
                     return new Validator.Success(parsedKey);
                 }
                 else {
@@ -150,8 +154,8 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public Map<String, Validator.ValidationResult> getAllValidated() {
-        Map<String, Validator.ValidationResult> resultMap = new HashMap<>();
+    public Map<ValKey, Validator.ValidationResult> getAllValidated() {
+        Map<ValKey, Validator.ValidationResult> resultMap = new HashMap<>();
 
         String sql = "SELECT unit_key, valid FROM ucumate_validate";
 
@@ -169,7 +173,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
                 } else {
                     result = new Validator.Failure();
                 }
-                resultMap.put(key, result);
+                resultMap.put(ValKey.fromStorageKey(key), result);
 
                 logger.debug("Loaded {} from data source into cache", key);
             }
@@ -182,8 +186,8 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public Map<UCUMExpression, Canonicalizer.CanonicalStepResult> getAllCanonical() {
-        Map<UCUMExpression, Canonicalizer.CanonicalStepResult> resultMap = new HashMap<>();
+    public Map<CanonKey, Canonicalizer.CanonicalStepResult> getAllCanonical() {
+        Map<CanonKey, Canonicalizer.CanonicalStepResult> resultMap = new HashMap<>();
 
         String sql = "SELECT * FROM ucumate_canonical";
 
@@ -192,12 +196,11 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
             while (rs.next()) {
                 String unitKey = rs.getString("unit_key");
+                CanonKey canonKey = CanonKey.fromStorageKey(unitKey);
                 String magnitudeStr = rs.getString("magnitude");
                 String cfPrefixStr = rs.getString("cfPrefix");
                 String termStr = rs.getString("term");
                 boolean special = rs.getBoolean("special");
-
-                UCUMExpression inputKey = Validator.parseByPassChecks(unitKey);
                 UCUMExpression.Term term = Validator.parseCanonical(termStr);
                 PreciseDecimal magnitude = new PreciseDecimal(magnitudeStr);
                 PreciseDecimal cfPrefix = new PreciseDecimal(cfPrefixStr);
@@ -220,7 +223,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
                 logger.debug("Loaded {} from data source into cache.", unitKey);
 
-                resultMap.put(inputKey, step);
+                resultMap.put(canonKey, step);
             }
 
         } catch (SQLException e) {

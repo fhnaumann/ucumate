@@ -23,6 +23,13 @@ public class ParseUtil {
         return nodes.stream().map(ParseTree::getText).collect(Collectors.joining());
     }
 
+    public static boolean isMetric(UCUMDefinition.UCUMUnit ucumUnit) {
+        return switch (ucumUnit) {
+            case UCUMDefinition.BaseUnit baseUnit -> true; // base units are always metric
+            case UCUMDefinition.DefinedUnit definedUnit -> definedUnit.isMetric();
+        };
+    }
+
     private static MatchResult computeMatchResult(String textMaybeWithUCUMUnit, String partialText, UCUMRegistry registry) {
         Optional<UCUMDefinition.UCUMUnit> optionalUCUMUnit = registry.getUCUMUnit(partialText);
         if(optionalUCUMUnit.isPresent()) {
