@@ -12,6 +12,8 @@ import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Properties;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -39,7 +41,9 @@ public class TestCache {
 
     @BeforeAll
     public static void init() {
-        System.setProperty("ucumate.cache.enable", "true");
+        Properties props = new Properties();
+        props.setProperty("ucumate.cache.enable", "true");
+        PersistenceRegistry.initCache(props);
     }
 
     @Test
