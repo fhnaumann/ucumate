@@ -1,5 +1,6 @@
 package io.github.fhnaumann.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.github.fhnaumann.adapters.PreciseDecimalAdapter;
 import io.github.fhnaumann.adapters.UCUMUnitAdapter;
 import io.github.fhnaumann.util.PreciseDecimal;
@@ -12,7 +13,14 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import java.util.Collection;
 import java.util.List;
 
-public sealed interface UCUMDefinition {
+public sealed interface UCUMDefinition extends UCUMExpression {
+
+    /**
+     * This interfaces only exists to help Jackson get over polymorphism problems when mapping from the UCUM essence file
+     * because UCUMDefinition extends UCUMExpression.
+     */
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
+    public interface UCUMExpressionMixIn {}
 
     @JacksonXmlRootElement(localName = "root", namespace = "http://unitsofmeasure.org/ucum-essence")
     record UCUMEssence(

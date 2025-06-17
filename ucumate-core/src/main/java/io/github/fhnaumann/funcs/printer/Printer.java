@@ -50,6 +50,7 @@ public abstract class Printer {
             case UCUMExpression.NoPrefixSimpleUnit noPrefixSimpleUnit -> printNoPrefixSimpleUnit(noPrefixSimpleUnit);
             case UCUMExpression.Exponent exponent -> printExponent(exponent);
             case UCUMExpression.Operator operator -> printOperator(operator);
+            case UCUMDefinition ucumDefinition -> printUCUMDef(ucumDefinition);
         };
     }
 

@@ -2,10 +2,11 @@ package io.github.fhnaumann.persistence;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import io.github.fhnaumann.configuration.CanonKey;
+import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
-import io.github.fhnaumann.model.UCUMExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +20,8 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(InMemoryPersistenceProvider.class);
 
-    private Cache<UCUMExpression, Canonicalizer.CanonicalStepResult> canonCache;
-    private Cache<String, Validator.ValidationResult> valCache;
+    private Cache<CanonKey, Canonicalizer.CanonicalStepResult> canonCache;
+    private Cache<ValKey, Validator.ValidationResult> valCache;
 
     private boolean enabled;
 
@@ -60,17 +61,17 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public void saveCanonical(UCUMExpression key, Canonicalizer.CanonicalStepResult value) {
+    public void saveCanonical(CanonKey key, Canonicalizer.CanonicalStepResult value) {
         if(isEnabled()) {
             canonCache.put(key, value);
             if(logger.isDebugEnabled()) {
-                logger.debug("Saved key={} in cache.", UCUMService.print(key)); // call to #print is expensive here
+                logger.debug("Saved key={} in cache.", UCUMService.print(key.expression())); // call to #print is expensive here
             }
         }
     }
 
     @Override
-    public Canonicalizer.CanonicalStepResult getCanonical(UCUMExpression key) {
+    public Canonicalizer.CanonicalStepResult getCanonical(CanonKey key) {
         if(isEnabled()) {
             return canonCache.getIfPresent(key);
         }
@@ -80,12 +81,12 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public Map<UCUMExpression, Canonicalizer.CanonicalStepResult> getAllCanonical() {
+    public Map<CanonKey, Canonicalizer.CanonicalStepResult> getAllCanonical() {
         return canonCache.asMap();
     }
 
     @Override
-    public void saveValidated(String key, Validator.ValidationResult value) {
+    public void saveValidated(ValKey key, Validator.ValidationResult value) {
         if(isEnabled()) {
             valCache.put(key, value);
             logger.debug("Saved key={} in cache.", key);
@@ -93,7 +94,7 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public Validator.ValidationResult getValidated(String key) {
+    public Validator.ValidationResult getValidated(ValKey key) {
         if(isEnabled()) {
             return valCache.getIfPresent(key);
         }
@@ -103,7 +104,7 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public Map<String, Validator.ValidationResult> getAllValidated() {
+    public Map<ValKey, Validator.ValidationResult> getAllValidated() {
         return valCache.asMap();
     }
 

@@ -4,6 +4,9 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.ReplaceOptions;
+import io.github.fhnaumann.configuration.CanonKey;
+import io.github.fhnaumann.configuration.FeatureFlagsContext;
+import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
@@ -36,8 +39,8 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public void saveCanonical(UCUMExpression key, Canonicalizer.CanonicalStepResult value) {
-        String keyString = UCUMService.print(key, Printer.PrintType.UCUM_SYNTAX);
+    public void saveCanonical(CanonKey key, Canonicalizer.CanonicalStepResult value) {
+        String keyString = key.toStorageKey(FeatureFlagsContext.get());
         Document doc = new Document("unit_key", keyString)
                 .append("magnitude", value.magnitude().toString())
                 .append("cfPrefix", value.cfPrefix().toString())
@@ -56,8 +59,8 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
 
 
     @Override
-    public Canonicalizer.CanonicalStepResult getCanonical(UCUMExpression key) {
-        String keyString = UCUMService.print(key, Printer.PrintType.UCUM_SYNTAX);
+    public Canonicalizer.CanonicalStepResult getCanonical(CanonKey key) {
+        String keyString = key.toStorageKey(FeatureFlagsContext.get());
         Document doc = canonicalColl.find(eq("unit_key", keyString)).first();
         if (doc == null) {
             return null;
@@ -80,14 +83,13 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public Map<UCUMExpression, Canonicalizer.CanonicalStepResult> getAllCanonical() {
-        Map<UCUMExpression, Canonicalizer.CanonicalStepResult> resultMap = new HashMap<>();
+    public Map<CanonKey, Canonicalizer.CanonicalStepResult> getAllCanonical() {
+        Map<CanonKey, Canonicalizer.CanonicalStepResult> resultMap = new HashMap<>();
 
         for (Document doc : canonicalColl.find()) {
             String unitKey = doc.getString("unit_key");
+            CanonKey canonKey = CanonKey.fromStorageKey(unitKey);
             String termStr = doc.getString("term");
-
-            UCUMExpression key = Validator.parseByPassChecks(unitKey);
             UCUMExpression.Term term = Validator.parseCanonical(termStr);
             PreciseDecimal magnitude = new PreciseDecimal(doc.getString("magnitude"));
             PreciseDecimal cfPrefix = new PreciseDecimal(doc.getString("cfPrefix"));
@@ -106,47 +108,48 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
                     term, magnitude, cfPrefix, special, func
             );
 
-            resultMap.put(key, result);
+            resultMap.put(canonKey, result);
         }
 
         return resultMap;
     }
 
     @Override
-    public void saveValidated(String key, Validator.ValidationResult value) {
-        Document doc = new Document("key", key)
+    public void saveValidated(ValKey key, Validator.ValidationResult value) {
+        Document doc = new Document("key", key.toStorageKey(FeatureFlagsContext.get()))
                 .append("valid", value instanceof Validator.Success);
-        validationColl.replaceOne(eq("key", key), doc, new ReplaceOptions().upsert(true));
+        validationColl.replaceOne(eq("key", key.toStorageKey(FeatureFlagsContext.get())), doc, new ReplaceOptions().upsert(true));
     }
 
     @Override
-    public Validator.ValidationResult getValidated(String key) {
-        Document doc = validationColl.find(eq("key", key)).first();
+    public Validator.ValidationResult getValidated(ValKey key) {
+        Document doc = validationColl.find(eq("key", key.toStorageKey(FeatureFlagsContext.get()))).first();
         if(doc == null) {
             return null;
         }
 
         boolean valid = doc.getBoolean("valid", false);
         if(valid) {
-            return new Validator.Success(Validator.parseByPassChecks(key));
+            return new Validator.Success(Validator.parseByPassChecks(key.expression()));
         } else {
             return new Validator.Failure();
         }
     }
 
     @Override
-    public Map<String, Validator.ValidationResult> getAllValidated() {
-        Map<String, Validator.ValidationResult> resultMap = new HashMap<>();
+    public Map<ValKey, Validator.ValidationResult> getAllValidated() {
+        Map<ValKey, Validator.ValidationResult> resultMap = new HashMap<>();
 
         for(Document doc : validationColl.find()) {
             String key = doc.getString("unit_key");
+            ValKey valKey = ValKey.fromStorageKey(key);
             boolean valid = doc.getBoolean("valid", false);
 
             Validator.ValidationResult result = valid
-                    ? new Validator.Success(Validator.parseByPassChecks(key))
+                    ? new Validator.Success(Validator.parseByPassChecks(valKey.expression()))
                     : new Validator.Failure();
 
-            resultMap.put(key, result);
+            resultMap.put(valKey, result);
         }
 
         return resultMap;

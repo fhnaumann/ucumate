@@ -164,7 +164,6 @@ public class Canonicalizer {
             }
             resultTerm = new AlphabeticalSorter().sort(resultTerm);
             // explicitly cache the result after normalizing and flatten
-            //if(substanceMolarMassCoeff == null) {
 
 
             boolean isSpecial = canonicalStep.specialHandlingActive() && canonicalStep.specialFunction() != null;

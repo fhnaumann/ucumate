@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Felix Naumann
@@ -24,7 +26,25 @@ public class ConfigurationRegistry {
         if(!configuration.isEnableSQLitePersistence() && persistenceModuleOnClassPath) {
             log.warn("SQLite Persistence disabled but SQLitePersistenceProvider was found. Did you miss to enable SQLite Persistence at 'ucumate.persistence.sqlite.enable'? If you already use a different persistent storage you can safely ignore this message.");
         }
+
+        FeatureFlags flags = getFeatureFlags(configuration);
+        FeatureFlagsContext.set(flags);
+
         instance = configuration;
+    }
+
+    public static FeatureFlags getFeatureFlags(Configuration configuration) {
+        Set<FeatureFlags.Flag> featureFlags = new HashSet<>();
+        if(configuration.isEnablePrefixOnNonMetricUnits()) {
+            featureFlags.add(FeatureFlags.Flag.PREFIX_ON_NON_METRIC);
+        }
+        if(configuration.isEnableMolMassConversion()) {
+            featureFlags.add(FeatureFlags.Flag.MOL_MASS_CONVERSION);
+        }
+        if(configuration.isAllowAnnotAfterParens()) {
+            featureFlags.add(FeatureFlags.Flag.ANNOT_AFTER_PARENS);
+        }
+        return FeatureFlags.of(featureFlags);
     }
 
     public static Configuration get() {

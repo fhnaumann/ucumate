@@ -21,6 +21,10 @@ public class Configuration {
         this.sqliteDBPath = sqliteDBPath;
     }
 
+    public FeatureFlags asFeatureFlags() {
+        return ConfigurationRegistry.getFeatureFlags(this);
+    }
+
     public boolean isEnablePrefixOnNonMetricUnits() {
         return enablePrefixOnNonMetricUnits;
     }
