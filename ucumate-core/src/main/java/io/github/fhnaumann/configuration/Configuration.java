@@ -45,6 +45,17 @@ public class Configuration {
         return sqliteDBPath;
     }
 
+    @Override
+    public String toString() {
+        return "Configuration{" +
+                "enablePrefixOnNonMetricUnits=" + enablePrefixOnNonMetricUnits +
+                ", enableMolMassConversion=" + enableMolMassConversion +
+                ", allowAnnotAfterParens=" + allowAnnotAfterParens +
+                ", enableSQLitePersistence=" + enableSQLitePersistence +
+                ", sqliteDBPath='" + sqliteDBPath + '\'' +
+                '}';
+    }
+
     public static Builder builder() {
         return new Builder();
     }
