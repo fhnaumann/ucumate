@@ -60,6 +60,14 @@ public class Validator {
     public static ValidationResult validate(String input) {
         ValidationResult cached = PersistenceRegistry.getInstance().getValidated(input);
         if(cached != null) {
+            /*
+            This is redundant for the cache itself, but there is a specific scenario where this is needed:
+            When the cache and preHeat are enabled and the user inputs a unit that is in the pre-heated list, then
+            it will have cache hit and return here, but the unit is not saved in any of the additional providers.
+             */
+            if(PersistenceRegistry.hasAny()) {
+                PersistenceRegistry.getInstance().saveValidated(input, cached);
+            }
             return cached;
         }
 
