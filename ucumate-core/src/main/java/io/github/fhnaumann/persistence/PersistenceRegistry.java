@@ -59,12 +59,12 @@ public class PersistenceRegistry implements PersistenceProvider {
      */
     public static void initCache(Properties properties) {
         try {
-            boolean enableCache = Boolean.parseBoolean(properties.getProperty("ucumate.cache.enable"));
-            int maxCanonSize = Integer.parseInt(properties.getProperty("ucumate.cache.maxCanonSize"));
-            int maxValSize = Integer.parseInt(properties.getProperty("ucumate.cache.maxValSize"));
-            boolean recordStats = Boolean.parseBoolean(properties.getProperty("ucumate.cache.recordStats"));
-            boolean preHeat = Boolean.parseBoolean(properties.getProperty("ucumate.cache.preheat"));
-            boolean overrideInsteadOfAdd = Boolean.parseBoolean(properties.getProperty("ucumate.cache.preheat.override"));
+            boolean enableCache = Boolean.parseBoolean(properties.getProperty("ucumate.cache.enable", "true"));
+            int maxCanonSize = Integer.parseInt(properties.getProperty("ucumate.cache.maxCanonSize", "10000"));
+            int maxValSize = Integer.parseInt(properties.getProperty("ucumate.cache.maxValSize", "10000"));
+            boolean recordStats = Boolean.parseBoolean(properties.getProperty("ucumate.cache.recordStats", "false"));
+            boolean preHeat = Boolean.parseBoolean(properties.getProperty("ucumate.cache.preheat", "true"));
+            boolean overrideInsteadOfAdd = Boolean.parseBoolean(properties.getProperty("ucumate.cache.preheat.override", "false"));
             List<String> defaultPreHeatCodes = PropertiesUtil.readCodeFile(PersistenceRegistry.class.getClassLoader().getResourceAsStream("pre_heat_codes.json"));
             String preHeatCodesFilename = properties.getProperty("ucumate.cache.preheat.codes", "");
             List<String> preHeatCodes = !preHeatCodesFilename.isBlank() ? PropertiesUtil.readCodeFile(preHeatCodesFilename) : List.of();
