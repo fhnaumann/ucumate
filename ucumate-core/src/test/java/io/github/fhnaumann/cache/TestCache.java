@@ -46,6 +46,7 @@ public class TestCache {
         ConfigurationRegistry.initialize(DISABLE_PREFIX_ON_NON_METRIC);
         Validator.ValidationResult valResult = UCUMService.validate(expression);
         assertThat(valResult).isInstanceOf(Validator.Failure.class);
+        System.out.println(ConfigurationRegistry.get());
         Validator.ValidationResult allEnabledValResult = PersistenceRegistry.getInstance().getValidated(new ValKey(expression, ALL_ENABLED.asFeatureFlags()));
         assertThat(allEnabledValResult).isInstanceOf(Validator.Success.class);
     }
