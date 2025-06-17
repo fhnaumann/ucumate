@@ -3,6 +3,7 @@ package io.github.fhnaumann.funcs;
 import io.github.fhnaumann.NewUCUMBaseVisitor;
 import io.github.fhnaumann.NewUCUMLexer;
 import io.github.fhnaumann.NewUCUMParser;
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.model.CanonicalUCUMSyntaxVisitor;
 import io.github.fhnaumann.model.UCUMSyntaxVisitor;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
@@ -12,8 +13,12 @@ import io.github.fhnaumann.model.UCUMExpression.Term;
 import io.github.fhnaumann.util.ParseUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Validator {
+
+    private static final Logger log = LoggerFactory.getLogger(Validator.class);
 
     public sealed interface ValidationResult {}
 
@@ -78,9 +83,16 @@ public class Validator {
         }
         */
         try {
+            ValidationResult result;
             Term term = validateImpl(input, new UCUMSyntaxVisitor(UCUMRegistry.getInstance()));
+            if(!ConfigurationRegistry.get().isAllowAnnotAfterParens() && hasAnnotationAfterParens(term)) {
+                log.warn("Encountered term {} with an annotation on parenthesis but the property {} is disabled.", input, "ucumate.allowAnnotAfterParens");
+                result = new Failure();
+                PersistenceRegistry.getInstance().saveValidated(input, result);
+                return result;
+            }
             SpecialChecker.SpecialCheckResult specialCheckResult = SpecialChecker.checkForSpecialUnitInTerm(term, new SpecialChecker.SpecialCheckResult(false, false,false));
-            ValidationResult result = specialCheckResult.isValid() ? new Success(term) : new Failure();
+            result = specialCheckResult.isValid() ? new Success(term) : new Failure();
             PersistenceRegistry.getInstance().saveValidated(input, result);
             return result;
         } catch (LexerException | ParserException e) {
@@ -112,5 +124,16 @@ public class Validator {
         ParseTree tree = parser.mainTerm();
         UCUMExpression.Term term = (UCUMExpression.Term) visitor.visit(tree);
         return term;
+    }
+
+    private static boolean hasAnnotationAfterParens(Term term) {
+        return switch (term) {
+            case UCUMExpression.ComponentTerm componentTerm -> false;
+            case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> false;
+            case UCUMExpression.BinaryTerm binaryTerm -> hasAnnotationAfterParens(binaryTerm.left()) || hasAnnotationAfterParens(binaryTerm.right());
+            case UCUMExpression.UnaryDivTerm unaryDivTerm -> hasAnnotationAfterParens(unaryDivTerm.term());
+            case UCUMExpression.AnnotTerm annotTerm -> annotTerm.term() instanceof UCUMExpression.ParenTerm;
+            case UCUMExpression.ParenTerm parenTerm -> hasAnnotationAfterParens(parenTerm.term());
+        };
     }
 }
