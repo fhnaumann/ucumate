@@ -9,6 +9,7 @@ import io.github.fhnaumann.funcs.Converter;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +36,11 @@ public class TestCache {
             .enablePrefixOnNonMetricUnits(true)
             .allowAnnotAfterParens(true)
             .build();
+
+    @BeforeAll
+    public static void init() {
+        System.setProperty("ucumate.cache.enable", "true");
+    }
 
     @Test
     public void val_key_is_unique_with_different_flags_set() {
