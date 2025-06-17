@@ -47,6 +47,7 @@ public class TestCache {
         Validator.ValidationResult valResult = UCUMService.validate(expression);
         assertThat(valResult).isInstanceOf(Validator.Failure.class);
         System.out.println(ConfigurationRegistry.get());
+        System.out.println(System.getProperty("ucumate.cache.enable"));
         Validator.ValidationResult allEnabledValResult = PersistenceRegistry.getInstance().getValidated(new ValKey(expression, ALL_ENABLED.asFeatureFlags()));
         assertThat(allEnabledValResult).isInstanceOf(Validator.Success.class);
     }
