@@ -50,7 +50,7 @@ If you don't want to provide decimal number for the substance's molar mass coeff
 <dependency>
     <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-mol-support</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 </dependency>
 ```
 

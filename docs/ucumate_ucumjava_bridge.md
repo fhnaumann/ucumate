@@ -6,7 +6,7 @@ ucumate offers a drop-in replacement module for [Ucum-java](https://github.com/F
 <dependency>
     <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-ucumjava-bridge</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 </dependency>
 ```
 

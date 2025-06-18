@@ -6,12 +6,12 @@
 
     <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-demo</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <!--parent>
         <groupId>io.github.fhnaumann</groupId>
         <artifactId>ucumate-parent</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>ucumate-demo</artifactId -->
@@ -34,12 +34,12 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
         <!--dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.3-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency -->
         <!--dependency>
@@ -55,7 +55,7 @@
         <!--dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-persistence</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency -->
         <!--dependency>
             <groupId>com.github.fhnaumann.ucumate</groupId>

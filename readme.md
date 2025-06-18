@@ -9,7 +9,7 @@ Furthermore, all special units are supported.
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-core</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 </dependency>
 ```
 

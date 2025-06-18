@@ -32,7 +32,7 @@ You will need the core implementation.
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-core</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -42,7 +42,7 @@ If you used [Ucum-java](https://github.com/FHIR/Ucum-java) previously you can us
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-ucumjava-bridge</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -53,7 +53,7 @@ If you need high precision (especially when special units are involved) then you
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-core-exact-special-math</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -63,7 +63,7 @@ If you need data persistence across restarts you can use the [ucumate-persistenc
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-persistence</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -73,6 +73,6 @@ If you work with mol and mass units a lot you can use the optional [ucumate-mol 
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-mol-support</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 </dependency>
 ```

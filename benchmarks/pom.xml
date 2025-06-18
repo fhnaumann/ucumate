@@ -6,7 +6,7 @@
 
     <groupId>io.github.fhnaumann</groupId>
     <artifactId>benchmarks</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.fhir</groupId>
