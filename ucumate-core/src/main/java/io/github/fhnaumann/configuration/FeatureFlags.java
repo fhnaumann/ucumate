@@ -36,7 +36,6 @@ public final class FeatureFlags {
     private final EnumSet<Flag> flags;
     private final int bitmask;
 
-    // Interning cache (optional but helpful)
     private static final ConcurrentMap<Integer, FeatureFlags> INTERNED = new ConcurrentHashMap<>();
 
     private FeatureFlags(EnumSet<Flag> flags) {

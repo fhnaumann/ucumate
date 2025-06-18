@@ -36,6 +36,17 @@ You will need the core implementation.
 </dependency>
 ```
 
+If you used [Ucum-java](https://github.com/FHIR/Ucum-java) previously you can use the [drop-in replacement module](ucumate_ucumjava_bridge.md).
+
+```xml
+<dependency>
+    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <artifactId>ucumate-ucumjava-bridge</artifactId>
+    <version>1.0.2-SNAPSHOT</version>
+</dependency>
+```
+
+
 If you need high precision (especially when special units are involved) then you should use the [ucumate-core-exact-special-math module](exact_math.md).
 
 ```xml
@@ -46,12 +57,22 @@ If you need high precision (especially when special units are involved) then you
 </dependency>
 ```
 
-If you need data persistence across restarts you can use the [ucumate-persistence](persistence.md) module.
+If you need data persistence across restarts you can use the [ucumate-persistence module](persistence.md) .
 
 ```xml
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-persistence</artifactId>
+    <version>1.0.2-SNAPSHOT</version>
+</dependency>
+```
+
+If you work with mol and mass units a lot you can use the optional [ucumate-mol module](mol_mass_conversion.md).
+
+```xml
+<dependency>
+    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <artifactId>ucumate-mol-support</artifactId>
     <version>1.0.2-SNAPSHOT</version>
 </dependency>
 ```

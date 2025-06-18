@@ -1,5 +1,7 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.configuration.Configuration;
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
@@ -34,6 +36,7 @@ public abstract class DBPersistenceIntegrationTestBase {
 
     @BeforeEach
     public void setup() throws SQLException {
+        ConfigurationRegistry.initialize(Configuration.builder().enableSQLitePersistence(false).build());
         //connection = getConnection();
         ConnectionPoolFactory.shutdownAll();
         registerPersistenceProvider();

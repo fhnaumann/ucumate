@@ -1,5 +1,7 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.configuration.Configuration;
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.providers.SQLitePersistenceProvider;
 import org.junit.jupiter.api.io.TempDir;
@@ -20,8 +22,8 @@ public class SQLitePersistenceIntegrationTest extends DBPersistenceIntegrationTe
 
     @Override
     protected void registerPersistenceProvider() {
-        System.setProperty("ucumate.persistence.sqlite.enable", "false");
-        System.setProperty("ucumate.persistence.sqlite.dbpath", dbPath.resolve("ucumate.db").toString());
+        ConfigurationRegistry.initialize(Configuration.builder().enableSQLitePersistence(true).sqliteDBPath(dbPath.resolve("ucumate.db").toString()).build());
+        //System.setProperty("ucumate.persistence.sqlite.dbpath", dbPath.resolve("ucumate.db").toString());
         SQLitePersistenceProvider provider = PersistenceProviderFactory.createDefaultSQLiteProvider();
         connection = provider.connection;
 
