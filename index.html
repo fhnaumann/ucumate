@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="turbo-root" content="/ucumate">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.803450144266">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.803523256860">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 3.10.1">
@@ -32,12 +32,12 @@
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
     <link href="favicon.png" rel="icon">
-    <link href="resources/css/retype.css?v=3.10.1.803450144266" rel="stylesheet">
+    <link href="resources/css/retype.css?v=3.10.1.803523256860" rel="stylesheet">
 
-    <script data-cfasync="false" src="resources/js/config.js?v=3.10.1.803450144266" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="resources/js/config.js?v=3.10.1.803523256860" data-turbo-eval="false" defer></script>
     <script data-cfasync="false" src="resources/js/retype.js?v=3.10.1" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="resources/js/lunr.js?v=3.10.1.803450144266" data-turbo-eval="false" defer></script>
-    <script id="prism-js" data-cfasync="false" src="resources/js/prism.js?v=3.10.1.803450144266" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="resources/js/lunr.js?v=3.10.1.803523256860" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="resources/js/prism.js?v=3.10.1.803523256860" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -203,6 +203,14 @@ Currently, all dependencies are hosted on the maven central snapshot repository,
     &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </doc-codeblock></div>
+<p>If you used <a href="https://github.com/FHIR/Ucum-java" class="outbound" target="_blank"><span>Ucum-java</span><svg xmlns="http://www.w3.org/2000/svg" class="docs-icon ml-1" viewBox="0 0 24 24" role="presentation"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a> previously you can use the <a href="ucumate_ucumjava_bridge/">drop-in replacement module</a>.</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre translate="no" class="language-markup"><code v-pre class="language-markup">&lt;dependency&gt;
+    &lt;groupId&gt;com.github.fhnaumann.ucumate&lt;/groupId&gt;
+    &lt;artifactId&gt;ucumate-ucumjava-bridge&lt;/artifactId&gt;
+    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</doc-codeblock></div>
 <p>If you need high precision (especially when special units are involved) then you should use the <a href="exact_math/">ucumate-core-exact-special-math module</a>.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
 <pre translate="no" class="language-markup"><code v-pre class="language-markup">&lt;dependency&gt;
@@ -211,11 +219,19 @@ Currently, all dependencies are hosted on the maven central snapshot repository,
     &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </doc-codeblock></div>
-<p>If you need data persistence across restarts you can use the <a href="persistence/">ucumate-persistence</a> module.</p>
+<p>If you need data persistence across restarts you can use the <a href="persistence/">ucumate-persistence module</a> .</p>
 <div class="codeblock-wrapper"><doc-codeblock>
 <pre translate="no" class="language-markup"><code v-pre class="language-markup">&lt;dependency&gt;
     &lt;groupId&gt;com.github.fhnaumann.ucumate&lt;/groupId&gt;
     &lt;artifactId&gt;ucumate-persistence&lt;/artifactId&gt;
+    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</doc-codeblock></div>
+<p>If you work with mol and mass units a lot you can use the optional <a href="mol_mass_conversion/">ucumate-mol module</a>.</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre translate="no" class="language-markup"><code v-pre class="language-markup">&lt;dependency&gt;
+    &lt;groupId&gt;com.github.fhnaumann.ucumate&lt;/groupId&gt;
+    &lt;artifactId&gt;ucumate-mol-support&lt;/artifactId&gt;
     &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </doc-codeblock></div>

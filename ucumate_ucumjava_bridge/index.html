@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="turbo-root" content="/ucumate">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.803450144266">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.803523256860">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 3.10.1">
@@ -32,12 +32,12 @@
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
     <link href="../favicon.png" rel="icon">
-    <link href="../resources/css/retype.css?v=3.10.1.803450144266" rel="stylesheet">
+    <link href="../resources/css/retype.css?v=3.10.1.803523256860" rel="stylesheet">
 
-    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.803450144266" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.803523256860" data-turbo-eval="false" defer></script>
     <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.1" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.803450144266" data-turbo-eval="false" defer></script>
-    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.803450144266" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.803523256860" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.803523256860" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -290,13 +290,12 @@ compared to the core implementation.</p>
         <span>Functional JSON Test Difference</span>
     </h2>
 </doc-anchor-target>
-<p>todo: There is probably a difference with non-metric unit prefixes (i.e. <code v-pre>c[in_i]</code>)</p>
 <p>During the development of ucumate, a new additional <a href="../tests/">test suite</a> has been created. This adds more extensive edge case tests,
 but it also has some slightly different validation rules which will be highlighted below.</p>
 <p>Here are all the test cases from the JSON tests where <code v-pre>ucum-java</code> differs from <code v-pre>ucumate</code>. The <code v-pre>ucumate-ucumjava-bridge</code> does change any validation or conversion logic
 compared to the core implementation.</p>
 <div class="table-wrapper scrollbar overflow-hidden">
-<table class="comfortable" abc="">
+<table class="comfortable">
 <thead>
 <tr>
 <th>Test ID</th>
@@ -323,7 +322,7 @@ compared to the core implementation.</p>
 </tr>
 <tr>
 <td>55</td>
-<td>m</td>
+<td>m{ }</td>
 <td>Invalid</td>
 <td>Valid</td>
 <td>The space character is number 32, but only characters inside the range 33-126 may be used.</td>
@@ -372,7 +371,7 @@ compared to the core implementation.</p>
 </tr>
 <tr>
 <td>72</td>
-<td>-5</td>
+<td>-5{abc}</td>
 <td>Invalid</td>
 <td>Valid</td>
 <td>Negative integers are not allowed in UCUM but <code v-pre>ucum-java</code> allows it.</td>

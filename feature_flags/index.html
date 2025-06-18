@@ -10,24 +10,24 @@
     <meta name="generator" content="Retype 3.10.1">
 
     <!-- Primary Meta Tags -->
-    <title>Details on the Rounding Behaviour with Numbers provided by the ucum-essence File</title>
-    <meta name="title" content="Details on the Rounding Behaviour with Numbers provided by the ucum-essence File">
-    <meta name="description" content="Conversion factors are usually exact numbers (even decimals) that have infinite precision. I.e. the conversion factor from">
+    <title>Feature Flags</title>
+    <meta name="title" content="Feature Flags">
+    <meta name="description" content="The UCUM specification has some ambiguity, and therefore it is not easy to agree on what might be valid UCUM syntax and what not.">
 
     <!-- Canonical -->
-    <link rel="canonical" href="https://fhnaumann.github.io/ucumate/precision/">
+    <link rel="canonical" href="https://fhnaumann.github.io/ucumate/feature_flags/">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://fhnaumann.github.io/ucumate/precision/">
-    <meta property="og:title" content="Details on the Rounding Behaviour with Numbers provided by the ucum-essence File">
-    <meta property="og:description" content="Conversion factors are usually exact numbers (even decimals) that have infinite precision. I.e. the conversion factor from">
+    <meta property="og:url" content="https://fhnaumann.github.io/ucumate/feature_flags/">
+    <meta property="og:title" content="Feature Flags">
+    <meta property="og:description" content="The UCUM specification has some ambiguity, and therefore it is not easy to agree on what might be valid UCUM syntax and what not.">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/precision/">
-    <meta property="twitter:title" content="Details on the Rounding Behaviour with Numbers provided by the ucum-essence File">
-    <meta property="twitter:description" content="Conversion factors are usually exact numbers (even decimals) that have infinite precision. I.e. the conversion factor from">
+    <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/feature_flags/">
+    <meta property="twitter:title" content="Feature Flags">
+    <meta property="twitter:description" content="The UCUM specification has some ambiguity, and therefore it is not easy to agree on what might be valid UCUM syntax and what not.">
 
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
@@ -37,6 +37,7 @@
     <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.803523256860" data-turbo-eval="false" defer></script>
     <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.1" data-turbo-eval="false" defer></script>
     <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.803523256860" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.803523256860" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -178,119 +179,99 @@
                                             </svg>
                                         </li>
                                         <li class="pr-4">
-                                            <a href="../precision/" class="pr-4">
-                                                Details on the Rounding Behaviour with Numbers provided by the ucum-​essence File
+                                            <a href="../feature_flags/" class="pr-4">
+                                                Feature Flags
                                             </a>
                                         </li>
                                     </ol>
                                 </nav>
                 
                                 <!-- Page content  -->
-<doc-anchor-target id="details-on-the-rounding-behaviour-with-numbers-provided-by-the-ucum-essence-file" class="break-words">
+<doc-anchor-target id="feature-flags" class="break-words">
     <h1>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#details-on-the-rounding-behaviour-with-numbers-provided-by-the-ucum-essence-file">#</doc-anchor-trigger>
-        <span>Details on the Rounding Behaviour with Numbers provided by the ucum-essence File</span>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#feature-flags">#</doc-anchor-trigger>
+        <span>Feature Flags</span>
     </h1>
 </doc-anchor-target>
-<doc-anchor-target id="problem">
+<p>The UCUM specification has some ambiguity, and therefore it is not easy to agree on what might be valid UCUM syntax and what not.
+<code v-pre>ucumate</code> provides some feature flags that let the developer choose by which rules to play by.</p>
+<doc-anchor-target id="setting-feature-flags">
     <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#problem">#</doc-anchor-trigger>
-        <span>Problem</span>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#setting-feature-flags">#</doc-anchor-trigger>
+        <span>Setting Feature Flags</span>
     </h2>
 </doc-anchor-target>
-<p>Conversion factors are usually exact numbers (even decimals) that have infinite precision. I.e. the conversion factor from
-inches to cm is 2.54. It is a decimal number and in a different context it has a limited precision of 3. However, in the
-context of unit conversion it has unlimited precision. The conversion factor is exactly that, no uncertainty.
-There are a few exceptions to this. Some units rely on constants that are inherently limited when used in computers. Most
-notably this includes any unit that relies on pi. To add to this mess, lately (~ 5 years) some constants like the planck
-constant have been switched from being an inexact measurement to being defined as an exact number. They now have infinite
-precision. UCUM does not provide a way to differentiate between them and therefore manually sorting and checking has to be
-done once.</p>
-<p>Another problem is when the user provides an additional factor during unit conversion. For example, a user might want to
-know how much 3.5 inches are in cm. Again, it&#x27;s not possible for the system to directly know what the precision is.
-Interpreting the 3.5 as a measurement would indicate that the resulting conversion factor (8.89 cm) should be rounded to
-9.0 cm. If the input had been 3.50 then it results in 8.89 cm. Personally, I think its annoying for the user to rely on this
-behaviour. Instead, a flag could be used where the user marks their input factor as exact with unlimited precision.</p>
-<p>There is also the division problem. If two numbers with infinite precision are divided, the resulting number should have
-infinite precision as well. But the division is often not exact and the result has to be cut to <em>some</em> precision. I.e. the
-absolute max precision may be 100. The question is how this should be marked. Should the result now have limited precision (100)
-or should it still be marked as infinite precision and just show the 100 digits.</p>
-<p>Additionally, special units also use other more complex math functions. It is not feasible to implement them all with scientific
-rounding. Therefore, another math lib (big-math) has to be used. In cases where really precise rounding together with
-special units is needed, this lib would have to be used.</p>
-<doc-anchor-target id="definitions">
-    <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#definitions">#</doc-anchor-trigger>
-        <span>Definitions</span>
-    </h2>
+<p>To enable or disable these settings application wide, you can use properties of the provided builder class.</p>
+<doc-anchor-target id="properties">
+    <h3>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#properties">#</doc-anchor-trigger>
+        <span>Properties</span>
+    </h3>
 </doc-anchor-target>
-<p><strong>Significant digits</strong>:</p>
-<p>Digits that convey important information regarding the number they are part of.
-There are three exceptions where a digit may be present but not considered significant:</p>
-<ul>
-<li><p>Leading zeros. I.e. 0.056m has two insignificant digits (the two 0&#x27;s at the beginning) because the expression
-may be scaled with a prefix which results in 56mm. Note that this is only the case when the digit before the
-decimal point is 0.</p>
-</li>
-<li><p>Trailing zeros (but not in UCUM). In physical measurements they may indicate that a measurement is approximated.
-In the context of UCUM this is never the case. Here trailing zeros are always understood as intentional and are considered significant.</p>
-</li>
-<li><p>Spurious digits. If through some way or another the resulting number has more significant figures than any input
-number, then these additional digits have &quot;false precision&quot; and should be discarded.</p>
-</li>
-</ul>
-<p><a href="https://en.wikipedia.org/wiki/Significant_figures#Identifying_significant_figures" class="outbound" target="_blank"><span>Identify significant figures</span><svg xmlns="http://www.w3.org/2000/svg" class="docs-icon ml-1" viewBox="0 0 24 24" role="presentation"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a></p>
-<p><strong>Precision</strong>:</p>
-<p>The number of significant digits (ignoring leading zeros).</p>
-<p><strong>Scale</strong>:</p>
-<p>The number of digits after the decimal point (ignoring leading zeros).</p>
-<p><strong>Integer Number</strong>:</p>
-<p>Integer numbers are considered to have unlimited precision.</p>
-<p><strong>Conversion Factor</strong>:</p>
-<p>In UCUM there are lots of conversion factors defined that are not integer numbers. For example, the conversion factor
-from inches to cm is defined as 2.54. This is a decimal number and following the definitions above, it should have a
-precision of 3 and a scale of 2. However, in the context of unit conversion, there is no ambiguity. The conversion factor
-between these two units is <em>exactly</em> 2.54, there is no uncertainty. There is an exception to this when the conversion
-factor involves a unit that is inherently irrational like pi or the gravitational constant.</p>
-<doc-anchor-target id="scientific-notation">
-    <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#scientific-notation">#</doc-anchor-trigger>
-        <span>Scientific Notation</span>
-    </h2>
+<p>Create a <code v-pre>ucumate.properties</code> file in your resource folder.</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre translate="no" class="language-properties"><code v-pre class="language-properties">ucumate.enablePrefixOnNonMetricUnits=true
+ucumate.enableMolMassConversion=true
+ucumate.allowAnnotAfterParens=true</code></pre>
+</doc-codeblock></div>
+<doc-anchor-target id="builder">
+    <h3>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#builder">#</doc-anchor-trigger>
+        <span>Builder</span>
+    </h3>
 </doc-anchor-target>
-<p>The ucum-essence file uses the scientific notation for many of the conversion factor definitions. For example,
-the inch to cm conversion factor (2.54) is actually defined as 254e-2. This non-normalized form of the scientific notation
-can be problematic. 254 is an integer but the normalized or interpreted form is a decimal number with limited precision.
-In the conversion factor definitions this is not a problem because they are considered to be exact anyway (with a few exceptions).</p>
-<doc-anchor-target id="user-provided-factor">
-    <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#user-provided-factor">#</doc-anchor-trigger>
-        <span>User-provided Factor</span>
-    </h2>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre translate="no" class="language-java"><code v-pre class="language-java">Configuration configuration = Configuration.builder()
+        .enablePrefixOnNonMetricUnits(true)
+        .enableMolMassConversion(true)
+        .allowAnnotAfterParens(true)
+        .build();
+ConfigurationRegistry.initialize(configuration);</code></pre>
+</doc-codeblock></div>
+<doc-anchor-target id="prefixes-on-non-metric-units">
+    <h3>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#prefixes-on-non-metric-units">#</doc-anchor-trigger>
+        <span>Prefixes on Non-Metric Units</span>
+    </h3>
 </doc-anchor-target>
-<p>When canonicalizing or converting between units, the user may provide an additional factor that is used during the calculations.
-For example, the user might want to convert 3.5 inches to cm. The system is incapable of determining whether this custom
-factor has limited precision/scaling or not. It depends on what the user wants and therefore (maybe) I can add an additional
-bool parameter to flag this behaviour?</p>
-<p>There is additional complexity when the factor is in scientific notation, especially regarding the decimal places after the dot.
-1.0e2 expands to 100.0, 1.00e2 -&gt; 100.00, etc. Conversely, 1.0e-2 expands to 0.010, 1.00e-2 -&gt; 0.0100</p>
-<doc-anchor-target id="examples">
-    <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#examples">#</doc-anchor-trigger>
-        <span>Examples</span>
-    </h2>
+<p>The UCUM specification mentions that prefixes (i.e. <code v-pre>centi</code>, <code v-pre>mili</code>, ...) may only be used on metric units. For example,
+<code v-pre>meter</code> may be prefixed with <code v-pre>centi</code> to form <code v-pre>centimeter</code> (UCUM syntax: <code v-pre>cm</code>). Forming <code v-pre>centifoot</code> (UCUM syntax: <code v-pre>c[ft_i]</code>)
+would be invalid. Sometimes this behaviour is desired and therefore this flag exists.</p>
+<div class="flex mb-6">
+    <div class="shrink-0 w-1.5 rounded-tl-lg rounded-bl-lg bg-blue-300"></div>
+    <div class="flex w-full py-4 border border-l-0 border-gray-300 rounded-tr-lg rounded-br-lg doc-callout bg-white dark:bg-dark-700 dark:border-dark-700" role="alert">
+        <div class="flex items-center ml-4 h-7">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mb-px text-blue-300" width="22" height="22" viewBox="0 0 24 24" role="presentation">
+                <g fill="currentColor"><g>
+                    <path d="M12 1C5.93 1 1 5.93 1 12s4.93 11 11 11 11-4.93 11-11S18.07 1 12 1zm0 20c-4.96 0-9-4.04-9-9s4.04-9 9-9 9 4.04 9 9-4.04 9-9 9z"></path>
+                    <path d="M12 11c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1s1-.45 1-1v-4c0-.55-.45-1-1-1zM12.01 7c-.56 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"></path>
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                </g></g>
+            </svg>
+        </div>
+        <div class="pr-5 ml-3 w-full">
+            <h5>The <code v-pre>da</code> Problem</h5>
+<p>If prefixes on non-metric units are disabled, then <code v-pre>da</code> matches the <code v-pre>deka</code> prefix which just by itself is invalid UCUM syntax.
+If enabled, then <code v-pre>da</code> matches <code v-pre>deci year</code>.</p>
+        </div>
+    </div>
+</div>
+<doc-anchor-target id="annotations-on-parenthesis">
+    <h3>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#annotations-on-parenthesis">#</doc-anchor-trigger>
+        <span>Annotations on Parenthesis</span>
+    </h3>
 </doc-anchor-target>
-<ul>
-<li>0 -&gt; unlimited</li>
-<li>3 -&gt; unlimited</li>
-<li>2.54 (ucum cf) -&gt; unlimited</li>
-<li>254e-2 (ucum cf) -&gt; unlimited</li>
-<li>1.0 -&gt; p: 2, s: 1</li>
-<li>1.00 -&gt; p: 3, s: 2</li>
-<li>0.01 -&gt; p: 1, s: 1</li>
-<li>0.0100 -&gt; p: 3, s: 3</li>
-<li>3.1415926535897932384626433832795028841971693993751058209749445923 (ucum def) -&gt; p: ..., s: p-1</li>
-</ul>
+<p>It is not clear whether <code v-pre>(m.s){annot}</code> is valid or not. Some common UCUM code lists include such codes, hence this flag exists.</p>
+<doc-anchor-target id="mol---mass-conversion">
+    <h3>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#mol---mass-conversion">#</doc-anchor-trigger>
+        <span>Mol &lt;-&gt; Mass Conversion</span>
+    </h3>
+</doc-anchor-target>
+<p>The UCUM specification explicitly states that mol (and any unit defined on it) canonicalizes to avogadro&#x27;s number (dimensionless).
+This is sometimes undesirable as in different context it can also canonicalize to a mass (usually gram). This requires an
+additional parameter, the substance&#x27;s molar mass coefficient.</p>
 
                                 
                                 <!-- Required only on API pages -->
@@ -300,20 +281,20 @@ bool parameter to flag this behaviour?</p>
                             
                                 <nav id="retype-nextprev" class="print:hidden flex mt-14">
                                     <div class="w-1/2">
-                                        <a class="px-5 py-4 h-full flex items-center break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-l-lg transition-colors duration-150 relative hover:z-5" href="../tests/">
+                                        <a class="px-5 py-4 h-full flex items-center break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-l-lg transition-colors duration-150 relative hover:z-5" href="../exact_math/">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="mr-3" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" overflow="visible"><path d="M19 11H7.41l5.29-5.29a.996.996 0 10-1.41-1.41l-7 7a1 1 0 000 1.42l7 7a1.024 1.024 0 001.42-.01.996.996 0 000-1.41L7.41 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
                                             <span>
                                                 <span class="block text-xs font-normal text-gray-400 dark:text-dark-400">Previous</span>
-                                                <span class="block mt-1">UCUM Tests</span>
+                                                <span class="block mt-1">Exact Math</span>
                                             </span>
                                         </a>
                                     </div>
                             
                                     <div class="w-1/2">
-                                        <a class="px-5 py-4 -mx-px h-full flex items-center justify-end break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-r-lg transition-colors duration-150 relative hover:z-5" href="../exact_math/">
+                                        <a class="px-5 py-4 -mx-px h-full flex items-center justify-end break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-r-lg transition-colors duration-150 relative hover:z-5" href="../mol_mass_conversion/">
                                             <span>
                                                 <span class="block text-xs font-normal text-right text-gray-400 dark:text-dark-400">Next</span>
-                                                <span class="block mt-1">Exact Math</span>
+                                                <span class="block mt-1">Mole <-> Mass Conversion</span>
                                             </span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="ml-3" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" overflow="visible"><path d="M19.92 12.38a1 1 0 00-.22-1.09l-7-7a.996.996 0 10-1.41 1.41l5.3 5.3H5c-.55 0-1 .45-1 1s.45 1 1 1h11.59l-5.29 5.29a.996.996 0 000 1.41c.19.2.44.3.7.3s.51-.1.71-.29l7-7c.09-.09.16-.21.21-.33z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
                                         </a>
@@ -357,6 +338,6 @@ bool parameter to flag this behaviour?</p>
 
     <div id="retype-overlay-target"></div>
 
-    <script data-cfasync="false">window.__DOCS__ = { "title": "Details on the Rounding Behaviour with Numbers provided by the ucum-essence File", level: 1, icon: "file", hasPrism: false, hasMermaid: false, hasMath: false, tocDepth: 23 }</script>
+    <script data-cfasync="false">window.__DOCS__ = { "title": "Feature Flags", level: 1, icon: "file", hasPrism: true, hasMermaid: false, hasMath: false, tocDepth: 23 }</script>
 </body>
 </html>
