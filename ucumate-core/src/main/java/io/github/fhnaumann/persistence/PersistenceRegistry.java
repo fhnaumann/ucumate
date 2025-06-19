@@ -153,6 +153,15 @@ public class PersistenceRegistry implements PersistenceProvider {
         }
         cache.setEnabled(false);
     }
+
+    public static void setCache(InMemoryPersistenceProvider newCache, boolean transferEntriesOver) {
+        if(cache != null) {
+            cache.clearCache();
+            cache.setEnabled(false);
+        }
+        cache = newCache;
+    }
+
     public static PersistenceRegistry getInstance() {
         return INSTANCE;
     }
