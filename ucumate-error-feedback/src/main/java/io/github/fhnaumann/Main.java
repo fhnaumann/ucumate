@@ -17,6 +17,8 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         visit("cft_i");
+
+        //TODO: hook into main startup (SPI?) and change grammar being used, etc.
         //System.out.println(UCUMService.print(parsed, Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX));
     }
 

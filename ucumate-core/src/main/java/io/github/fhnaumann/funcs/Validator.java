@@ -27,7 +27,7 @@ public class Validator {
 
     public record Success(UCUMExpression.Term term) implements ValidationResult {}
     public record Failure(String message) implements ValidationResult {
-        Failure() {
+        public Failure() {
             this("");
         }
     }
