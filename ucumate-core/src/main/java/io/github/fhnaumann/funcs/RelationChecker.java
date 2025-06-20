@@ -1,6 +1,5 @@
 package io.github.fhnaumann.funcs;
 
-import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.model.UCUMExpression.CanonicalTerm;
 import io.github.fhnaumann.model.UCUMExpression.Term;
 

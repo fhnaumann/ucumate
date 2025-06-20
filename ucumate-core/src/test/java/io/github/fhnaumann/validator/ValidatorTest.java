@@ -1,6 +1,7 @@
 package io.github.fhnaumann.validator;
 
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ public class ValidatorTest {
         assertThat(result)
                 .isInstanceOf(Validator.Success.class)
                 .extracting(Validator.Success.class::cast)
-                .extracting(Validator.Success::term)
+                .extracting(ValidatorService.Success::term)
                 .extracting(term -> new UCUMSyntaxPrinter().print(term))
                 .isEqualTo(vTestCase.expectedDisplay());
     }

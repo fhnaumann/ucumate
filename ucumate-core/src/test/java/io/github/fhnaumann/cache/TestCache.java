@@ -1,10 +1,8 @@
 package io.github.fhnaumann.cache;
 
-import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.Converter;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;

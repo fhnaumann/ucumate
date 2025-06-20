@@ -2,12 +2,9 @@ package io.github.fhnaumann.model;
 
 import io.github.fhnaumann.NewUCUMBaseVisitor;
 import io.github.fhnaumann.NewUCUMParser;
-import io.github.fhnaumann.builders.SoloTermBuilder;
-import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.Validator.ParserException;
-import io.github.fhnaumann.funcs.printer.Printer;
+import io.github.fhnaumann.funcs.ValidatorService.ParserException;
 import io.github.fhnaumann.model.UCUMExpression.Operator;
 import io.github.fhnaumann.util.ParseUtil;
 import io.github.fhnaumann.util.UCUMRegistry;

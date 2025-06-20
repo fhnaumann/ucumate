@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * @author Felix Naumann
  */
-public class InMemoryPersistenceProvider implements PersistenceProvider {
+public class InMemoryPersistenceProvider implements PersistenceProvider, InMemory {
 
     private static final Logger logger = LoggerFactory.getLogger(InMemoryPersistenceProvider.class);
 

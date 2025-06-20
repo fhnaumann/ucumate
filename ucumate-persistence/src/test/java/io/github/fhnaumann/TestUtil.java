@@ -1,7 +1,6 @@
 package io.github.fhnaumann;
 
 import io.github.fhnaumann.builders.SoloTermBuilder;
-import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.funcs.printer.WolframAlphaSyntaxPrinter;

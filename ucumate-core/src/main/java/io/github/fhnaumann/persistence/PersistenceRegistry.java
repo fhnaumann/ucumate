@@ -5,7 +5,6 @@ import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.Validator;
-import io.github.fhnaumann.model.UCUMExpression;
 
 import java.io.IOException;
 import java.io.InputStream;

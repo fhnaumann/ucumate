@@ -1,6 +1,5 @@
 package io.github.fhnaumann.funcs;
 
-import io.github.fhnaumann.compounds.CompoundUtil;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.sorter.AlphabeticalSorter;
 import io.github.fhnaumann.model.UCUMDefinition.*;
@@ -9,7 +8,7 @@ import io.github.fhnaumann.util.MolMassUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.builders.CombineTermBuilder;
 import io.github.fhnaumann.builders.SoloTermBuilder;
-import io.github.fhnaumann.funcs.Validator.Failure;
+import io.github.fhnaumann.funcs.ValidatorService.Failure;
 import io.github.fhnaumann.model.UCUMExpression.*;
 import io.github.fhnaumann.model.special.SpecialUnits;
 import io.github.fhnaumann.model.special.SpecialUnitsFunctionProvider;

@@ -1,7 +1,6 @@
 package io.github.fhnaumann.providers;
 
 import io.github.fhnaumann.configuration.CanonKey;
-import io.github.fhnaumann.configuration.FeatureFlags;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.Canonicalizer;
