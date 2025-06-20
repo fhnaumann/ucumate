@@ -9,18 +9,33 @@ mainTerm
 term
     : component # termOnly
     | term annotation # termWithAnnotation
+    | term '{' withinCbSymbol* # termWithAnnotationMissingCurlyClosing
+    | term withinCbOrSbSymbol* '}' # termWithAnnotationMissingCurlyOpening
     | annotation # annotationOnly
+    // | '{'? withinCbSymbol* '}'? # annotationWithPotentialMissingCurly
+    | '{' withinCbOrSbSymbol* # annotationOnlyMissingCurlyClosing
+    | withinCbOrSbSymbol* '}' # annotationOnlyMissingCurlyOpening
     | '(' term ')' # parenthesisedTerm
+    | '(' term # missingRightParen
+    | term ')' # missingLeftParen
+    | term '.' term # binaryMulTerm
+    | term '/' term # binaryDivTerm
     | term DIV_SYMBOL term # binaryDivTerm
     | term MUL_SYMBOL term # binaryMulTerm
+    | ('.' | '/' | MUL_SYMBOL | DIV_SYMBOL) term # missingLHS
+    | term ('.' | '/' | MUL_SYMBOL | DIV_SYMBOL) # missingRHS
     ;
 
-MUL_SYMBOL : '.' | '*' | '×' | '✕' | '✖' | '⨯';
-DIV_SYMBOL : '/' | '÷' | '∕' | '➗';
+incompleteTerm
+    : term
+    ;
+
+MUL_SYMBOL : '*' | '×' | '✕' | '✖' | '⨯';
+DIV_SYMBOL : '÷' | '∕' | '➗';
 
 component
     : simpleSymbolUnit # componentOnly
-    | simpleSymbolUnit EXPONENT_SYMBOL+ exponent # componentWithExponent
+    | simpleSymbolUnit EXPONENT_SYMBOL? exponent # componentWithExponent
     ;
 
 EXPONENT_SYMBOL: '^';
@@ -47,9 +62,12 @@ terminalSymbolUnit
 
 simpleSymbolUnit
     : digitSymbols # numberUnit // i.e. "5", "56"
+    | invalidDigitSymbols # invalidNumberUnit // i.e. "-5"
     | maybeAPrefix? dimlessUnit # maybeAPrefixSymbolUnit // i.e. "10*", "%"
     | maybePrefixSymbolUnit # maybeAPrefixSymbolUnit // i.e. "m", "cm", "notavalidprefix"
     | '[' withinSbSymbol+ ']' # stigmatizedSymbolUnit
+    | maybeAPrefix? '[' withinSbSymbol+ # stigmatizedSymbolUnitMissingClosingSquareBracket
+    | maybeAPrefix? withinSbSymbol+ ']' # stigmatizedSymbolunitMissingOpeningSquareBracket
     | maybeAPrefix '[' withinSbSymbol+ ']' # maybeAPrefixSymbolUnit // i.e. "[lb_av]", "c[lb_av]", per definition prefixing non-metric is not allowed, but most parsers allow it
     | maybeAPrefix? 'g%' # maybeAPrefixSymbolUnit // 'g%' requires special handling because the '%' is part of the symbol in the unit and not the dimless '%' unit
     | maybeAPrefix? '%[slope]' #maybeAPrefixSymbolUnit // '%[slope]' requires special handling because the '%' is part of the symbol in the unit and not the dimless '%' unit'
@@ -66,6 +84,10 @@ maybePrefixSymbolUnit
 exponent
     : ('+' | '-') digitSymbols # exponentWithExplicitSign
     | digitSymbols # exponentWithoutSign
+    ;
+
+invalidDigitSymbols
+    : '-' digitSymbols
     ;
 
 digitSymbols

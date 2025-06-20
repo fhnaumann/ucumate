@@ -33,6 +33,12 @@
             <artifactId>commons-text</artifactId>
             <version>1.10.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.fhnaumann</groupId>
+            <artifactId>ucumate-test-utils</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 

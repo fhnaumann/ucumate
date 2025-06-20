@@ -7,6 +7,10 @@ import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.ParseUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,6 +168,54 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
     @Override
     public UCUMExpression visitCompleteMainTerm(ErrorFeedbackUCUMParser.CompleteMainTermContext ctx) {
         return visit(ctx.term());
+    }
+
+    @Override
+    public UCUMExpression visitMissingLHS(ErrorFeedbackUCUMParser.MissingLHSContext ctx) {
+        errorMessages.add(ErrorMessages.get("binary_term_missing_lhs", ctx.getChild(1).getText()));
+        SyntaxMatchHelper.checkWrongButKnownMulSymbolUsed(ctx.getChild(0).getText(), errorMessages);
+        SyntaxMatchHelper.checkWrongButKnownDivSymbolUsed(ctx.getChild(0).getText(), errorMessages);
+        return visit(ctx.term());
+    }
+
+    @Override
+    public UCUMExpression visitMissingRHS(ErrorFeedbackUCUMParser.MissingRHSContext ctx) {
+        errorMessages.add(ErrorMessages.get("binary_term_missing_rhs", ctx.getChild(0).getText()));
+        SyntaxMatchHelper.checkWrongButKnownMulSymbolUsed(ctx.getChild(1).getText(), errorMessages);
+        SyntaxMatchHelper.checkWrongButKnownDivSymbolUsed(ctx.getChild(1).getText(), errorMessages);
+        return visit(ctx.term());
+    }
+
+    @Override
+    public UCUMExpression visitMissingLeftParen(ErrorFeedbackUCUMParser.MissingLeftParenContext ctx) {
+        //errorMessages.addAll(ErrorMessages.get("binary_term_missing_left_paren", ))
+        return super.visitMissingLeftParen(ctx);
+    }
+
+    @Override
+    public UCUMExpression visitMissingRightParen(ErrorFeedbackUCUMParser.MissingRightParenContext ctx) {
+        return super.visitMissingRightParen(ctx);
+    }
+
+    @Override
+    public UCUMExpression visitInvalidNumberUnit(ErrorFeedbackUCUMParser.InvalidNumberUnitContext ctx) {
+        // only negative numbers for now
+        errorMessages.add(ErrorMessages.get("negative_number", ctx.getText()));
+        return super.visitInvalidNumberUnit(ctx);
+    }
+
+    @Override
+    public UCUMExpression visitStigmatizedSymbolUnitMissingClosingSquareBracket(ErrorFeedbackUCUMParser.StigmatizedSymbolUnitMissingClosingSquareBracketContext ctx) {
+        // Will be checked earlier by SyntaxMatchHelper#searchForAnyUnbalancedParens
+        //errorMessages.add(ErrorMessages.get("missing_right_square_bracket", ctx.getText()));
+        return super.visitStigmatizedSymbolUnitMissingClosingSquareBracket(ctx);
+    }
+
+    @Override
+    public UCUMExpression visitStigmatizedSymbolunitMissingOpeningSquareBracket(ErrorFeedbackUCUMParser.StigmatizedSymbolunitMissingOpeningSquareBracketContext ctx) {
+        // Will be checked earlier by SyntaxMatchHelper#searchForAnyUnbalancedParens
+        //errorMessages.add(ErrorMessages.get("missing_left_square_bracket", ctx.getText()));
+        return super.visitStigmatizedSymbolunitMissingOpeningSquareBracket(ctx);
     }
 
     public List<String> getErrorMessages() {

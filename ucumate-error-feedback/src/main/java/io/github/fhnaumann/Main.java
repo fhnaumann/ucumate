@@ -50,10 +50,14 @@ public class Main {
                 throw new Validator.ParserException("Syntax error at line " + line + ":" + charPositionInLine + ": " + msg);
             }
         });
-        ParseTree tree = parser.mainTerm();
-        MyFeedbackVisitor visitor = new MyFeedbackVisitor(UCUMRegistry.getInstance(), errorMessages);
+        ParserRuleContext tree = parser.mainTerm();
+
+        SyntaxMatchHelper.searchForAnyUnbalancedParens(tokens, tree, errorMessages);
+
+        MyFeedbackVisitor visitor = new MyFeedbackVisitor(UCUMRegistry.getInstance(), new ArrayList<>());
         try {
             UCUMExpression.Term term = (UCUMExpression.Term) visitor.visit(tree);
+            errorMessages.addAll(visitor.getErrorMessages());
             // not all errors throw an actual exceptions, some just add an error message
             if(errorMessages.isEmpty()) {
                 return new Success(term);
@@ -62,8 +66,15 @@ public class Main {
                 return new Failure(errorMessages);
             }
         } catch (Validator.ParserException e) {
-            e.printStackTrace();
-            errorMessages.addAll(SyntaxMatchHelper.extractErrorMessagesFrom(e));
+            //e.printStackTrace();
+
+            String analysedMessage = SyntaxMatchHelper.analyseUnitForErrorDetails(input);
+            if(analysedMessage != null) {
+                errorMessages.add(analysedMessage);
+            }
+            else {
+                errorMessages.addAll(SyntaxMatchHelper.extractErrorMessagesFrom(e));
+            }
             return new Failure(errorMessages);
         } finally {
             // System.out.println(visitor.getErrorMessages());
