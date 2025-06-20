@@ -85,6 +85,7 @@ public class ParseUtil {
                 .sorted(preferUnitsOverPrefixedUnits())
                            .findFirst()
                            .orElse(new InvalidResults(matchResults.stream()
+                                   .distinct()
                                                                   .filter(matchResult -> matchResult instanceof FailureResult)
                                                                   .map(FailureResult.class::cast)
                                                                   .toList())

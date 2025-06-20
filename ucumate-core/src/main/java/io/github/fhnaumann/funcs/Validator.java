@@ -16,6 +16,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Validator {
 
     private static final Logger log = LoggerFactory.getLogger(Validator.class);
@@ -23,7 +26,11 @@ public class Validator {
     public sealed interface ValidationResult {}
 
     public record Success(UCUMExpression.Term term) implements ValidationResult {}
-    public record Failure() implements ValidationResult {}
+    public record Failure(String message) implements ValidationResult {
+        public Failure() {
+            this("");
+        }
+    }
 
     public static class LexerException extends RuntimeException {
         public LexerException(String message) {
@@ -31,11 +38,25 @@ public class Validator {
         }
     }
     public static class ParserException extends RuntimeException {
+
+        private final List<ParseUtil.FailureResult> failures;
+
         public ParserException(String message) {
             super(message);
+            this.failures = new ArrayList<>();
         }
-        public ParserException(ParseUtil.FailureResult failureResult) {}
-        public ParserException(ParseUtil.InvalidResults invalidResults) {}
+        public ParserException(ParseUtil.FailureResult failureResult) {
+            super(failureResult.failedText());
+            this.failures = List.of(failureResult);
+        }
+        public ParserException(ParseUtil.InvalidResults invalidResults) {
+            super(invalidResults.toString());
+            this.failures = invalidResults.failureResults();
+        }
+
+        public List<ParseUtil.FailureResult> getFailures() {
+            return failures;
+        }
     }
 
     public record ParserError() implements
