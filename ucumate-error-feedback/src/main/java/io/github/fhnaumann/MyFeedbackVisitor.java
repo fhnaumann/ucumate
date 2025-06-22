@@ -3,6 +3,7 @@ package io.github.fhnaumann;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.ParseUtil;
@@ -21,6 +22,8 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
     private final UCUMRegistry registry;
 
     private final List<String> errorMessages;
+
+    private final Printer printer = new Printer();
 
     public MyFeedbackVisitor(UCUMRegistry registry, List<String> errorMessages) {
         this.registry = registry;
@@ -45,8 +48,8 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
             case ParseUtil.SuccessNoPrefixUnit(UCUMDefinition.UCUMUnit unit) -> new UCUMExpression.MixedNoPrefixSimpleUnit(unit);
             case ParseUtil.SuccessPrefixUnit(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.UCUMUnit unit) -> {
                 if(!ConfigurationRegistry.get().isEnablePrefixOnNonMetricUnits() && !ParseUtil.isMetric(unit)) {
-                    String prefixString = UCUMService.print(prefix);
-                    String unitString = UCUMService.print(unit);
+                    String prefixString = printer.print(prefix);
+                    String unitString = printer.print(unit);
                     log.warn("Matched prefix={} and unit={} but {} is not metric and prefixes for non-metric units is disabled.\nYou can change the behaviour with the 'ucumate.enablePrefixOnNonMetricUnits' property.", prefixString, unitString, unitString);
                     throw new Validator.ParserException("Matched prefix=%s and unit=%s but %s is not metric and prefixes for non-metric units is disabled.".formatted(prefixString, unitString, unitString));
                 }

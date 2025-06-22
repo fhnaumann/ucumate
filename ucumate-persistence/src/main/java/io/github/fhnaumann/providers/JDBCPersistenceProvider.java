@@ -4,9 +4,11 @@ import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.Canonicalizer;
+import io.github.fhnaumann.funcs.PrinterService;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.Printer;
+import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.persistence.PersistenceProvider;
@@ -27,6 +29,8 @@ import java.util.Map;
 public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JDBCPersistenceProvider.class);
+
+    private static final PrinterService printer = new UCUMSyntaxPrinter();
 
     public final Connection connection;
     protected final String canonicalTableName;
@@ -65,7 +69,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             stmt.setString(1, keyString);
             stmt.setString(2, value.magnitude().toString());
             stmt.setString(3, value.cfPrefix().toString());
-            String canonStep = UCUMService.print(value.term(), Printer.PrintType.UCUM_SYNTAX);
+            String canonStep = printer.print(value.term());
             stmt.setString(4, canonStep);
             stmt.setBoolean(5, value.specialHandlingActive());
             if(value.specialHandlingActive()) {

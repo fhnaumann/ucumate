@@ -1,7 +1,5 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.configuration.Configuration;
-import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.special.SpecialUnits;
@@ -22,12 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PreciseUCUMTests {
 
     private static TestSuite testSuite;
+    private UCUMService service;
 
     @BeforeAll
     public void initalSetup() throws IOException {
         //ConfigurationRegistry.initialize(Configuration.builder().enableMolMassConversion(true).build());
         SpecialUnits.setProvider(new PreciseSpecialUnitsFunctionProvider());
         testSuite = TestCaseLoader.load();
+        service = new UCUMService();
     }
 
     public static Stream<TestCase.ValidateTestCase> validateTestCases() {
@@ -45,14 +45,14 @@ public class PreciseUCUMTests {
     @ParameterizedTest(name="{0}")
     @MethodSource("validateTestCases")
     public void testValidation(TestCase.ValidateTestCase testCase) {
-        boolean actual = UCUMService.validateToBool(testCase.inputExpression());
+        boolean actual = service.validateToBool(testCase.inputExpression());
         assertEquals(testCase.valid(), actual, "%s: Expected %s but got %s, reason: %s".formatted(testCase.id(), testCase.valid(), actual, testCase.reason()));
     }
 
     @ParameterizedTest(name="{0}")
     @MethodSource("commensurableTestCases")
     public void testCommensurability(TestCase.CommensurableTestCase testCase) {
-        RelationChecker.RelationResult result = UCUMService.checkCommensurable(TestUtil.parse(testCase.expr1()), TestUtil.parse(testCase.expr2()), false);
+        RelationChecker.RelationResult result = service.checkCommensurable(TestUtil.parse(testCase.expr1()), TestUtil.parse(testCase.expr2()), false);
         assertEquals(testCase.commensurable(), result instanceof RelationChecker.IsCommensurable, testCase.toString());
     }
 
@@ -63,13 +63,13 @@ public class PreciseUCUMTests {
         PreciseDecimal toFactor = new PreciseDecimal(testCase.resultingConversionFactor());
         UCUMExpression.Term from = TestUtil.parse(testCase.from());
         UCUMExpression.Term to = TestUtil.parse(testCase.to());
-        Converter.ConversionResult result = UCUMService.convert(fromFactor, from, to, testCase.substanceMolarMassCoeff() != null ? new PreciseDecimal(testCase.substanceMolarMassCoeff()) : null);
+        Converter.ConversionResult result = service.convert(fromFactor, from, to, testCase.substanceMolarMassCoeff() != null ? new PreciseDecimal(testCase.substanceMolarMassCoeff()) : null);
         if(testCase.valid()) {
             Assertions.assertThat(result)
                 .withFailMessage("%s: Unexpected validation error while testing the conversion: %s".formatted(testCase.id(), result))
                 .isInstanceOf(Converter.Success.class)
                 .extracting(Converter.Success.class::cast)
-                .extracting(Converter.Success::conversionFactor)
+                .extracting(ConverterService.Success::conversionFactor)
                 .asString()
                 .satisfies(s -> {
                     Assertions.assertThat(s)

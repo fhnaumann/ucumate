@@ -100,7 +100,7 @@ public class TestUtil {
     }
 
     public static UCUMExpression.Term parse(String input) {
-        return ((Validator.Success) Validator.validate(input)).term();
+        return ((Validator.Success) new Validator().validate(input)).term();
     }
 
     public static String print(UCUMExpression UCUMExpression) {

@@ -25,16 +25,28 @@ public class UcumateToUcumJavaService implements UcumService {
     private final UcumJavaLegacyPrinter legacyPrinter;
     private final UcumJavaCanonicalUnitsLegacyPrinter canonicalUnitsLegacyPrinter;
 
-    public UcumateToUcumJavaService(InputStream stream) throws UcumException {
+    private final UCUMService newUCUMService;
+
+    public UcumateToUcumJavaService(InputStream stream, UCUMService newUCUMService) throws UcumException {
         legacy = new UcumEssenceService(stream);
+        this.newUCUMService = newUCUMService;
         this.legacyPrinter = new UcumJavaLegacyPrinter();
         this.canonicalUnitsLegacyPrinter = new UcumJavaCanonicalUnitsLegacyPrinter();
     }
 
-    public UcumateToUcumJavaService(String filename) throws UcumException {
+    public UcumateToUcumJavaService(String filename, UCUMService newUCUMService) throws UcumException {
         legacy = new UcumEssenceService(filename);
+        this.newUCUMService = newUCUMService;
         this.legacyPrinter = new UcumJavaLegacyPrinter();
         this.canonicalUnitsLegacyPrinter = new UcumJavaCanonicalUnitsLegacyPrinter();
+    }
+
+    public UcumateToUcumJavaService(InputStream stream) throws UcumException {
+        this(stream, new UCUMService());
+    }
+
+    public UcumateToUcumJavaService(String filename) throws UcumException {
+        this(filename, new UCUMService());
     }
 
     @Override
@@ -56,7 +68,7 @@ public class UcumateToUcumJavaService implements UcumService {
          */
         UCUMRegistry registry = UCUMRegistry.getInstance();
         return registry.getAll().stream()
-                .filter(concept -> !UCUMService.validateToBool(concept.code()))
+                .filter(concept -> !newUCUMService.validateToBool(concept.code()))
                 .map(concept -> "%s is invalid according to ucumate but exists in the provided essence file.".formatted(concept.code()))
                 .toList();
     }
@@ -122,12 +134,12 @@ public class UcumateToUcumJavaService implements UcumService {
 
     @Override
     public String validate(String unit) {
-        return UCUMService.validateToBool(unit) ? null : "ucumate found the input to be invalid.";
+        return newUCUMService.validateToBool(unit) ? null : "ucumate found the input to be invalid.";
     }
 
     @Override
     public String analyse(String unit) throws UcumException {
-        return UCUMService.print(unit, legacyPrinter);
+        return newUCUMService.print(unit, legacyPrinter);
     }
 
     @Override
@@ -137,11 +149,11 @@ public class UcumateToUcumJavaService implements UcumService {
 
     @Override
     public String validateCanonicalUnits(String unit, String canonical) {
-        Canonicalizer.CanonicalizationResult canonResult = UCUMService.canonicalize(unit);
-        if(!(canonResult instanceof Canonicalizer.Success success)) {
+        CanonicalizerService.CanonicalizationResult canonResult = newUCUMService.canonicalize(unit);
+        if(!(canonResult instanceof CanonicalizerService.Success success)) {
             return "%s is not a valid unit.".formatted(unit);
         }
-        Validator.ValidationResult canonicalValResult = UCUMService.validate(canonical);
+        Validator.ValidationResult canonicalValResult = newUCUMService.validate(canonical);
         if(!(canonicalValResult instanceof Validator.Success canonicalParsedSuccess)) {
             return "%s is not a valid unit.".formatted(canonical);
         }
@@ -149,8 +161,8 @@ public class UcumateToUcumJavaService implements UcumService {
             return "%s is not a canonical unit.".formatted(canonical);
         }
         // It is safe to canonicalize now because if it is not a canonical unit, the CanonicalChecker would have returned false
-        Canonicalizer.CanonicalizationResult canonicalizationResult = UCUMService.canonicalize(canonicalParsedSuccess.term());
-        if(!(canonicalizationResult instanceof Canonicalizer.Success success1)) {
+        CanonicalizerService.CanonicalizationResult canonicalizationResult = newUCUMService.canonicalize(canonicalParsedSuccess.term());
+        if(!(canonicalizationResult instanceof CanonicalizerService.Success success1)) {
             throw new RuntimeException("Canonicalized failed but CanonicalChecker said it should work.");
         }
 
@@ -163,20 +175,20 @@ public class UcumateToUcumJavaService implements UcumService {
 
     @Override
     public String getCanonicalUnits(String unit) throws UcumException {
-        return switch (UCUMService.canonicalize(unit)) {
-            case Canonicalizer.FailedCanonicalization failedCanonicalization -> throw new UcumException(failedCanonicalization.toString());
-            case Canonicalizer.Success success -> UCUMService.print(success.canonicalTerm(), canonicalUnitsLegacyPrinter);
+        return switch (newUCUMService.canonicalize(unit)) {
+            case CanonicalizerService.FailedCanonicalization failedCanonicalization -> throw new UcumException(failedCanonicalization.toString());
+            case CanonicalizerService.Success success -> newUCUMService.print(success.canonicalTerm(), canonicalUnitsLegacyPrinter);
         };
     }
 
     @Override
     public boolean isComparable(String units1, String units2) throws UcumException {
-        Canonicalizer.CanonicalizationResult units1Result = UCUMService.canonicalize(units1);
-        if(!(units1Result instanceof Canonicalizer.Success units1Success)) {
+        CanonicalizerService.CanonicalizationResult units1Result = newUCUMService.canonicalize(units1);
+        if(!(units1Result instanceof CanonicalizerService.Success units1Success)) {
             throw new UcumException("%s could not be canonicalized.".formatted(units1));
         }
-        Canonicalizer.CanonicalizationResult units2Result = UCUMService.canonicalize(units2);
-        if(!(units2Result instanceof Canonicalizer.Success units2Success)) {
+        CanonicalizerService.CanonicalizationResult units2Result = newUCUMService.canonicalize(units2);
+        if(!(units2Result instanceof CanonicalizerService.Success units2Success)) {
             throw new UcumException("%s could not be canonicalized.".formatted(units2));
         }
         return switch (DimensionAnalyzer.compare(units1Success.canonicalTerm(), units2Success.canonicalTerm())) {
@@ -202,8 +214,8 @@ public class UcumateToUcumJavaService implements UcumService {
                     .asTerm()
                     .build();
 
-            var canonResult = UCUMService.canonicalize(term);
-            if (!(canonResult instanceof Canonicalizer.Success success)) {
+            var canonResult = newUCUMService.canonicalize(term);
+            if (!(canonResult instanceof CanonicalizerService.Success success)) {
                 log.error("Encountered canonicalization error for unit {}.", definedUnit);
                 continue;
             }
@@ -236,15 +248,15 @@ public class UcumateToUcumJavaService implements UcumService {
 
     @Override
     public Pair getCanonicalForm(Pair value) throws UcumException {
-        return switch (UCUMService.canonicalize(value.getValue().asDecimal(), value.getCode())) {
-            case Canonicalizer.FailedCanonicalization failedCanonicalization -> throw new UcumException(failedCanonicalization.toString());
-            case Canonicalizer.Success success -> new Pair(new Decimal(success.magnitude().toString()), UCUMService.print(success.canonicalTerm(), Printer.PrintType.UCUM_SYNTAX));
+        return switch (newUCUMService.canonicalize(value.getValue().asDecimal(), value.getCode())) {
+            case CanonicalizerService.FailedCanonicalization failedCanonicalization -> throw new UcumException(failedCanonicalization.toString());
+            case CanonicalizerService.Success success -> new Pair(new Decimal(success.magnitude().toString()), newUCUMService.print(success.canonicalTerm(), Printer.PrintType.UCUM_SYNTAX));
         };
     }
 
     @Override
     public Decimal convert(Decimal value, String sourceUnit, String destUnit) throws UcumException {
-        return switch (UCUMService.convert(value.asDecimal(), sourceUnit, destUnit)) {
+        return switch (newUCUMService.convert(value.asDecimal(), sourceUnit, destUnit)) {
             case Converter.FailedConversion failedConversion -> throw new UcumException(failedConversion.toString());
             case Converter.Success success -> new Decimal(success.conversionFactor().toString());
         };

@@ -4,6 +4,7 @@ import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.funcs.printer.PrettyPrinter;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -23,9 +24,7 @@ public class UCUMRegistry {
     private static final UCUMRegistry instance = loadFromUCUMEssence(UCUMRegistry.class.getClassLoader().getResourceAsStream("ucum-essence.xml"));
     private static final Logger log = LoggerFactory.getLogger(UCUMRegistry.class);
 
-    static {
-        // instance.translateValueDefinitions();
-    }
+    private static final ValidatorService validatorService = new Validator();
 
     private final UCUMDefinition.UCUMEssence ucumEssence;
     private final Map<String, UCUMDefinition.UCUMPrefix> prefixes;
@@ -77,7 +76,7 @@ public class UCUMRegistry {
                 Fahrenheit is defined as "K/9" -> Only keep "K" because the "/9" is already accounted for manually in the conversion
 
                  */
-                UCUMExpression.Term term = ((Validator.Success) UCUMService.validate(definedUnit.value().function().unit())).term();
+                UCUMExpression.Term term = ((Validator.Success) validatorService.validate(definedUnit.value().function().unit())).term();
                 //UCUMExpression.Term extracted = new UnitExtractor().extractUnits(term);
                 PrettyPrinter pp = new PrettyPrinter();
                 //System.out.println(pp.print(term) + " is extracted to " + pp.print(extracted));
@@ -100,7 +99,7 @@ public class UCUMRegistry {
     }
 
     private UCUMExpression.Term handleCommon(UCUMDefinition.DefinedUnit definedUnit) {
-        return ((Validator.Success) UCUMService.validate(definedUnit.value().unit())).term();
+        return ((Validator.Success) validatorService.validate(definedUnit.value().unit())).term();
     }
 
     public Optional<UCUMDefinition.UCUMUnit> getUCUMUnit(String unit) {

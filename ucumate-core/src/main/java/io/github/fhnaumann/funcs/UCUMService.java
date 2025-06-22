@@ -1,7 +1,5 @@
 package io.github.fhnaumann.funcs;
 
-import io.github.fhnaumann.funcs.Canonicalizer.CanonicalizationResult;
-import io.github.fhnaumann.funcs.Converter.ConversionResult;
 import io.github.fhnaumann.funcs.printer.*;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -18,35 +16,34 @@ import java.util.Map;
  */
 public class UCUMService implements IUCUMService {
 
-    private static final Map<PrintType, Printer> DEFAULT_PRINTERS = Map.of(
-            PrintType.UCUM_SYNTAX, new UCUMSyntaxPrinter(),
-            PrintType.EXPRESSIVE_UCUM_SYNTAX, new ExpressiveUCUMSyntaxPrinter(),
-            PrintType.COMMON_MATH_SYNTAX, new WolframAlphaSyntaxPrinter(),
-            PrintType.LATEX_SYNTAX, new LatexPrinter()
-    );
+    private static final ValidatorService DEFAULT_VALIDATOR_SERVICE = new Validator();
+    private static final PrinterService DEFAULT_PRINTER_SERVICE = new Printer();
+    private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = new RelationChecker(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE);
+    private static final ConverterService DEFAULT_CONVERTER_SERVICE = new Converter(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE);
+    private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = new Canonicalizer(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE);
 
     private CanonicalizerService canonicalizerService;
     private ConverterService converterService;
     private ValidatorService validatorService;
     private RelationCheckerService relationCheckerService;
-    private final Map<PrintType, Printer> printers;
+    private PrinterService printerService;
 
     public UCUMService() {
         this(
-                null,
-                null,
-                new Validator(),
-                null,
-                DEFAULT_PRINTERS
+                DEFAULT_CANONICALIZER_SERVICE,
+                DEFAULT_CONVERTER_SERVICE,
+                DEFAULT_VALIDATOR_SERVICE,
+                DEFAULT_RELATION_CHECKER_SERVICE,
+                DEFAULT_PRINTER_SERVICE
         );
     }
 
-    public UCUMService(CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, Map<PrintType, Printer> printers) {
+    public UCUMService(CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService) {
         this.canonicalizerService = canonicalizerService;
         this.converterService = converterService;
         this.validatorService = validatorService;
         this.relationCheckerService = relationCheckerService;
-        this.printers = printers;
+        this.printerService = printerService;
     }
 
     @Override
@@ -67,7 +64,7 @@ public class UCUMService implements IUCUMService {
 
     @Override
     public String print(UCUMExpression ucumExpression, PrintType printType) {
-        return printers.get(printType).print(ucumExpression);
+        return printerService.print(ucumExpression, printType);
     }
 
     @Override
@@ -82,7 +79,11 @@ public class UCUMService implements IUCUMService {
 
     @Override
     public UCUMExpression.Term parseOrError(String input) {
-        return switch (validate(input)) {
+        return staticParseOrError(input, validatorService);
+    }
+
+    public static UCUMExpression.Term staticParseOrError(String input, ValidatorService validatorService) {
+        return switch (validatorService.validate(input)) {
             case Validator.Success success -> success.term();
             case Validator.Failure failure -> throw new Validator.ParserException("Failed parsing input: %s".formatted(input));
         };
@@ -126,5 +127,13 @@ public class UCUMService implements IUCUMService {
     @Override
     public void setRelationCheckerService(RelationCheckerService relationCheckerService) {
         this.relationCheckerService = relationCheckerService;
+    }
+
+    public PrinterService getPrinterService() {
+        return printerService;
+    }
+
+    public void setPrinterService(PrinterService printerService) {
+        this.printerService = printerService;
     }
 }

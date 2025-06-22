@@ -147,4 +147,35 @@ public interface ConverterService extends QuickParse {
      * @return A ConversionResult either containing the resulting conversion factor or an error with more details.
      */
     public Converter.ConversionResult convert(PreciseDecimal factor, UCUMExpression.Term from, UCUMExpression.Term to, PreciseDecimal substanceMolMassCoeff);
+
+    /**
+     * Contains information about the conversion.
+     */
+    sealed interface ConversionResult {}
+
+    /**
+     * Represents a failed conversion. The subclasses provide more details.
+     */
+    sealed interface FailedConversion extends ConversionResult permits Converter.BaseDimensionMismatch, Converter.FailedCanonicalization, Validator.ParserError {}
+
+    /**
+     * The conversion was successful.
+     * @param conversionFactor The resulting conversion factor. I.e. <code>x</code> in <code>factor * from = x * to</code>.
+     */
+    record Success(PreciseDecimal conversionFactor) implements ConversionResult {}
+
+    /**
+     * The conversion failed because the two terms don't share the same base dimensions.
+     * <br>
+     * I.e. if <code>from='m'</code> and <code>to='s'</code> then they can't be converted because they are in different dimensions.
+     * @param failure More details about the dimension failure.
+     */
+    record BaseDimensionMismatch(DimensionAnalyzer.Failure failure) implements FailedConversion {}
+
+    /**
+     * The conversion failed because one or both terms failed the canonicalization.
+     * So far this may only occur when a term contains an arbitrary unit.
+     * @param failedCanonicalization More details about the canonicalization failure.
+     */
+    record FailedCanonicalization(CanonicalizerService.FailedCanonicalization failedCanonicalization) implements FailedConversion {}
 }

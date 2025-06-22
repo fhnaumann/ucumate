@@ -3,6 +3,7 @@ package io.github.fhnaumann.validator;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,11 +15,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ValidatorTest {
 
+    private static Validator validator;
+
+    @BeforeAll
+    public static void init() {
+        validator = new Validator();
+    }
+
     @ParameterizedTest
     @DisplayName("Validation works as expected")
     @MethodSource("provide_validator_input_strings")
     public void test(VTestCase vTestCase) {
-        Validator.ValidationResult result = Validator.validate(vTestCase.actual());
+        Validator.ValidationResult result = validator.validate(vTestCase.actual());
         assertThat(result)
                 .isInstanceOf(Validator.Success.class)
                 .extracting(Validator.Success.class::cast)
@@ -29,7 +37,7 @@ public class ValidatorTest {
 
     @Test
     public void test2() {
-        Validator.ValidationResult result = Validator.validate("g{正}");
+        Validator.ValidationResult result = validator.validate("g{正}");
         System.out.println(result);
     }
 

@@ -2,7 +2,10 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.funcs.Canonicalizer;
+import io.github.fhnaumann.funcs.CanonicalizerService;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.funcs.printer.WolframAlphaSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
@@ -15,6 +18,9 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 public class TestUtil {
+
+    private static final ValidatorService validatorService = new Validator();
+    private static final CanonicalizerService canonicalizerService = new Canonicalizer(new Printer(), validatorService);
 
     private static final BigDecimal EPSILON = new BigDecimal("0.00001");
 
@@ -107,11 +113,11 @@ public class TestUtil {
     }
 
     public static UCUMExpression.Term parse(String input) {
-        return ((Validator.Success) Validator.validate(input)).term();
+        return ((Validator.Success) validatorService.validate(input)).term();
     }
 
     public static UCUMExpression.CanonicalTerm parse_canonical(String input) {
-        return ((Canonicalizer.Success) new Canonicalizer().canonicalize(PreciseDecimal.ONE, parse(input), true, true, Canonicalizer.UnitDirection.FROM, PreciseDecimal.ONE)).canonicalTerm();
+        return ((CanonicalizerService.Success) canonicalizerService.canonicalize(PreciseDecimal.ONE, parse(input))).canonicalTerm();
     }
 
     public static String print(UCUMExpression UCUMExpression) {

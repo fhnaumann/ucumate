@@ -1,9 +1,6 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.funcs.Converter;
-import io.github.fhnaumann.funcs.RelationChecker;
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 import org.assertj.core.api.Assertions;
@@ -24,10 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class UCUMTests {
 
     private static TestSuite testSuite;
+    private UCUMService service;
 
     @BeforeAll
     public void initalSetup() throws IOException {
         testSuite = TestCaseLoader.load();
+        service = new UCUMService();
     }
 
     public static Stream<TestCase.ValidateTestCase> validateTestCases() {
@@ -70,7 +69,7 @@ public class UCUMTests {
     @ParameterizedTest(name="{0}")
     @MethodSource("validateTestCases")
     public void testValidation(TestCase.ValidateTestCase testCase) {
-        boolean actual = UCUMService.validateToBool(testCase.inputExpression());
+        boolean actual = service.validateToBool(testCase.inputExpression());
         assertEquals(testCase.valid(), actual, "%s: Expected %s but got %s, reason: %s".formatted(testCase.id(), testCase.valid(), actual, testCase.reason()));
         /*
         if(testCase.valid()) {
@@ -84,7 +83,7 @@ public class UCUMTests {
     @ParameterizedTest(name="{0}")
     @MethodSource("commensurableTestCases")
     public void testCommensurability(TestCase.CommensurableTestCase testCase) {
-        RelationChecker.RelationResult result = UCUMService.checkCommensurable(Validator.parseByPassChecks(testCase.expr1()), Validator.parseByPassChecks(testCase.expr2()), false);
+        RelationChecker.RelationResult result = service.checkCommensurable(Validator.parseByPassChecks(testCase.expr1()), Validator.parseByPassChecks(testCase.expr2()), false);
         assertEquals(testCase.commensurable(), result instanceof RelationChecker.IsCommensurable, testCase.toString());
     }
 
@@ -95,13 +94,13 @@ public class UCUMTests {
         PreciseDecimal toFactor = new PreciseDecimal(testCase.resultingConversionFactor());
         UCUMExpression.Term from = Validator.parseByPassChecks(testCase.from());
         UCUMExpression.Term to = Validator.parseByPassChecks(testCase.to());
-        Converter.ConversionResult result = UCUMService.convert(fromFactor, from, to, testCase.substanceMolarMassCoeff() != null ? new PreciseDecimal(testCase.substanceMolarMassCoeff()) : null);
+        Converter.ConversionResult result = service.convert(fromFactor, from, to, testCase.substanceMolarMassCoeff() != null ? new PreciseDecimal(testCase.substanceMolarMassCoeff()) : null);
         if(testCase.valid()) {
             Assertions.assertThat(result)
                 .withFailMessage("%s: Unexpected validation error while testing the conversion: %s".formatted(testCase.id(), result))
                 .isInstanceOf(Converter.Success.class)
                 .extracting(Converter.Success.class::cast)
-                .extracting(Converter.Success::conversionFactor)
+                .extracting(ConverterService.Success::conversionFactor)
                 .satisfies(pd -> {
                     /*
                     TestUtil.skipIfRoundingProblem(toFactor.toString(), pd);

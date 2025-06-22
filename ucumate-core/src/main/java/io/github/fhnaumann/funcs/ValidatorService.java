@@ -35,23 +35,23 @@ public interface ValidatorService {
         };
     }
 
-    sealed interface ValidationResult {}
+    public sealed interface ValidationResult {}
 
-    record Success(UCUMExpression.Term term) implements ValidationResult {}
+    public record Success(UCUMExpression.Term term) implements ValidationResult {}
 
-    record Failure(String message) implements ValidationResult {
+    public record Failure(String message) implements ValidationResult {
         public Failure() {
             this("");
         }
     }
 
-    class LexerException extends RuntimeException {
+    public class LexerException extends RuntimeException {
         public LexerException(String message) {
             super(message);
         }
     }
 
-    class ParserException extends RuntimeException {
+    public class ParserException extends RuntimeException {
 
         private final List<ParseUtil.FailureResult> failures;
 
@@ -73,8 +73,8 @@ public interface ValidatorService {
         }
     }
 
-    record ParserError() implements
-            Canonicalizer.FailedCanonicalization,
+    public record ParserError() implements
+            CanonicalizerService.FailedCanonicalization,
             Converter.FailedConversion, RelationChecker.FailedRelationCheck,
             RelationChecker.FailedCommensurableCheck
     {}

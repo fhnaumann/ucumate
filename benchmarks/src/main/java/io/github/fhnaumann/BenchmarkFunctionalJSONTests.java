@@ -47,7 +47,7 @@ public class BenchmarkFunctionalJSONTests {
         List<String> diff = new ArrayList<>();
         for (TestCase.ValidateTestCase testCase : validateCases) {
             boolean ucumJavaValid = service.validate(testCase.inputExpression()) == null;
-            boolean ucumateValid = UCUMService.validateToBool(testCase.inputExpression());
+            boolean ucumateValid = new UCUMService().validateToBool(testCase.inputExpression());
             if(ucumJavaValid != ucumateValid) {
                 diff.add("id %s: Input %s: ucum-java says %s but ucumate says %s.".formatted(testCase.id(), testCase.inputExpression(), ucumJavaValid, ucumateValid));
             }
@@ -88,7 +88,7 @@ public class BenchmarkFunctionalJSONTests {
     public void benchmarkUcumateValidation() {
         logger.warn("Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
         for (TestCase.ValidateTestCase testCase : validateCases) {
-            UCUMService.validateToBool(testCase.inputExpression());
+            new UCUMService().validateToBool(testCase.inputExpression());
         }
         logger.warn("After Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
     }
@@ -96,7 +96,7 @@ public class BenchmarkFunctionalJSONTests {
     @Benchmark
     public void benchmarkUcumateCommensurability() {
         for (TestCase.CommensurableTestCase testCase : commensurableCases) {
-            UCUMService.checkCommensurable(
+            new UCUMService().checkCommensurable(
                     testCase.expr1(),
                     testCase.expr2(),
                     false
@@ -107,7 +107,7 @@ public class BenchmarkFunctionalJSONTests {
     @Benchmark
     public void benchmarkUcumateConversion() {
         for (TestCase.ConvertTestCase testCase : convertCases) {
-            UCUMService.convert(testCase.conversionFactor(), testCase.from(), testCase.to());
+            new UCUMService().convert(testCase.conversionFactor(), testCase.from(), testCase.to());
         }
     }
 

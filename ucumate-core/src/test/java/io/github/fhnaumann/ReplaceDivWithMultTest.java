@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static io.github.fhnaumann.TestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled("The class under test is obsolete and used anymore.")
+@Disabled("The class under test is obsolete and not used anymore.")
 public class ReplaceDivWithMultTest {
 
     @Test

@@ -2,6 +2,8 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.printer.Printer;
+import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.util.ParseUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
  * @author Felix Naumann
  */
 public class SyntaxMatchHelper {
+
+    private static final Printer printer = new UCUMSyntaxPrinter();
 
     private static final Set<String> WRONG_BUT_KNOWN_MUL_SYMBOLS = Set.of(
             "*", // Asteriks
@@ -147,7 +151,7 @@ public class SyntaxMatchHelper {
 
         //String matchedPrefixPrint = matchedPrefix != null ? UCUMService.print(matchedPrefix) : "";
         String matchedUnitsString = highestScoredUnits.stream()
-                .map(UCUMService::print)
+                .map(printer::print)
                 .collect(Collectors.joining(","));
         if(matchedUnits.isEmpty()) {
             // analyzing did not lead to anything meaningful, the input is truly indecipherable

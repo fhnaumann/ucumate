@@ -2,6 +2,7 @@ package io.github.fhnaumann.dimanalyzer;
 
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.Canonicalizer;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
 import org.junit.jupiter.api.Test;
 
@@ -22,11 +23,11 @@ public class DimAnalyzerTest {
 
     @Test
     public void test_functional_tests_3_126() {
-        UCUMExpression.Term from = ((Validator.Success)Validator.validate("S")).term();
+        UCUMExpression.Term from = ((Validator.Success)new Validator().validate("S")).term();
         //Expression.Term to = ((Validator.Success)Validator.validate("g-1.m-2.C2.s")).term();
         //Expression.Term to = ((Validator.Success)Validator.validate("m/g")).term();
 
-        UCUMExpression.CanonicalTerm canonicalFrom = ((Canonicalizer.Success)new Canonicalizer().canonicalize(from)).canonicalTerm();
+        UCUMExpression.CanonicalTerm canonicalFrom = ((CanonicalizerService.Success)new Canonicalizer(new Printer(), new Validator()).canonicalize(from)).canonicalTerm();
         //Expression.CanonicalTerm canonicalTo = ((Canonicalizer.Success)new Canonicalizer().canonicalizeNoSpecialUnitAllowed(to)).canonicalTerm();
         var map1 = DimensionAnalyzer.analyze(canonicalFrom);
         //var map2 = DimensionAnalyzer.analyze(canonicalTo);

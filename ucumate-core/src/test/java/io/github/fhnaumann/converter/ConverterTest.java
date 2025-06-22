@@ -4,12 +4,13 @@ import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.Converter;
-import io.github.fhnaumann.funcs.RelationChecker;
+import io.github.fhnaumann.funcs.ConverterService;
 import io.github.fhnaumann.funcs.UCUMService;
+import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.util.PreciseDecimal;
-import io.github.fhnaumann.util.UCUMRegistry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConverterTest {
 
-    private Converter converter;
+    private static Converter converter;
 
     @BeforeAll
     public static void init() {
@@ -32,19 +33,19 @@ public class ConverterTest {
         PersistenceRegistry.disableInMemoryCache(true); // todo mole mass stuff messes up the caching, inspect
     }
 
-    @BeforeEach
-    public void setUp() {
-        converter = new Converter();
+    @BeforeAll
+    public static void setUp() {
+        converter = new Converter(new Printer(), new Validator());
     }
 
     @ParameterizedTest
     @MethodSource("provide_mol_mass_conversion")
     public void test_can_convert_mol_to_mass(String factor, String from, String to, String substanceMolarMassCoeff, String expected) {
-        Converter.ConversionResult convResult = UCUMService.convert(factor, from, to, substanceMolarMassCoeff);
+        Converter.ConversionResult convResult = converter.convert(factor, from, to, substanceMolarMassCoeff);
         assertThat(convResult)
                 .isInstanceOf(Converter.Success.class)
                 .extracting(Converter.Success.class::cast)
-                .extracting(Converter.Success::conversionFactor)
+                .extracting(ConverterService.Success::conversionFactor)
                 .asString()
                 .startsWith(expected);
     }
@@ -158,7 +159,7 @@ public class ConverterTest {
         assertThat(actual)
                 .isInstanceOf(Converter.Success.class)
                 .extracting(Converter.Success.class::cast)
-                .extracting(Converter.Success::conversionFactor)
+                .extracting(ConverterService.Success::conversionFactor)
                 .isEqualTo(expectedCf);
     }
 }

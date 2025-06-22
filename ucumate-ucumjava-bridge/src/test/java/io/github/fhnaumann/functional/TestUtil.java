@@ -2,7 +2,9 @@ package io.github.fhnaumann.functional;
 
 import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.funcs.Canonicalizer;
+import io.github.fhnaumann.funcs.CanonicalizerService;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.funcs.printer.WolframAlphaSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
@@ -107,11 +109,11 @@ public class TestUtil {
     }
 
     public static UCUMExpression.Term parse(String input) {
-        return ((Validator.Success) Validator.validate(input)).term();
+        return ((Validator.Success) new Validator().validate(input)).term();
     }
 
     public static UCUMExpression.CanonicalTerm parse_canonical(String input) {
-        return ((Canonicalizer.Success) new Canonicalizer().canonicalize(PreciseDecimal.ONE, parse(input), false, false, Canonicalizer.UnitDirection.FROM, PreciseDecimal.ONE)).canonicalTerm();
+        return ((CanonicalizerService.Success) new Canonicalizer(new Printer(), new Validator()).canonicalize(PreciseDecimal.ONE, parse(input), false, false, Canonicalizer.UnitDirection.FROM, PreciseDecimal.ONE)).canonicalTerm();
     }
 
     public static String print(UCUMExpression UCUMExpression) {
