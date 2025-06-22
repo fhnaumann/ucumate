@@ -3,6 +3,9 @@ package io.github.fhnaumann;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.UCUMService;
+import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,12 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class TestFeatureFlagAnnotAfterParens {
 
+    private static ValidatorService validatorService;
+
+    @BeforeAll
+    public static void init() {
+        validatorService = new Validator();
+    }
+
     @ParameterizedTest
     @MethodSource("provide_expressions")
     public void test(String expression, boolean allowAnnotAfterParens, boolean expectedValid) {
         ConfigurationRegistry.initialize(Configuration.builder().allowAnnotAfterParens(allowAnnotAfterParens).build());
 
-        boolean actualValid = UCUMService.validateToBool(expression);
+        boolean actualValid = validatorService.validateToBool(expression);
 
         assertThat(actualValid).isEqualTo(expectedValid);
     }

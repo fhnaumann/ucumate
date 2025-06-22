@@ -1,14 +1,24 @@
 package io.github.fhnaumann.funcs.printer;
 
+import io.github.fhnaumann.funcs.PrinterService;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
+
+import java.util.Map;
 
 /**
  * Provides methods to print the UCUMExpression model (and its subclasses) to a string representation.
  * <br>
  * You can extend this class to create your own printer implementation.
  */
-public abstract class Printer {
+public class Printer implements PrinterService {
+
+    private static final Map<PrintType, Printer> DEFAULT_PRINTERS = Map.of(
+            PrintType.UCUM_SYNTAX, new UCUMSyntaxPrinter(),
+            PrintType.EXPRESSIVE_UCUM_SYNTAX, new ExpressiveUCUMSyntaxPrinter(),
+            PrintType.COMMON_MATH_SYNTAX, new WolframAlphaSyntaxPrinter(),
+            PrintType.LATEX_SYNTAX, new LatexPrinter()
+    );
 
     /**
      * The different print types.
@@ -31,6 +41,15 @@ public abstract class Printer {
          * Produces strings that are understood by LaTeX parsers. May be used in conjunction with a LaTeX renderer to render pretty expressions.
          */
         LATEX_SYNTAX
+    }
+
+    @Override
+    public UCUMExpression.Term parseOrError(String input) {
+        return null;
+    }
+
+    public String print(UCUMExpression ucumExpression, PrintType printType) {
+        return print(ucumExpression, DEFAULT_PRINTERS.get(printType));
     }
 
     public String print(UCUMExpression UCUMExpression) {

@@ -1,6 +1,5 @@
 package io.github.fhnaumann.funcs;
 
-import io.github.fhnaumann.compounds.CompoundUtil;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.sorter.AlphabeticalSorter;
 import io.github.fhnaumann.model.UCUMDefinition.*;
@@ -9,7 +8,7 @@ import io.github.fhnaumann.util.MolMassUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.builders.CombineTermBuilder;
 import io.github.fhnaumann.builders.SoloTermBuilder;
-import io.github.fhnaumann.funcs.Validator.Failure;
+import io.github.fhnaumann.funcs.ValidatorService.Failure;
 import io.github.fhnaumann.model.UCUMExpression.*;
 import io.github.fhnaumann.model.special.SpecialUnits;
 import io.github.fhnaumann.model.special.SpecialUnitsFunctionProvider;
@@ -17,10 +16,23 @@ import io.github.fhnaumann.util.PreciseDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Canonicalizer {
+public class Canonicalizer implements CanonicalizerService {
 
     private static final UCUMRegistry registry = UCUMRegistry.getInstance();
     private static final Logger log = LoggerFactory.getLogger(Canonicalizer.class);
+
+    private final PrinterService printerService;
+    private final ValidatorService validatorService;
+
+    public Canonicalizer(PrinterService printerService, ValidatorService validatorService) {
+        this.printerService = printerService;
+        this.validatorService = validatorService;
+    }
+
+    @Override
+    public Term parseOrError(String input) {
+        return UCUMService.staticParseOrError(input, validatorService);
+    }
 
     public record CanonicalStepResult(
         Term term,
@@ -132,11 +144,11 @@ public class Canonicalizer {
         FROM, TO
     }
 
-    public CanonicalizationResult canonicalize(Term term) {
+    public CanonicalizerService.CanonicalizationResult canonicalize(Term term) {
         return canonicalize(PreciseDecimal.ONE, term);
     }
 
-    public CanonicalizationResult canonicalize(Term term, boolean allowMolMassConversion) {
+    public CanonicalizerService.CanonicalizationResult canonicalize(Term term, boolean allowMolMassConversion) {
         /*
         A bit weird here with the molMassConversion flag:
         If false, use null because it will canonicalize mol->1
@@ -145,11 +157,11 @@ public class Canonicalizer {
         return canonicalize(PreciseDecimal.ONE, term, true, true, UnitDirection.FROM, allowMolMassConversion ? PreciseDecimal.ONE : null);
     }
 
-    public CanonicalizationResult canonicalize(PreciseDecimal factor, Term term) {
+    public CanonicalizerService.CanonicalizationResult canonicalize(PreciseDecimal factor, Term term) {
         return canonicalize(factor, term, true, true, UnitDirection.FROM, null);
     }
 
-    public CanonicalizationResult canonicalize(PreciseDecimal factor, Term term, boolean normalize, boolean flatten, UnitDirection unitDirection, PreciseDecimal substanceMolarMassCoeff) {
+    public CanonicalizerService.CanonicalizationResult canonicalize(PreciseDecimal factor, Term term, boolean normalize, boolean flatten, UnitDirection unitDirection, PreciseDecimal substanceMolarMassCoeff) {
         try {
             CanonicalStepResult canonicalStep = canonicalizeImpl(term, new CanonicalStepResult(term, PreciseDecimal.ONE, PreciseDecimal.ONE, false, null), substanceMolarMassCoeff);
             if(!(canonicalStep.term() instanceof CanonicalTerm canonicalTerm)) {
@@ -171,7 +183,7 @@ public class Canonicalizer {
             if(isSpecial && isMolInvolved && substanceMolarMassCoeff != null && ConfigurationRegistry.get().isEnableMolMassConversion()) {
                 // as for UCUM version 2.2 this only affects "[pH]"
                 log.warn("Conversion involving the special unit '[pH]' to a mass unit is not supported.");
-                return new TermContainsPHAndCanonicalizingToMass();
+                return new CanonicalizerService.TermContainsPHAndCanonicalizingToMass();
             }
 
             /*
@@ -190,7 +202,7 @@ public class Canonicalizer {
                 ));
             }
             else if(log.isDebugEnabled() && PersistenceRegistry.hasAny()){
-                log.debug("Not saving {} in cache because the mole unit requires additional properties to be stored in the key, which is not currently implemented.", UCUMService.print(term));
+                log.debug("Not saving {} in cache because the mole unit requires additional properties to be stored in the key, which is not currently implemented.", printerService.print(term));
             }
 
             PreciseDecimal resultFactor = switch (unitDirection) {
@@ -217,14 +229,14 @@ public class Canonicalizer {
                 }
             };
 
-            return new Success(resultFactor, resultTerm);
+            return new CanonicalizerService.Success(resultFactor, resultTerm);
         } catch (TermHasArbitraryUnitException e) {
-            return new TermHasArbitraryUnit(e.arbitraryUnit);
+            return new CanonicalizerService.TermHasArbitraryUnit(e.arbitraryUnit);
         }
     }
 
     private PreciseDecimal extractPrefixOrDimlessFactorFromSpecialUnit(String specialUnitFunctionUnit) {
-        return switch (Validator.validate(specialUnitFunctionUnit)) {
+        return switch (validatorService.validate(specialUnitFunctionUnit)) {
             case Failure failure -> throw new RuntimeException("Failed to extract prefix or dimless factor from special unit definition " + specialUnitFunctionUnit);
             case Validator.Success success -> extractPrefixOrDimlessFactorFromSpecialUnitImpl(success.term(), PreciseDecimal.ONE);
         };
@@ -434,38 +446,5 @@ public class Canonicalizer {
             this.arbitraryUnit = arbitraryUnit;
         }
     }
-
-    /**
-     * Contains information about the canonicalization.
-     */
-    public sealed interface CanonicalizationResult {}
-
-    /**
-     * Represents a failed canonicalization. The subclasses provide more details.
-     */
-    public sealed interface FailedCanonicalization extends CanonicalizationResult permits TermContainsPHAndCanonicalizingToMass, TermHasArbitraryUnit, Validator.ParserError {}
-
-    /**
-     * The canonicalization was successful.
-     * @param magnitude The conversion factor that was created during the canonicalization.
-     * @param canonicalTerm The canonical form of the given input term.
-     */
-    public record Success(PreciseDecimal magnitude, CanonicalTerm canonicalTerm) implements
-        CanonicalizationResult {}
-
-    /**
-     * The canonicalization failed because the input term contains an arbitrary unit. Arbitrary units cannot be
-     * converted to or from anything.
-     * @param arbitraryUnit The arbitrary unit that was encountered and caused the failure.
-     */
-    public record TermHasArbitraryUnit(ArbitraryUnit arbitraryUnit) implements
-        FailedCanonicalization {}
-
-    /**
-     * The canonicalization failed because the input term is the special unit '[pH]' and it's trying to be converted
-     * to mass and mol to mass conversion is enabled in the configuration. This is just not supported (and this conversion
-     * does not make any sense either).
-     */
-    public record TermContainsPHAndCanonicalizingToMass() implements FailedCanonicalization {}
 
 }

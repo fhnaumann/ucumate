@@ -9,18 +9,28 @@ import io.github.fhnaumann.util.PreciseDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Converter {
+public class Converter implements ConverterService {
 
     private static final Logger log = LoggerFactory.getLogger(Converter.class);
 
-    public record Conversion(PreciseDecimal factor, UCUMExpression.Term term) {}
+    private final PrinterService printerService;
+    private final ValidatorService validatorService;
 
-    public ConversionResult convert(UCUMExpression.Term from, UCUMExpression.Term to) {
-        return convert(PreciseDecimal.ONE, from, to);
+    public Converter(PrinterService printerService, ValidatorService validatorService) {
+        this.printerService = printerService;
+        this.validatorService = validatorService;
     }
 
-    public ConversionResult convert(PreciseDecimal factor, UCUMExpression.Term from, UCUMExpression.Term to) {
-        return convert(new Conversion(factor, from), to, null);
+    @Override
+    public UCUMExpression.Term parseOrError(String input) {
+        return UCUMService.staticParseOrError(input, validatorService);
+    }
+
+    public record Conversion(PreciseDecimal factor, UCUMExpression.Term term) {}
+
+    @Override
+    public ConversionResult convert(PreciseDecimal factor, UCUMExpression.Term from, UCUMExpression.Term to, PreciseDecimal substanceMolMassCoeff) {
+        return convert(new Conversion(factor, from), to, substanceMolMassCoeff);
     }
 
     public ConversionResult convert(Conversion from, UCUMExpression.Term to) {
@@ -33,16 +43,16 @@ public class Converter {
         if(ConfigurationRegistry.get().isEnableMolMassConversion() && (fromContainsMol || toContainsMol) && PreciseDecimal.ONE.equals(substanceMolarMassCoeff)) {
             log.warn("Mol <-> Mass conversion enabled and either from or to contains mol but no substanceMolarMassCoeff has been given. It is highly unlikely that a coefficient of 1 is desired.");
         }
-        Canonicalizer canonicalizer = new Canonicalizer();
-        Canonicalizer.CanonicalizationResult fromResult = canonicalizer.canonicalize(from.factor(), from.term(), true, true, UnitDirection.FROM, toContainsMol ? null : substanceMolarMassCoeff);
+        Canonicalizer canonicalizer = new Canonicalizer(printerService, validatorService);
+        CanonicalizerService.CanonicalizationResult fromResult = canonicalizer.canonicalize(from.factor(), from.term(), true, true, UnitDirection.FROM, toContainsMol ? null : substanceMolarMassCoeff);
         return switch (fromResult) {
-            case Canonicalizer.FailedCanonicalization failedCanonicalization -> new FailedCanonicalization(failedCanonicalization);
-            case Canonicalizer.Success fromSuccess -> {
+            case CanonicalizerService.FailedCanonicalization failedCanonicalization -> new FailedCanonicalization(failedCanonicalization);
+            case CanonicalizerService.Success fromSuccess -> {
 
-                Canonicalizer.CanonicalizationResult toResult = canonicalizer.canonicalize(fromSuccess.magnitude(), to, true, true, UnitDirection.TO, fromContainsMol ? null : substanceMolarMassCoeff);
+                CanonicalizerService.CanonicalizationResult toResult = canonicalizer.canonicalize(fromSuccess.magnitude(), to, true, true, UnitDirection.TO, fromContainsMol ? null : substanceMolarMassCoeff);
                 yield switch (toResult) {
-                    case Canonicalizer.FailedCanonicalization failedCanonicalization -> new FailedCanonicalization(failedCanonicalization);
-                    case Canonicalizer.Success toSuccess -> {
+                    case CanonicalizerService.FailedCanonicalization failedCanonicalization -> new FailedCanonicalization(failedCanonicalization);
+                    case CanonicalizerService.Success toSuccess -> {
                         DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(fromSuccess.canonicalTerm(), toSuccess.canonicalTerm());
                         yield switch (comparisonResult) {
                             case Failure failure -> new BaseDimensionMismatch(failure);
@@ -53,104 +63,4 @@ public class Converter {
             }
         };
     }
-/*
-
-
-    public ConversionResult convert(Conversion from, UCUMExpression.Term to) {
-        Canonicalizer canonicalizer = new Canonicalizer();
-        Canonicalizer.CanonicalizationResult fromResult = canonicalizer.canonicalize(from.term(), new Canonicalizer.SpecialUnitConversionContext(from.factor(), Canonicalizer.SpecialUnitApplicationDirection.FROM));
-        Canonicalizer.CanonicalizationResult toResult = canonicalizer.canonicalize(to, new Canonicalizer.SpecialUnitConversionContext(from.factor(), Canonicalizer.SpecialUnitApplicationDirection.TO)); // was pd.ONE instead of "from.factor()"
-        if(fromResult instanceof Canonicalizer.FailedCanonicalization fromFailed) {
-            return new FailedCanonicalization(fromFailed);
-        }
-        Canonicalizer.Success fromSuccess = (Canonicalizer.Success) fromResult;
-        if(toResult instanceof Canonicalizer.FailedCanonicalization toFailed) {
-            return new FailedCanonicalization(toFailed);
-        }
-        Canonicalizer.Success toSuccess = (Canonicalizer.Success) toResult;
-
-        DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(fromSuccess.canonicalTerm(), toSuccess.canonicalTerm());
-        return switch(comparisonResult) {
-            case DimensionAnalyzer.Success success -> {
-/*
-                PreciseDecimal conversionFactor;
-                if(SpecialUtil.containsSpecialUnit(from.term())) {
-                    // i.e. Cel->K
-                    conversionFactor = PreciseDecimal.ZERO;
-                }
-                else {
-                    // no special unit was involved during 'from' canonicalization
-                    conversionFactor = from.factor().multiply(fromSuccess.conversionFactor());
-                }
-
-                if(SpecialUtil.containsSpecialUnit(to)) {
-                    // i.e. K->Cel
-                    conversionFactor = PreciseDecimal.ZERO;
-                }
-                else {
-                    conversionFactor = conversionFactor.divide(toSuccess.conversionFactor());
-                }
-                yield new Success(conversionFactor);
-
-
-
-
-                PreciseDecimal conversionFactor;
-                if((toSuccess.direction() == Canonicalizer.SpecialUnitApplicationDirection.TO && SpecialUtil.containsSpecialUnit(to))) {
-                    // i.e. K->Cel
-                    conversionFactor = PreciseDecimal.ONE.divide(fromSuccess.conversionFactor()).multiply(toSuccess.conversionFactor());
-                }
-                else if((fromSuccess.direction() == Canonicalizer.SpecialUnitApplicationDirection.FROM && SpecialUtil.containsSpecialUnit(from.term()))) {
-                    // i.e. Cel->K
-                    conversionFactor = fromSuccess.conversionFactor().multiply(PreciseDecimal.ONE.divide(toSuccess.conversionFactor()));
-                }
-                else {
-                    // no special unit involved
-                    conversionFactor = from.factor().multiply(fromSuccess.conversionFactor()).multiply(PreciseDecimal.ONE.divide(toSuccess.conversionFactor()));
-
-                }
-                yield new Success(conversionFactor);
-
-
-
-            }
-            case DimensionAnalyzer.Failure failure -> new BaseDimensionMismatch(failure);
-
-
-        };
-
-    }
-
- */
-
-    /**
-     * Contains information about the conversion.
-     */
-    public sealed interface ConversionResult {}
-
-    /**
-     * Represents a failed conversion. The subclasses provide more details.
-     */
-    public sealed interface FailedConversion extends ConversionResult permits BaseDimensionMismatch, FailedCanonicalization, Validator.ParserError {}
-
-    /**
-     * The conversion was successful.
-     * @param conversionFactor The resulting conversion factor. I.e. <code>x</code> in <code>factor * from = x * to</code>.
-     */
-    public record Success(PreciseDecimal conversionFactor) implements ConversionResult {}
-
-    /**
-     * The conversion failed because the two terms don't share the same base dimensions.
-     * <br>
-     * I.e. if <code>from='m'</code> and <code>to='s'</code> then they can't be converted because they are in different dimensions.
-     * @param failure More details about the dimension failure.
-     */
-    public record BaseDimensionMismatch(DimensionAnalyzer.Failure failure) implements FailedConversion {}
-
-    /**
-     * The conversion failed because one or both terms failed the canonicalization.
-     * So far this may only occur when a term contains an arbitrary unit.
-     * @param failedCanonicalization More details about the canonicalization failure.
-     */
-    public record FailedCanonicalization(Canonicalizer.FailedCanonicalization failedCanonicalization) implements FailedConversion {}
 }

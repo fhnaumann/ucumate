@@ -3,6 +3,8 @@ package io.github.fhnaumann;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.UCUMService;
+import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.persistence.PersistenceProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,9 +21,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class TestFeatureFlagPrefixNonMetricUnits {
 
+    private static ValidatorService validatorService;
+
     @BeforeAll
     public static void init() {
         //System.setProperty("ucumate.cache.enable", "false");
+        validatorService = new Validator();
     }
 
     @ParameterizedTest
@@ -31,7 +36,7 @@ public class TestFeatureFlagPrefixNonMetricUnits {
         Configuration config = Configuration.builder().enablePrefixOnNonMetricUnits(enablePrefixOnNonMetricUnits).build();
         ConfigurationRegistry.initialize(config);
 
-        boolean actualValid = UCUMService.validateToBool(expression);
+        boolean actualValid = validatorService.validateToBool(expression);
         assertThat(actualValid).isEqualTo(expectedValid);
     }
 

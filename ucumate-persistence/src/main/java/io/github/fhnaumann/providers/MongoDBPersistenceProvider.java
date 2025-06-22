@@ -8,9 +8,11 @@ import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.Canonicalizer;
+import io.github.fhnaumann.funcs.PrinterService;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.Printer;
+import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.persistence.PersistenceProvider;
@@ -31,6 +33,8 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     private final MongoCollection<Document> canonicalColl;
     private final MongoCollection<Document> validationColl;
 
+    private static final PrinterService printer = new UCUMSyntaxPrinter();
+
     public MongoDBPersistenceProvider(MongoClient client, String dbName) {
         this.client = client;
         MongoDatabase db = client.getDatabase(dbName);
@@ -44,7 +48,7 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
         Document doc = new Document("unit_key", keyString)
                 .append("magnitude", value.magnitude().toString())
                 .append("cfPrefix", value.cfPrefix().toString())
-                .append("term", UCUMService.print(value.term(), Printer.PrintType.UCUM_SYNTAX))
+                .append("term", printer.print(value.term()))
                 .append("special", value.specialHandlingActive());
 
         if (value.specialHandlingActive()) {

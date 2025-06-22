@@ -1,12 +1,9 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
-import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.UCUMRegistry;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
 import java.util.List;

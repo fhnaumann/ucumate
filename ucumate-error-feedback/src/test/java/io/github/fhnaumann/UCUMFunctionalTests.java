@@ -1,8 +1,7 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.funcs.Converter;
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.*;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 import io.github.fhnaumann.util.UCUMRegistry;
@@ -35,6 +34,10 @@ public class UCUMFunctionalTests {
     to see the individual reasoning for each test case that is listed here.
      */
     private static List<String> TESTS_TO_SKIP = List.of("1-108", "3-115", "3-121", "3-122", "3-123", "3-124", "3-128");
+
+    private static ValidatorService validatorService = new Validator();
+    private static PrinterService printerService = new Printer();
+    private static ConverterService converterService = new Converter(printerService, validatorService);
 
     @BeforeAll
     public static void init() {
@@ -77,8 +80,8 @@ public class UCUMFunctionalTests {
         String uRes = x.getAttribute("uRes");
         PreciseDecimal pd1 = new PreciseDecimal(v1, true);
         PreciseDecimal pd2 = new PreciseDecimal(v2, true);
-        UCUMExpression.Term term1 = ((Validator.Success) Validator.validate(u1)).term();
-        UCUMExpression.Term term2 = ((Validator.Success) Validator.validate(u2)).term();
+        UCUMExpression.Term term1 = ((Validator.Success) validatorService.validate(u1)).term();
+        UCUMExpression.Term term2 = ((Validator.Success) validatorService.validate(u2)).term();
 
     }
 
@@ -91,7 +94,7 @@ public class UCUMFunctionalTests {
 
         assumeFalse(TESTS_TO_SKIP.contains(id), "Skipping test %s because it was marked so. See the ucumate online documentation to find out why.".formatted(id));
 
-        Converter.ConversionResult result = UCUMService.convert(new PreciseDecimal(value, false), srcUnit, dstUnit);
+        Converter.ConversionResult result = converterService.convert(new PreciseDecimal(value, false), srcUnit, dstUnit);
         //Converter.ConversionResult result = new Converter().convert(new Converter.Conversion(new PreciseDecimal(value, true), fromTerm), toTerm);
         assertThat(result)
                 .withFailMessage("Test %s is not of instance success for conversion".formatted(id))
@@ -118,7 +121,7 @@ public class UCUMFunctionalTests {
 
         assumeFalse(TESTS_TO_SKIP.contains(id), "Skipping test %s because it was marked so. See the ucumate online documentation to find out why.".formatted(id));
 
-        Validator.ValidationResult result = Validator.validate(unit);
+        Validator.ValidationResult result = validatorService.validate(unit);
         if(valid) {
             assertThat(result)
                     .withFailMessage("Unit %s was expected to be valid, but was invalid (%s)".formatted(unit, id))

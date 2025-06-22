@@ -10,60 +10,14 @@ import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UCUMExpression.Term;
-import io.github.fhnaumann.util.ParseUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Validator {
+public class Validator implements ValidatorService {
 
     private static final Logger log = LoggerFactory.getLogger(Validator.class);
-
-    public sealed interface ValidationResult {}
-
-    public record Success(UCUMExpression.Term term) implements ValidationResult {}
-    public record Failure(String message) implements ValidationResult {
-        public Failure() {
-            this("");
-        }
-    }
-
-    public static class LexerException extends RuntimeException {
-        public LexerException(String message) {
-            super(message);
-        }
-    }
-    public static class ParserException extends RuntimeException {
-
-        private final List<ParseUtil.FailureResult> failures;
-
-        public ParserException(String message) {
-            super(message);
-            this.failures = new ArrayList<>();
-        }
-        public ParserException(ParseUtil.FailureResult failureResult) {
-            super(failureResult.failedText());
-            this.failures = List.of(failureResult);
-        }
-        public ParserException(ParseUtil.InvalidResults invalidResults) {
-            super(invalidResults.toString());
-            this.failures = invalidResults.failureResults();
-        }
-
-        public List<ParseUtil.FailureResult> getFailures() {
-            return failures;
-        }
-    }
-
-    public record ParserError() implements
-            Canonicalizer.FailedCanonicalization,
-            Converter.FailedConversion, RelationChecker.FailedRelationCheck,
-            RelationChecker.FailedCommensurableCheck
-    {}
 
     /**
      * Internal use only!
@@ -83,7 +37,7 @@ public class Validator {
         return validateImpl(input, new UCUMSyntaxVisitor(UCUMRegistry.getInstance()));
     }
 
-    public static ValidationResult validate(String input) {
+    public ValidationResult validate(String input) {
         ValidationResult cached = PersistenceRegistry.getInstance().getValidated(input);
         if(cached != null) {
             /*
@@ -147,7 +101,7 @@ public class Validator {
         return term;
     }
 
-    private static boolean hasAnnotationAfterParens(Term term) {
+    private boolean hasAnnotationAfterParens(Term term) {
         return switch (term) {
             case UCUMExpression.ComponentTerm componentTerm -> false;
             case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> false;

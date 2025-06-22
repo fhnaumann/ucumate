@@ -1,7 +1,7 @@
 package io.github.fhnaumann.util;
 
 import io.github.fhnaumann.model.UCUMDefinition;
-import io.github.fhnaumann.funcs.Validator.ParserException;
+import io.github.fhnaumann.funcs.ValidatorService.ParserException;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.Comparator;

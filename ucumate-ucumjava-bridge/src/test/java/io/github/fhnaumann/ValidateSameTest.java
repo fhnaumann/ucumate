@@ -51,7 +51,7 @@ public class ValidateSameTest extends UcumateToUcumJavaTestBase {
         assumeFalse(TESTS_TO_SKIP.contains(id), "Skipping test %s because it was marked so. See the ucumate online documentation to find out why.".formatted(id));
 
         boolean expectedValid = oldService.validate(unit) == null;
-        Validator.ValidationResult result = Validator.validate(unit);
+        Validator.ValidationResult result = new Validator().validate(unit);
         if(expectedValid) {
             assertThat(result)
                     .withFailMessage("Unit %s was expected to be valid, but was invalid (%s)".formatted(unit, id))

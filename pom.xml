@@ -55,7 +55,7 @@
         <module>ucumate-persistence</module>
         <module>ucumate-test-utils</module>
         <module>ucumate-mol-support</module>
-        <!--module>ucumate-spi-tests</module-->
+        <module>ucumate-spi-tests</module>
         <module>ucumate-ucumjava-bridge</module>
         <module>ucumate-ontoserver</module>
         <module>ucumate-error-feedback</module>

@@ -3,6 +3,8 @@ package io.github.fhnaumann;
 import io.github.fhnaumann.compounds.CompoundProvider;
 import io.github.fhnaumann.funcs.Converter;
 import io.github.fhnaumann.funcs.UCUMService;
+import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.printer.Printer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -30,7 +32,7 @@ public class NistCompoundProviderSPITest {
 
     @Test
     public void test_spi_provider_is_auto_discovered_when_accessing_UCUMService() {
-        Converter.ConversionResult result = UCUMService.convert("1", "mol", "g", "1309-37-1");
+        Converter.ConversionResult result = new Converter(new Printer(), new Validator()).convert("1", "mol", "g", "1309-37-1");
         assertThat(result)
                 .isNotNull()
                 .isInstanceOf(Converter.Success.class)

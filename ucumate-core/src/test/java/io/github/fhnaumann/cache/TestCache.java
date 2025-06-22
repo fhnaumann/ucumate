@@ -1,13 +1,10 @@
 package io.github.fhnaumann.cache;
 
-import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.funcs.Canonicalizer;
-import io.github.fhnaumann.funcs.Converter;
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.*;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,8 +36,13 @@ public class TestCache {
             .allowAnnotAfterParens(true)
             .build();
 
+    private static ValidatorService validatorService;
+    private static ConverterService converterService;
+
     @BeforeAll
     public static void init() {
+        validatorService = new Validator();
+        converterService = new Converter(new Printer(), validatorService);
         Properties props = new Properties();
         props.setProperty("ucumate.cache.enable", "true");
         PersistenceRegistry.initCache(props);
@@ -51,10 +53,10 @@ public class TestCache {
         String expression = "c[ft_i]";
         ConfigurationRegistry.initialize(ALL_ENABLED);
         // will store in cache
-        UCUMService.validate(expression);
+        validatorService.validate(expression);
         // simulate dev changing property
         ConfigurationRegistry.initialize(DISABLE_PREFIX_ON_NON_METRIC);
-        Validator.ValidationResult valResult = UCUMService.validate(expression);
+        Validator.ValidationResult valResult = validatorService.validate(expression);
         assertThat(valResult).isInstanceOf(Validator.Failure.class);
         System.out.println(ConfigurationRegistry.get());
         System.out.println(PersistenceRegistry.cache.isEnabled());
@@ -68,11 +70,11 @@ public class TestCache {
         String toExpression = "g";
         ConfigurationRegistry.initialize(ALL_ENABLED);
         // will store in cache
-        Converter.ConversionResult conversionResult = UCUMService.convert("1", fromExpression, toExpression, "5");
+        Converter.ConversionResult conversionResult = converterService.convert("1", fromExpression, toExpression, "5");
         assertThat(conversionResult).isInstanceOf(Converter.Success.class);
         // simulate dev changing property
         ConfigurationRegistry.initialize(DISABLE_MOL_MASS_CONVERSION);
-        Converter.ConversionResult convResult = UCUMService.convert("1", fromExpression, toExpression, "5");
+        Converter.ConversionResult convResult = converterService.convert("1", fromExpression, toExpression, "5");
         assertThat(convResult).isInstanceOf(Converter.FailedConversion.class);
     }
 }

@@ -4,9 +4,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.funcs.Canonicalizer;
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.*;
+import io.github.fhnaumann.funcs.printer.Printer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,12 +15,16 @@ import java.util.Map;
 /**
  * @author Felix Naumann
  */
-public class InMemoryPersistenceProvider implements PersistenceProvider {
+public class InMemoryPersistenceProvider implements PersistenceProvider, InMemory {
 
     private static final Logger logger = LoggerFactory.getLogger(InMemoryPersistenceProvider.class);
 
     private Cache<CanonKey, Canonicalizer.CanonicalStepResult> canonCache;
     private Cache<ValKey, Validator.ValidationResult> valCache;
+
+    private final ValidatorService validatorService = new Validator();
+    private final PrinterService printerService = new Printer();
+    private final CanonicalizerService canonicalizerService = new Canonicalizer(printerService, validatorService);
 
     private boolean enabled;
 
@@ -42,17 +45,17 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
 
     public void preHeat(List<String> ucumCodes) {
         ucumCodes.forEach(code -> {
-            Validator.ValidationResult valResult = UCUMService.validate(code);
+            Validator.ValidationResult valResult = validatorService.validate(code);
             switch (valResult) {
                 case Validator.Failure failure -> {
                     logger.debug("Preheated {}: Result: invalid. Skipping canonicalization preheat.", code);
                 }
                 case Validator.Success success -> {
                     logger.debug("Preheated {}: Result: valid", code);
-                    Canonicalizer.CanonicalizationResult canonResult = UCUMService.canonicalize(success.term());
+                    CanonicalizerService.CanonicalizationResult canonResult = canonicalizerService.canonicalize(success.term());
                     switch (canonResult) {
-                        case Canonicalizer.FailedCanonicalization failedCanonicalization -> logger.debug("Tried to preheat {} for canonicalization but it failed.", code);
-                        case Canonicalizer.Success canonSuccess -> logger.debug("Preheated {} for canonicalization.", code);
+                        case CanonicalizerService.FailedCanonicalization failedCanonicalization -> logger.debug("Tried to preheat {} for canonicalization but it failed.", code);
+                        case CanonicalizerService.Success canonSuccess -> logger.debug("Preheated {} for canonicalization.", code);
                     }
                 }
             }
@@ -65,7 +68,7 @@ public class InMemoryPersistenceProvider implements PersistenceProvider {
         if(isEnabled()) {
             canonCache.put(key, value);
             if(logger.isDebugEnabled()) {
-                logger.debug("Saved key={} in cache.", UCUMService.print(key.expression())); // call to #print is expensive here
+                logger.debug("Saved key={} in cache.", printerService.print(key.expression())); // call to #print is expensive here
             }
         }
     }

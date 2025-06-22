@@ -1,8 +1,10 @@
 package io.github.fhnaumann;
 
 import io.github.fhnaumann.compounds.CompoundProvider;
+import io.github.fhnaumann.funcs.Converter;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.persistence.PersistenceProvider;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.junit.jupiter.api.AfterEach;
@@ -61,7 +63,7 @@ public class SQLitePersistenceProviderSPITest {
 
     @Test
     public void test_spi_provider_is_auto_discovered_when_accessing_UCUMService() {
-        Validator.validate("[ft_i]");
+        new Validator().validate("[ft_i]");
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath)) {
             Statement stmt = conn.createStatement();
@@ -72,7 +74,7 @@ public class SQLitePersistenceProviderSPITest {
             fail("Failed to connect to SQLite DB: " + e.getMessage());
         }
 
-        UCUMService.convert("N", "kg.m.s2");
+        new Converter(new Printer(), new Validator()).convert("N", "kg.m.s2");
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath)) {
             Statement stmt = conn.createStatement();

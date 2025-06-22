@@ -2,11 +2,10 @@ package io.github.fhnaumann.model;
 
 import io.github.fhnaumann.NewUCUMBaseVisitor;
 import io.github.fhnaumann.NewUCUMParser;
-import io.github.fhnaumann.builders.SoloTermBuilder;
-import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
+import io.github.fhnaumann.funcs.PrinterService;
 import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.Validator.ParserException;
+import io.github.fhnaumann.funcs.ValidatorService.ParserException;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression.Operator;
 import io.github.fhnaumann.util.ParseUtil;
@@ -18,6 +17,8 @@ public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
 
     private static final Logger log = LoggerFactory.getLogger(UCUMSyntaxVisitor.class);
     private final UCUMRegistry registry;
+
+    private final PrinterService printerService = new Printer();
 
     public UCUMSyntaxVisitor(UCUMRegistry registry) {
         this.registry = registry;
@@ -41,8 +42,8 @@ public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
             case ParseUtil.SuccessNoPrefixUnit(UCUMDefinition.UCUMUnit unit) -> new UCUMExpression.MixedNoPrefixSimpleUnit(unit);
             case ParseUtil.SuccessPrefixUnit(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.UCUMUnit unit) -> {
                 if(!ConfigurationRegistry.get().isEnablePrefixOnNonMetricUnits() && !ParseUtil.isMetric(unit)) {
-                    String prefixString = UCUMService.print(prefix);
-                    String unitString = UCUMService.print(unit);
+                    String prefixString = printerService.print(prefix);
+                    String unitString = printerService.print(unit);
                     log.warn("Matched prefix={} and unit={} but {} is not metric and prefixes for non-metric units is disabled.\nYou can change the behaviour with the 'ucumate.enablePrefixOnNonMetricUnits' property.", prefixString, unitString, unitString);
                     throw new ParserException("Matched prefix=%s and unit=%s but %s is not metric and prefixes for non-metric units is disabled.".formatted(prefixString, unitString, unitString));
                 }

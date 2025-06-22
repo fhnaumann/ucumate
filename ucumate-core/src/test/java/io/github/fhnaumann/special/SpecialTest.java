@@ -2,7 +2,10 @@ package io.github.fhnaumann.special;
 
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Converter;
+import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.util.PreciseDecimal;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,11 +15,11 @@ import static io.github.fhnaumann.special.SpecialUtil.*;
 
 public class SpecialTest {
 
-    private Converter converter;
+    private static Converter converter;
 
-    @BeforeEach
-    public void setUp() {
-        converter = new Converter();
+    @BeforeAll
+    public static void setUp() {
+        converter = new Converter(new Printer(), new Validator());
     }
 
     @Test
@@ -85,7 +88,7 @@ public class SpecialTest {
     public void delete_me_4() {
         //Converter.ConversionResult result = UCUMService.convert(new PreciseDecimal("49"), , );
         //System.out.println(result);
-        Converter.ConversionResult result2 = UCUMService.convert(new PreciseDecimal("49"), parse("5.cm-1.s-2.mg1.3"), parse("mB[SPL]"));
+        Converter.ConversionResult result2 = converter.convert(new PreciseDecimal("49"), parse("5.cm-1.s-2.mg1.3"), parse("mB[SPL]"));
         System.out.println(result2);
     }
 
