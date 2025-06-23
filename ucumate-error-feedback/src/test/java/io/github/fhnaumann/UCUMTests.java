@@ -27,6 +27,7 @@ public class UCUMTests {
     public void initalSetup() throws IOException {
         testSuite = TestCaseLoader.load();
         service = new UCUMService();
+        service.setValidatorService(new FeedbackValidator());
     }
 
     public static Stream<TestCase.ValidateTestCase> validateTestCases() {

@@ -11,6 +11,7 @@ public class SpecialChecker {
     public static SpecialCheckResult checkForSpecialUnitInTerm(UCUMExpression.Term term, SpecialCheckResult result) {
         // special units may only be multiplied with scalar values
         return switch(term) {
+            case null -> SpecialCheckResult.NO_SPECIAL_UNIT_PRESENT;
             case UCUMExpression.ComponentTerm compTerm -> checkCompTermForSpecialUnitWithExponent(compTerm, result);
             case UCUMExpression.AnnotTerm annotTerm -> checkForSpecialUnitInTerm(annotTerm.term(), result);
             case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> SpecialCheckResult.NO_SPECIAL_UNIT_PRESENT; // annot only terms don't have special units (only the unity 1)
@@ -52,6 +53,7 @@ public class SpecialChecker {
                 && (componentExponent.exponent().exponent() != 0
                 || componentExponent.exponent().exponent() != 1);
         return switch(unit) {
+            case null -> SpecialCheckResult.NO_SPECIAL_UNIT_PRESENT;
             case UCUMExpression.IntegerUnit integerUnit -> SpecialCheckResult.NO_SPECIAL_UNIT_PRESENT; // integer units are never special
             // if it's a special unit, make sure it has no exponent
             case UCUMExpression.SimpleUnit simpleUnit -> {

@@ -2,6 +2,7 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
@@ -123,6 +124,10 @@ public class SyntaxMatchHelper {
                 .toList();
     }
 
+    public static List<String> extractErrorMessagesFrom(ValidatorService.LexerException lexerException) {
+        return List.of(lexerException.getMessage());
+    }
+
     private static String mapErrorTypeToErrorMessage(ParseUtil.FailureResult failureResult) {
         String rbString = switch (failureResult) {
             case ParseUtil.InvalidPrefix invalidPrefix -> "prefix_match_failure";
@@ -169,7 +174,6 @@ public class SyntaxMatchHelper {
                 list.add(Map.entry(optDirectMatch.get(), 0)); // direct matches have the best score
                 continue;
             }
-            System.out.println(potentialUnit);
             Score wrongMatched = WRONG_UNIT_CODES_TO_CORRECT_UNIT_CODES.get(potentialUnit);
             if(wrongMatched != null) {
                 wrongMatched.units().forEach(unit -> list.add(Map.entry(unit, wrongMatched.score())));
@@ -201,7 +205,6 @@ public class SyntaxMatchHelper {
 
     private static void reportParensError(MissingParenInfo parenInfo, String leftMissingKey, String rightMissingKey, List<String> errorMessages) {
         if(parenInfo != null) {
-            System.out.println(parenInfo.text());
             switch (parenInfo.side()) {
                 case LEFT -> errorMessages.add(ErrorMessages.get(leftMissingKey, parenInfo.text()));
                 case RIGHT -> errorMessages.add(ErrorMessages.get(rightMissingKey, parenInfo.text()));

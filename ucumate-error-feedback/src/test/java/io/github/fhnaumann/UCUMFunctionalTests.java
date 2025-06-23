@@ -35,7 +35,7 @@ public class UCUMFunctionalTests {
      */
     private static List<String> TESTS_TO_SKIP = List.of("1-108", "3-115", "3-121", "3-122", "3-123", "3-124", "3-128");
 
-    private static ValidatorService validatorService = new Validator();
+    private static ValidatorService validatorService = new FeedbackValidator();
     private static PrinterService printerService = new Printer();
     private static ConverterService converterService = new Converter(printerService, validatorService);
 

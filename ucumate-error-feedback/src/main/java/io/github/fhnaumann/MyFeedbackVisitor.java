@@ -99,6 +99,8 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
 
     @Override
     public UCUMExpression visitComponentWithExponent(ErrorFeedbackUCUMParser.ComponentWithExponentContext ctx) {
+        String exponentSymbol = ctx.getChild(1).getText();
+        SyntaxMatchHelper.checkWrongButKnownExpSymbolUsed(exponentSymbol, errorMessages);
         UCUMExpression.Unit unit = (UCUMExpression.Unit) visit(ctx.simpleSymbolUnit());
         UCUMExpression.Exponent exponent = (UCUMExpression.Exponent) visit(ctx.exponent());
         return new UCUMExpression.MixedComponentExponent(unit, exponent);
@@ -188,11 +190,6 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
     public UCUMExpression visitMissingLeftParen(ErrorFeedbackUCUMParser.MissingLeftParenContext ctx) {
         //errorMessages.addAll(ErrorMessages.get("binary_term_missing_left_paren", ))
         return super.visitMissingLeftParen(ctx);
-    }
-
-    @Override
-    public UCUMExpression visitMissingRightParen(ErrorFeedbackUCUMParser.MissingRightParenContext ctx) {
-        return super.visitMissingRightParen(ctx);
     }
 
     @Override

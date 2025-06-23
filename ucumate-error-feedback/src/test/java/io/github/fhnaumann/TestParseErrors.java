@@ -1,5 +1,6 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.model.UCUMExpression;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.api.InstanceOfAssertFactory;
@@ -36,14 +37,21 @@ public class TestParseErrors {
     private static final String MISSING_R_CB = "missing_right_curly_bracket";
     private static final String NEG_NUM = "negative_number";
 
+    private static ValidatorService validatorService;
+
+    @BeforeAll
+    public static void init() {
+        validatorService = new FeedbackValidator();
+    }
+
     @ParameterizedTest
     @MethodSource("provideInvalidInputs")
     public void test(String input, List<String> errorMessages) {
-        Main.Result result = Main.visit(input);
+        ValidatorService.ValidationResult result = validatorService.validate(input);
         assertThat(result)
-                .isInstanceOf(Main.Failure.class)
-                .extracting(Main.Failure.class::cast)
-                .extracting(Main.Failure::errorMessages)
+                .isInstanceOf(ValidatorService.Failure.class)
+                .extracting(ValidatorService.Failure.class::cast)
+                .extracting(ValidatorService.Failure::errorMessages)
                 .asInstanceOf(InstanceOfAssertFactories.LIST)
                 .containsExactlyInAnyOrderElementsOf(errorMessages);
 

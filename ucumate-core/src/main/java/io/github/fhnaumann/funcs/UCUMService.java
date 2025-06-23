@@ -6,6 +6,7 @@ import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 
 import java.util.Map;
+import java.util.ServiceLoader;
 
 /**
  * This class provides all the functionality of the ucumate library in a centralized place.
@@ -16,11 +17,11 @@ import java.util.Map;
  */
 public class UCUMService implements IUCUMService {
 
-    private static final ValidatorService DEFAULT_VALIDATOR_SERVICE = new Validator();
-    private static final PrinterService DEFAULT_PRINTER_SERVICE = new Printer();
-    private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = new RelationChecker(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE);
-    private static final ConverterService DEFAULT_CONVERTER_SERVICE = new Converter(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE);
-    private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = new Canonicalizer(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE);
+    private static final ValidatorService DEFAULT_VALIDATOR_SERVICE = loadService(ValidatorService.class, new Validator());
+    private static final PrinterService DEFAULT_PRINTER_SERVICE = loadService(PrinterService.class, new Printer());
+    private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = loadService(RelationCheckerService.class, new RelationChecker(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final ConverterService DEFAULT_CONVERTER_SERVICE = loadService(ConverterService.class, new Converter(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = loadService(CanonicalizerService.class, new Canonicalizer(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
 
     private CanonicalizerService canonicalizerService;
     private ConverterService converterService;
@@ -44,6 +45,11 @@ public class UCUMService implements IUCUMService {
         this.validatorService = validatorService;
         this.relationCheckerService = relationCheckerService;
         this.printerService = printerService;
+    }
+
+    private static <T> T loadService(Class<T> clazz, T fallback) {
+        ServiceLoader<T> loader = ServiceLoader.load(clazz);
+        return loader.findFirst().orElse(fallback);
     }
 
     @Override

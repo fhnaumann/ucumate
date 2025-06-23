@@ -16,7 +16,7 @@ term
     | '{' withinCbOrSbSymbol* # annotationOnlyMissingCurlyClosing
     | withinCbOrSbSymbol* '}' # annotationOnlyMissingCurlyOpening
     | '(' term ')' # parenthesisedTerm
-    | '(' term # missingRightParen
+    | '(' term # missingRightPacheckWrongButKnownExpSymbolUsedren
     | term ')' # missingLeftParen
     | term '.' term # binaryMulTerm
     | term '/' term # binaryDivTerm

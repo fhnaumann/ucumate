@@ -39,9 +39,13 @@ public interface ValidatorService {
 
     public record Success(UCUMExpression.Term term) implements ValidationResult {}
 
-    public record Failure(String message) implements ValidationResult {
+    public record Failure(List<String> errorMessages) implements ValidationResult {
         public Failure() {
             this("");
+        }
+
+        public Failure(String message) {
+            this(List.of(message));
         }
     }
 
