@@ -30,7 +30,7 @@ You will need the core implementation.
 
 ```xml
 <dependency>
-    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-core</artifactId>
     <version>1.0.3-SNAPSHOT</version>
 </dependency>
@@ -40,8 +40,18 @@ If you used [Ucum-java](https://github.com/FHIR/Ucum-java) previously you can us
 
 ```xml
 <dependency>
-    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-ucumjava-bridge</artifactId>
+    <version>1.0.3-SNAPSHOT</version>
+</dependency>
+```
+
+If you want error analysis with detailed messages on invalid input, use the [error feedback module](error_feedback.md).
+
+```xml
+<dependency>
+    <groupId>io.github.fhnaumann</groupId>
+    <artifactId>ucumate-error-feedback</artifactId>
     <version>1.0.3-SNAPSHOT</version>
 </dependency>
 ```
@@ -51,7 +61,7 @@ If you need high precision (especially when special units are involved) then you
 
 ```xml
 <dependency>
-    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-core-exact-special-math</artifactId>
     <version>1.0.3-SNAPSHOT</version>
 </dependency>
@@ -61,7 +71,7 @@ If you need data persistence across restarts you can use the [ucumate-persistenc
 
 ```xml
 <dependency>
-    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-persistence</artifactId>
     <version>1.0.3-SNAPSHOT</version>
 </dependency>
@@ -71,7 +81,7 @@ If you work with mol and mass units a lot you can use the optional [ucumate-mol 
 
 ```xml
 <dependency>
-    <groupId>com.github.fhnaumann.ucumate</groupId>
+    <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-mol-support</artifactId>
     <version>1.0.3-SNAPSHOT</version>
 </dependency>
