@@ -10,24 +10,24 @@
     <meta name="generator" content="Retype 3.10.1">
 
     <!-- Primary Meta Tags -->
-    <title>UCUM Tests</title>
-    <meta name="title" content="UCUM Tests">
-    <meta name="description" content="Having a full testsuite to define accordance with the UCUM standard is important. The testsuite should cover a range of">
+    <title>Error Feedback on Validation</title>
+    <meta name="title" content="Error Feedback on Validation">
+    <meta name="description" content="Add the dependency:">
 
     <!-- Canonical -->
-    <link rel="canonical" href="https://fhnaumann.github.io/ucumate/tests/">
+    <link rel="canonical" href="https://fhnaumann.github.io/ucumate/error_feedback/">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://fhnaumann.github.io/ucumate/tests/">
-    <meta property="og:title" content="UCUM Tests">
-    <meta property="og:description" content="Having a full testsuite to define accordance with the UCUM standard is important. The testsuite should cover a range of">
+    <meta property="og:url" content="https://fhnaumann.github.io/ucumate/error_feedback/">
+    <meta property="og:title" content="Error Feedback on Validation">
+    <meta property="og:description" content="Add the dependency:">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/tests/">
-    <meta property="twitter:title" content="UCUM Tests">
-    <meta property="twitter:description" content="Having a full testsuite to define accordance with the UCUM standard is important. The testsuite should cover a range of">
+    <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/error_feedback/">
+    <meta property="twitter:title" content="Error Feedback on Validation">
+    <meta property="twitter:description" content="Add the dependency:">
 
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
@@ -37,6 +37,7 @@
     <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.803957056206" data-turbo-eval="false" defer></script>
     <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.1" data-turbo-eval="false" defer></script>
     <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.803957056206" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.803957056206" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -178,70 +179,106 @@
                                             </svg>
                                         </li>
                                         <li class="pr-4">
-                                            <a href="../tests/" class="pr-4">
-                                                UCUM Tests
+                                            <a href="../error_feedback/" class="pr-4">
+                                                Error Feedback on Validation
                                             </a>
                                         </li>
                                     </ol>
                                 </nav>
                 
                                 <!-- Page content  -->
-<doc-anchor-target id="ucum-tests" class="break-words">
+<doc-anchor-target id="error-feedback-on-validation" class="break-words">
     <h1>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#ucum-tests">#</doc-anchor-trigger>
-        <span>UCUM Tests</span>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#error-feedback-on-validation">#</doc-anchor-trigger>
+        <span>Error Feedback on Validation</span>
     </h1>
 </doc-anchor-target>
-<p>Having a full testsuite to define accordance with the UCUM standard is important. The testsuite should cover a range of
-valid and invalid expressions and cover canonicalization and conversion including the resulting factors.
-Grahame Grieve maintains a <a href="https://ucum.org/docs/functional-tests" class="outbound" target="_blank"><span>functional XML testsuite</span><svg xmlns="http://www.w3.org/2000/svg" class="docs-icon ml-1" viewBox="0 0 24 24" role="presentation"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a> that covers a lot of test
-cases.</p>
-<p>ucumate passes almost all (see section below) the validation and conversion tests defined by Grahame, the other test cases were not tested.</p>
-<p>As part of developing the ucumate library, a new test suite has been developed. It is an accumulation of common UCUM codes
-together with extensive an extensive range of UCUM codes to cover edge cases.</p>
-<ul>
-<li><a href="https://www.hl7.org/fhir/R5/valueset-ucum-common.html" class="outbound" target="_blank"><span>Common UCUM codes in FHIR</span><svg xmlns="http://www.w3.org/2000/svg" class="docs-icon ml-1" viewBox="0 0 24 24" role="presentation"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a></li>
-<li><a href="https://ucum.org/docs/common-units" class="outbound" target="_blank"><span>Common UCUM units from UCUM</span><svg xmlns="http://www.w3.org/2000/svg" class="docs-icon ml-1" viewBox="0 0 24 24" role="presentation"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a></li>
-<li>Custom tests</li>
-</ul>
-<p>They were transformed into a single json file.</p>
-<p>Note: The new testsuite is not meant to replace the XML testsuite (for now). The tests from the older testsuite are not
-all present in the JSON testsuite.</p>
-<p>The <code v-pre>core</code> library fails some conversion tests due to limited precision when working with special units. The <code v-pre>ucumate-core-exact-special-math</code> implementation
-passes all tests, so use that if you require high precision.</p>
-<p>
-<div class="mb-6 px-5 py-4 flex justify-between relative border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded transition-colors duration-150">
-    <div class="flex items-center text-blue-500 dark:text-blue-400">
-        <span class="inline-block mb-px">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" role="presentation" fill="currentColor"><path fill="none" d="M0 0h24v24H0z"/><path d="M21 14c-.55 0-1 .45-1 1v4c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1v-4c0-.55-.45-1-1-1s-1 .45-1 1v4c0 1.65 1.35 3 3 3h14c1.65 0 3-1.35 3-3v-4c0-.55-.45-1-1-1z"/><path d="M11.29 15.71c.09.09.2.17.33.22.12.04.25.07.38.07s.26-.03.38-.08.23-.12.33-.22l5-5a.996.996 0 10-1.41-1.41l-3.3 3.3V3c0-.55-.45-1-1-1s-1 .45-1 1v9.59l-3.29-3.3A.996.996 0 106.3 10.7l4.99 5.01z"/></svg>
-        </span>
-        <span class="inline-block font-medium ml-2">JSON Testsuite</span>
-    </div>
-    <div class="flex items-center text-xs text-gray-400 dark:text-dark-400">
-        <span>ucum-tests.json</span>
-        <span class="inline-block ml-2">215KB</span>
-    </div>
-    <a href="../static/ucum-tests.json" class="absolute block inset-0" target="_blank" download="ucum-tests.json"></a>
+<p>Add the dependency:</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre translate="no" class="language-markup"><code v-pre class="language-markup">&lt;dependency&gt;
+    &lt;groupId&gt;io.github.fhnaumann&lt;/groupId&gt;
+    &lt;artifactId&gt;ucumate-error-feedback&lt;/artifactId&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</doc-codeblock></div>
+<p>This will automatically inject the <code v-pre>FeedbackValidator</code> into the <code v-pre>UCUMService</code>.</p>
+<p>The new validator tries to generate error messages with details on the invalid parts.
+Below is a table containing common errors that will be captured, analyzed, and explained in the error message.</p>
+<div class="table-wrapper scrollbar overflow-hidden">
+<table class="comfortable">
+<thead>
+<tr>
+<th>Error Type</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spaces Anywhere</td>
+<td>UCUM does not allow spaces in expressions.</td>
+</tr>
+<tr>
+<td>Wrong Multiplication Symbol</td>
+<td><code v-pre>*</code> can be misused as the multiplication symbol while only <code v-pre>.</code> is allowed.</td>
+</tr>
+<tr>
+<td>Wrong Division Symbol</td>
+<td>Albeit less common, <code v-pre>\</code> can be misused as the division symbol.</td>
+</tr>
+<tr>
+<td>Wrong Exponentiation Symbol</td>
+<td>UCUM does not have a direct exponentiation symbol. Instead they just follow on units with an optional sign.</td>
+</tr>
+<tr>
+<td>Unknown Unit</td>
+<td>The provided unit does not match a known UCUM Unit code. It will try to match (in that order) <ul><li>The same unit but with square brackets, i.e. <code v-pre>ft_i</code> matches <code v-pre>[ft_i]</code></li><li>The case-insensitive code</li><li>The print symbol</li><li>The other names</li></ul></td>
+</tr>
+<tr>
+<td>Missing <code v-pre>(</code> or <code v-pre>)</code></td>
+<td>Detects unopened or unclosed parenthesis.</td>
+</tr>
+<tr>
+<td>Missing <code v-pre>[</code> or <code v-pre>]</code></td>
+<td>Detects unopened or unclosed square brackets in units.</td>
+</tr>
+<tr>
+<td>Missing <code v-pre>{</code> or <code v-pre>}</code></td>
+<td>Detects unopened or unclosed curly brackets in unit annotations.</td>
+</tr>
+<tr>
+<td>Negative Integer Number</td>
+<td>Negative integer numbers are not allowed in UCUM. Only positive integers numbers are.</td>
+</tr>
+<tr>
+<td>Special Unit with Division</td>
+<td>Special units together with division are not allowed. Special units may only use integer multiplication or prefixes.</td>
+</tr>
+<tr>
+<td>Special Unit with Exponent</td>
+<td>Special units are not allowed to have an exponent. Special units may only use integer multiplication or prefixes.</td>
+</tr>
+</tbody>
+</table>
 </div>
-</p>
-<doc-anchor-target id="conformance-to-the-ucumfunctiontestsxml">
-    <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#conformance-to-the-ucumfunctiontestsxml">#</doc-anchor-trigger>
-        <span>Conformance to the UCUMFunctionTestsXML</span>
-    </h2>
-</doc-anchor-target>
-<p>All tests pass with these exceptions listed below. They are manually marked to be skipped during a test run.</p>
-<p>Most of these problems arise from the precision and rounding decisions made in both implementations. Read more about
-the encountered problems and decisions made regarding conversion factor precision <a href="../precision/">here</a>.</p>
-<ul>
-<li>1-108: <code v-pre>10+3/ul</code> is expected to be invalid but ucumate says it&#x27;s valid. In ucumate any positive integer unit may have an exponent.</li>
-<li>3-115: <code v-pre>6.3</code> * <code v-pre>s/4/m</code> = <code v-pre>1.6</code> * <code v-pre>s/m</code>. ucumate is more precise and does not round in this case. It returns <code v-pre>1.575</code>.</li>
-<li>3-121: 1 * <code v-pre>10*-7.s</code> = <code v-pre>1e-7</code> * <code v-pre>s</code>. Just a string mismatch, ucumate returns <code v-pre>0.0000001</code> instead of <code v-pre>1e-7</code></li>
-<li>3-122: 1 * <code v-pre>4.[pi].10*-7.s</code> = <code v-pre>0.00000125663706143591729538506</code> * <code v-pre>s</code>. ucumate is more precise by default and returns<code v-pre>0.00000125663706143591729538505735331180115367886776</code>. The last digit (<code v-pre>6</code>) is rounded and causes the problem.You can configure the desired precision through the <code v-pre>PreciseDecimal</code> class.</li>
-<li>3-123: Same problem as 3-122.</li>
-<li>3-124: 1 * <code v-pre>[mu_0]</code> = <code v-pre>0.00125663706143591729538506</code> * <code v-pre>g.m.C-2</code>. ucumate is more precise by default returns<code v-pre>0.00125663706143591729538505735331180115367886775975</code>.</li>
-<li>3-128: 1 * <code v-pre>1/[ly]</code> = <code v-pre>1.05700083402461546370946e-18</code> <code v-pre>cm-1</code>. ucumate is more precise and does not output conversionfactors in scientific notation. It returns <code v-pre>0.00000000000000000105700083402461546370946052448513</code>.</li>
-</ul>
+<div class="flex mb-6">
+    <div class="shrink-0 w-1.5 rounded-tl-lg rounded-bl-lg bg-blue-300"></div>
+    <div class="flex w-full py-4 border border-l-0 border-gray-300 rounded-tr-lg rounded-br-lg doc-callout bg-white dark:bg-dark-700 dark:border-dark-700" role="alert">
+        <div class="flex items-center ml-4 h-7">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mb-px text-blue-300" width="22" height="22" viewBox="0 0 24 24" role="presentation">
+                <g fill="currentColor"><g>
+                    <path d="M12 1C5.93 1 1 5.93 1 12s4.93 11 11 11 11-4.93 11-11S18.07 1 12 1zm0 20c-4.96 0-9-4.04-9-9s4.04-9 9-9 9 4.04 9 9-4.04 9-9 9z"></path>
+                    <path d="M12 11c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1s1-.45 1-1v-4c0-.55-.45-1-1-1zM12.01 7c-.56 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"></path>
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                </g></g>
+            </svg>
+        </div>
+        <div class="pr-5 ml-3 w-full">
+            <h5>Automatically Fix Errors</h5>
+<p>Currently, the validator only provides detailed error messages, but it does not correct anything.
+Please <a href="https://github.com/fhnaumann/ucumate/issues/new" class="outbound" target="_blank"><span>get in contact</span><svg xmlns="http://www.w3.org/2000/svg" class="docs-icon ml-1" viewBox="0 0 24 24" role="presentation"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a> if there is need for a validator that tries to automatically fix invalid inputs.</p>
+        </div>
+    </div>
+</div>
 
                                 
                                 <!-- Required only on API pages -->
@@ -251,20 +288,20 @@ the encountered problems and decisions made regarding conversion factor precisio
                             
                                 <nav id="retype-nextprev" class="print:hidden flex mt-14">
                                     <div class="w-1/2">
-                                        <a class="px-5 py-4 h-full flex items-center break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-l-lg transition-colors duration-150 relative hover:z-5" href="../persistence/">
+                                        <a class="px-5 py-4 h-full flex items-center break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-l-lg transition-colors duration-150 relative hover:z-5" href="../precision/">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="mr-3" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" overflow="visible"><path d="M19 11H7.41l5.29-5.29a.996.996 0 10-1.41-1.41l-7 7a1 1 0 000 1.42l7 7a1.024 1.024 0 001.42-.01.996.996 0 000-1.41L7.41 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
                                             <span>
                                                 <span class="block text-xs font-normal text-gray-400 dark:text-dark-400">Previous</span>
-                                                <span class="block mt-1">Data Persistence</span>
+                                                <span class="block mt-1">Details on the Rounding Behaviour with Numbers provided by the ucum-​essence File</span>
                                             </span>
                                         </a>
                                     </div>
                             
                                     <div class="w-1/2">
-                                        <a class="px-5 py-4 -mx-px h-full flex items-center justify-end break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-r-lg transition-colors duration-150 relative hover:z-5" href="../precision/">
+                                        <a class="px-5 py-4 -mx-px h-full flex items-center justify-end break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-r-lg transition-colors duration-150 relative hover:z-5" href="../exact_math/">
                                             <span>
                                                 <span class="block text-xs font-normal text-right text-gray-400 dark:text-dark-400">Next</span>
-                                                <span class="block mt-1">Details on the Rounding Behaviour with Numbers provided by the ucum-​essence File</span>
+                                                <span class="block mt-1">Exact Math</span>
                                             </span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="ml-3" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" overflow="visible"><path d="M19.92 12.38a1 1 0 00-.22-1.09l-7-7a.996.996 0 10-1.41 1.41l5.3 5.3H5c-.55 0-1 .45-1 1s.45 1 1 1h11.59l-5.29 5.29a.996.996 0 000 1.41c.19.2.44.3.7.3s.51-.1.71-.29l7-7c.09-.09.16-.21.21-.33z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
                                         </a>
@@ -308,6 +345,6 @@ the encountered problems and decisions made regarding conversion factor precisio
 
     <div id="retype-overlay-target"></div>
 
-    <script data-cfasync="false">window.__DOCS__ = { "title": "UCUM Tests", level: 1, icon: "file", hasPrism: false, hasMermaid: false, hasMath: false, tocDepth: 23 }</script>
+    <script data-cfasync="false">window.__DOCS__ = { "title": "Error Feedback on Validation", level: 1, icon: "file", hasPrism: true, hasMermaid: false, hasMath: false, tocDepth: 23 }</script>
 </body>
 </html>
