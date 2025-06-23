@@ -20,7 +20,9 @@ Canonicalizer.CanonicalizationResult canonResult = UCUMService.canonicalize("[in
 Converter.ConversionResult convResult = UCUMService.convert("[ft_i]", "[in_i]");
 ```
 
-Read more about the usage in the [documentation](https://virtuous-respect-production.up.railway.app/doc/index.html).
+Read more about the usage in the [documentation](https://fhnaumann.github.io/ucumate/).
+
+Try out the [live demo](https://virtuous-respect-production.up.railway.app/).
 
 # Build process
 
