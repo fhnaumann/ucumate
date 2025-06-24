@@ -146,10 +146,6 @@ public class UCUMRegistry {
     }
 
     public Optional<UCUMDefinition.Concept> getConcept(String concept) {
-        UCUMDefinition.Concept prefix = getConceptFrom(concept, prefixes);
-        if(prefix != null) {
-            return Optional.of(prefix);
-        }
         UCUMDefinition.BaseUnit baseUnit = (UCUMDefinition.BaseUnit) getConceptFrom(concept, baseUnits);
         if(baseUnit != null) {
             return Optional.of(baseUnit);
@@ -157,6 +153,11 @@ public class UCUMRegistry {
         UCUMDefinition.DefinedUnit definedUnit = (UCUMDefinition.DefinedUnit) getConceptFrom(concept, definedUnits);
         if(definedUnit != null) {
             return Optional.of(definedUnit);
+        }
+        // Prefer unit matches over prefix matches
+        UCUMDefinition.Concept prefix = getConceptFrom(concept, prefixes);
+        if(prefix != null) {
+            return Optional.of(prefix);
         }
         return Optional.empty();
     }

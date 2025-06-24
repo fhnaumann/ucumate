@@ -1,10 +1,13 @@
 package io.github.fhnaumann.funcs;
 
+import com.google.errorprone.annotations.RestrictedApi;
 import io.github.fhnaumann.funcs.printer.*;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -22,12 +25,14 @@ public class UCUMService implements IUCUMService {
     private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = loadService(RelationCheckerService.class, new RelationChecker(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
     private static final ConverterService DEFAULT_CONVERTER_SERVICE = loadService(ConverterService.class, new Converter(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
     private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = loadService(CanonicalizerService.class, new Canonicalizer(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final LookupService DEFAULT_LOOKUP_SERVICE = loadService(LookupService.class, new Lookup());
 
     private CanonicalizerService canonicalizerService;
     private ConverterService converterService;
     private ValidatorService validatorService;
     private RelationCheckerService relationCheckerService;
     private PrinterService printerService;
+    private LookupService lookupService;
 
     public UCUMService() {
         this(
@@ -35,16 +40,18 @@ public class UCUMService implements IUCUMService {
                 DEFAULT_CONVERTER_SERVICE,
                 DEFAULT_VALIDATOR_SERVICE,
                 DEFAULT_RELATION_CHECKER_SERVICE,
-                DEFAULT_PRINTER_SERVICE
+                DEFAULT_PRINTER_SERVICE,
+                DEFAULT_LOOKUP_SERVICE
         );
     }
 
-    public UCUMService(CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService) {
+    public UCUMService(CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService, LookupService lookupService) {
         this.canonicalizerService = canonicalizerService;
         this.converterService = converterService;
         this.validatorService = validatorService;
         this.relationCheckerService = relationCheckerService;
         this.printerService = printerService;
+        this.lookupService = lookupService;
     }
 
     private static <T> T loadService(Class<T> clazz, T fallback) {
@@ -81,6 +88,11 @@ public class UCUMService implements IUCUMService {
     @Override
     public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2, boolean allowMolMassConversion) {
         return relationCheckerService.checkCommensurable(term1, term2, allowMolMassConversion);
+    }
+
+    @Override
+    public LookupResult lookup(String input, Collection<MatchType> allowedMatchTypes, Comparator<MatchType> comparator) {
+        return lookupService.lookup(input, allowedMatchTypes, comparator);
     }
 
     @Override
@@ -133,6 +145,16 @@ public class UCUMService implements IUCUMService {
     @Override
     public void setRelationCheckerService(RelationCheckerService relationCheckerService) {
         this.relationCheckerService = relationCheckerService;
+    }
+
+    @Override
+    public LookupService getLookupService() {
+        return lookupService;
+    }
+
+    @Override
+    public void setLookupService(LookupService lookupService) {
+        this.lookupService = lookupService;
     }
 
     public PrinterService getPrinterService() {

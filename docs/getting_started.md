@@ -31,13 +31,15 @@ order: 99
 
 ## Core Functionality
 
-Use the `UCUMService` class to access the core functionality. This includes printing, validation, canonicalization and conversion.
+Use the `UCUMService` class to access the core functionality. This includes lookup, printing, validation, canonicalization and conversion.
 
 ```java
-String print = UCUMService.print("cm");
-Validator.ValidationResult valResult = UCUMService.validate("cm");
-Canonicalizer.CanonicalizationResult canonResult = UCUMService.canonicalize("[in_i]");
-Converter.ConversionResult convResult = UCUMService.convert("[ft_i]", "[in_i]");
+UCUMService ucumService = new UCUMService();
+LookupResult lookupResult = ucumService.lookup("meter");
+String print = ucumService.print("cm");
+ValidationResult valResult = ucumService.validate("cm");
+CanonicalizationResult canonResult = ucumService.canonicalize("[in_i]");
+ConversionResult convResult = ucumService.convert("[ft_i]", "[in_i]");
 ```
 
 Read more about the parameter and return types of the `UCUMService` class in the [core functionality documentation](core-lib.md).
