@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="turbo-root" content="/ucumate">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.803967275422">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.804051423925">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 3.10.1">
@@ -32,12 +32,12 @@
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
     <link href="../favicon.png" rel="icon">
-    <link href="../resources/css/retype.css?v=3.10.1.803967275422" rel="stylesheet">
+    <link href="../resources/css/retype.css?v=3.10.1.804051423925" rel="stylesheet">
 
-    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.803967275422" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.804051423925" data-turbo-eval="false" defer></script>
     <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.1" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.803967275422" data-turbo-eval="false" defer></script>
-    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.803967275422" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.804051423925" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.804051423925" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -229,17 +229,17 @@ on how to do that.</p>
 <p>Assuming the <code v-pre>ucumate.enableMolMassConversion</code> property is enabled, you can convert <code v-pre>mol</code> (or any unit that canonicalizes to mol)
 to a mass unit.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">UCUMService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;g&quot;, &quot;18.01528&quot;); // 18.01528 is the substance coefficient in water</code></pre>
+<pre translate="no" class="language-java"><code v-pre class="language-java">ucumService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;g&quot;, &quot;18.01528&quot;); // 18.01528 is the substance coefficient in water</code></pre>
 </doc-codeblock></div>
 <p>If you don&#x27;t provide the substance coefficient, then the conversion will fail because ucumate will try to convert to the
 dimensionless unit.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">UCUMService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;g&quot;); // yields a BaseDimensionMismatch because mol-&gt;g without substance coefficient is not possible
-UCUMService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;1&quot;); // yields 6.02214076*10 {#23}</code></pre>
+<pre translate="no" class="language-java"><code v-pre class="language-java">ucumService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;g&quot;); // yields a BaseDimensionMismatch because mol-&gt;g without substance coefficient is not possible
+ucumService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;1&quot;); // yields 6.02214076*10 {#23}</code></pre>
 </doc-codeblock></div>
 <p>Conversely, if <code v-pre>ucumate.enableMolMassConversion</code> is set to <code v-pre>false</code>, then converting mole to gram will always fail</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">UCUMService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;g&quot;, &quot;18.01528&quot;); // yields a BaseDimensionMismatch because mol&lt;-&gt;mass conversion is disabled application-wide</code></pre>
+<pre translate="no" class="language-java"><code v-pre class="language-java">ucumService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;g&quot;, &quot;18.01528&quot;); // yields a BaseDimensionMismatch because mol&lt;-&gt;mass conversion is disabled application-wide</code></pre>
 </doc-codeblock></div>
 <doc-anchor-target id="substances-molar-mass-values">
     <h3>
@@ -258,7 +258,7 @@ UCUMService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;1&quot;); // yields 6.
 <p>This lets you define the coefficient optionally by a different <code v-pre>name</code>, <code v-pre>casNr</code>, <code v-pre>formular</code>, etc.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
 <pre translate="no" class="language-java"><code v-pre class="language-java">// Use a casNr instead of a decimal number.
-Converter.ConversionResult result = UCUMService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;g&quot;, &quot;1309-37-1&quot;);
+Converter.ConversionResult result = ucumService.convert(&quot;1&quot;, &quot;mol&quot;, &quot;g&quot;, &quot;1309-37-1&quot;);
 System.out.println(result); // conversionFactor=159.688</code></pre>
 </doc-codeblock></div>
 <doc-anchor-target id="special-ph-unit">
@@ -273,8 +273,8 @@ unclear what this even means or in which context it would be used. Therefore, uc
 of <code v-pre>[pH]</code> to a mass unit.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
 <pre translate="no" class="language-java"><code v-pre class="language-java">// Assuming ucumate.enableMolMassConversion=true
-UCUMService.convert(&quot;1&quot;, &quot;[pH]&quot;, &quot;g&quot;, &quot;18.01528&quot;); // yields a TermContainsPHAndCanonicalizingToMass failure result
-UCUMService.convert(&quot;1&quot;, &quot;[pH]&quot;, &quot;/l&quot;); // yields a Success</code></pre>
+ucumService.convert(&quot;1&quot;, &quot;[pH]&quot;, &quot;g&quot;, &quot;18.01528&quot;); // yields a TermContainsPHAndCanonicalizingToMass failure result
+ucumService.convert(&quot;1&quot;, &quot;[pH]&quot;, &quot;/l&quot;); // yields a Success</code></pre>
 </doc-codeblock></div>
 <doc-anchor-target id="caching-and-storing-behaviour">
     <h3>

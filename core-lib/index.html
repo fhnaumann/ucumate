@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="turbo-root" content="/ucumate">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.803967275422">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.804051423925">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 3.10.1">
@@ -12,7 +12,7 @@
     <!-- Primary Meta Tags -->
     <title>Core Functionality</title>
     <meta name="title" content="Core Functionality">
-    <meta name="description" content="The ucumate library has three core features:">
+    <meta name="description" content="The ucumate library has these core features:">
 
     <!-- Canonical -->
     <link rel="canonical" href="https://fhnaumann.github.io/ucumate/core-lib/">
@@ -21,25 +21,25 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://fhnaumann.github.io/ucumate/core-lib/">
     <meta property="og:title" content="Core Functionality">
-    <meta property="og:description" content="The ucumate library has three core features:">
+    <meta property="og:description" content="The ucumate library has these core features:">
     <meta property="og:image" content="https://fhnaumann.github.io/ucumate/static/latex_example_img.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/core-lib/">
     <meta property="twitter:title" content="Core Functionality">
-    <meta property="twitter:description" content="The ucumate library has three core features:">
+    <meta property="twitter:description" content="The ucumate library has these core features:">
     <meta property="twitter:image" content="https://fhnaumann.github.io/ucumate/static/latex_example_img.png">
 
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
     <link href="../favicon.png" rel="icon">
-    <link href="../resources/css/retype.css?v=3.10.1.803967275422" rel="stylesheet">
+    <link href="../resources/css/retype.css?v=3.10.1.804051423925" rel="stylesheet">
 
-    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.803967275422" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.804051423925" data-turbo-eval="false" defer></script>
     <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.1" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.803967275422" data-turbo-eval="false" defer></script>
-    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.803967275422" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.804051423925" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.804051423925" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -195,8 +195,9 @@
         <span>Core Functionality</span>
     </h1>
 </doc-anchor-target>
-<p>The ucumate library has three core features:</p>
+<p>The ucumate library has these core features:</p>
 <ol>
+<li>Lookup of UCUM expressions</li>
 <li>Printing of UCUM expressions</li>
 <li>Validation of UCUM expressions</li>
 <li>Canonicalization of UCUM expressions</li>
@@ -207,6 +208,22 @@ together with switch pattern matching.</p>
 <p>By default, the core library caches validation and canonicalization results. Therefore, any subsequent calls to the same
 expressions lead to blazingly fast results. So the longer the app runs, the faster the answers on average get.
 You can <a href="../cache/">change these cache settings</a> if desired. You can also add <a href="../persistence/">persistent storage</a> if needed.</p>
+<doc-anchor-target id="lookup">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#lookup">#</doc-anchor-trigger>
+        <span>Lookup</span>
+    </h2>
+</doc-anchor-target>
+<p><code v-pre>UCUMService#lookup</code> can be used to look up a UCUM unit when it is not given by its code. For when you want to parse a
+UCUMExpression use the <doc-anchor-trigger to="#validation">validator result</doc-anchor-trigger>.</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre translate="no" class="language-java"><code v-pre class="language-java">LookupService.LookupResult lookupResult = ucumService.lookup(input);
+String print = switch (lookupResult) {
+    case NoMatch noMatch -&gt; &quot;Failed to match a unit&quot;;
+    case DirectMatch directMatch -&gt; &quot;Direct match found!&quot;;
+    case MultipleMatches multipleMatches -&gt; &quot;Multiple matches found!&quot;;
+};</code></pre>
+</doc-codeblock></div>
 <doc-anchor-target id="printing">
     <h2>
         <doc-anchor-trigger class="header-anchor-trigger" to="#printing">#</doc-anchor-trigger>
@@ -229,14 +246,14 @@ You can <a href="../cache/">change these cache settings</a> if desired. You can 
 </ol>
 <p>The default printing mode is the UCUM syntax. It is accessible through the <code v-pre>UCUMService#print</code> method.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">System.out.println(UCUMService.print(&quot;cm&quot;)); // cm
+<pre translate="no" class="language-java"><code v-pre class="language-java">System.out.println(ucumService.print(&quot;cm&quot;)); // cm
 // or when you have a parsed term object
 Term term = ...;
-System.out.println(UCUMService.print(term));</code></pre>
+System.out.println(ucumService.print(term));</code></pre>
 </doc-codeblock></div>
 <p>You may also specify the print mode with another parameter.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">System.out.println(UCUMService.print(&quot;cm&quot;, Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX)); // c (centi)m (meter)</code></pre>
+<pre translate="no" class="language-java"><code v-pre class="language-java">System.out.println(ucumService.print(&quot;cm&quot;, Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX)); // c (centi)m (meter)</code></pre>
 </doc-codeblock></div>
 <doc-anchor-target id="validation">
     <h2>
@@ -247,16 +264,16 @@ System.out.println(UCUMService.print(term));</code></pre>
 <p><code v-pre>UCUMService#validate(String input)</code> can be used to validate any given UCUM expression. The result is either a
 <code v-pre>Success</code> containing the parsed <code v-pre>Term</code> or a <code v-pre>Failure</code>.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">Validator.ValidationResult valResult = UCUMService.validate(&quot;cm.s&quot;);
+<pre translate="no" class="language-java"><code v-pre class="language-java">ValidationResult valResult = ucumService.validate(&quot;cm.s&quot;);
 String print = switch(valResult) {
-    case Validator.Failure failure -&gt; &quot;Invalid input&quot;;
-    case Validator.Success sucess -&gt; UCUMService.print(success.term(), Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX);
+    case Failure failure -&gt; &quot;Invalid input&quot;;
+    case Success sucess -&gt; ucumService.print(success.term(), Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX);
 };
 System.out.println(print); // c (centi)m (meter).s (second)</code></pre>
 </doc-codeblock></div>
 <p>If you are only interested whether a given UCUM expression is valid or invalid you may also use <code v-pre>UCUMService#validateToBool(String input)</code>.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">boolean valid = UCUMService.validateToBool(&quot;cm.s&quot;);
+<pre translate="no" class="language-java"><code v-pre class="language-java">boolean valid = ucumService.validateToBool(&quot;cm.s&quot;);
 System.out.println(valid); // true</code></pre>
 </doc-codeblock></div>
 <doc-anchor-target id="canonicalization">
@@ -268,10 +285,10 @@ System.out.println(valid); // true</code></pre>
 <p><code v-pre>UCUMService#canonicalize</code> can be used to validate any given UCUM expression. The result is either a <code v-pre>Success</code> containing
 the parsed <code v-pre>Term</code> and its canonicalization factor obtained during the canonicalization or a <code v-pre>FailedCanonicalization</code>.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">Canonicalizer.CanonicalizationResult canonResult = UCUMService.canonicalize(&quot;[in_i]&quot;);
+<pre translate="no" class="language-java"><code v-pre class="language-java">CanonicalizationResult canonResult = ucumService.canonicalize(&quot;[in_i]&quot;);
 String print = switch (canonResult) {
-    case Canonicalizer.FailedCanonicalization failedCanonicalization -&gt; &quot;Invalid input&quot;;
-    case Canonicalizer.Success success -&gt; String.format(&quot;Canonicalization Factor: %s, Canonical Form: %s&quot;.formatted(success.magnitude(), UCUMService.print(success.canonicalTerm())));
+    case FailedCanonicalization failedCanonicalization -&gt; &quot;Invalid input&quot;;
+    case Success success -&gt; String.format(&quot;Canonicalization Factor: %s, Canonical Form: %s&quot;.formatted(success.magnitude(), ucumService.print(success.canonicalTerm())));
 };
 System.out.println(print); // Canonicalization Factor: 0.0254, Canonical Form: m+1</code></pre>
 </doc-codeblock></div>
@@ -284,9 +301,10 @@ System.out.println(print); // Canonicalization Factor: 0.0254, Canonical Form: m
 <p><code v-pre>UCUMService#convert</code> can be used to convert any given UCUM expression to another. The result is either a <code v-pre>Success</code> containing
 the resulting conversion facor or a <code v-pre>FailedConversion</code>.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">String print = switch (convResult) {
-    case Converter.FailedConversion failedConversion -&gt; &quot;Conversion failed&quot;;
-    case Converter.Success success -&gt; &quot;1 [ft_i] is %s [in_i]&quot;.formatted(success.conversionFactor());
+<pre translate="no" class="language-java"><code v-pre class="language-java">ConversionResult convResult = ucumService.convert(&quot;[ft_i]&quot;, &quot;[in_i]&quot;);
+String print = switch (convResult) {
+    case FailedConversion failedConversion -&gt; &quot;Conversion failed&quot;;
+    case Success success -&gt; &quot;1 [ft_i] is %s [in_i]&quot;.formatted(success.conversionFactor());
 };
 System.out.println(print); // 1 [ft_i] is 12 [in_i]</code></pre>
 </doc-codeblock></div>

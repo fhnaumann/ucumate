@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="turbo-root" content="/ucumate">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.803967275422">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.10.1.804051423925">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 3.10.1">
@@ -12,7 +12,7 @@
     <!-- Primary Meta Tags -->
     <title>Getting Started</title>
     <meta name="title" content="Getting Started">
-    <meta name="description" content="Use the UCUMService class to access the core functionality. This includes printing, validation, canonicalization and conversion.">
+    <meta name="description" content="Use the UCUMService class to access the core functionality. This includes lookup, printing, validation, canonicalization and conversion.">
 
     <!-- Canonical -->
     <link rel="canonical" href="https://fhnaumann.github.io/ucumate/getting_started/">
@@ -21,23 +21,23 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://fhnaumann.github.io/ucumate/getting_started/">
     <meta property="og:title" content="Getting Started">
-    <meta property="og:description" content="Use the UCUMService class to access the core functionality. This includes printing, validation, canonicalization and conversion.">
+    <meta property="og:description" content="Use the UCUMService class to access the core functionality. This includes lookup, printing, validation, canonicalization and conversion.">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/getting_started/">
     <meta property="twitter:title" content="Getting Started">
-    <meta property="twitter:description" content="Use the UCUMService class to access the core functionality. This includes printing, validation, canonicalization and conversion.">
+    <meta property="twitter:description" content="Use the UCUMService class to access the core functionality. This includes lookup, printing, validation, canonicalization and conversion.">
 
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
     <link href="../favicon.png" rel="icon">
-    <link href="../resources/css/retype.css?v=3.10.1.803967275422" rel="stylesheet">
+    <link href="../resources/css/retype.css?v=3.10.1.804051423925" rel="stylesheet">
 
-    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.803967275422" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../resources/js/config.js?v=3.10.1.804051423925" data-turbo-eval="false" defer></script>
     <script data-cfasync="false" src="../resources/js/retype.js?v=3.10.1" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.803967275422" data-turbo-eval="false" defer></script>
-    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.803967275422" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.10.1.804051423925" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.10.1.804051423925" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -227,12 +227,14 @@
         <span>Core Functionality</span>
     </h2>
 </doc-anchor-target>
-<p>Use the <code v-pre>UCUMService</code> class to access the core functionality. This includes printing, validation, canonicalization and conversion.</p>
+<p>Use the <code v-pre>UCUMService</code> class to access the core functionality. This includes lookup, printing, validation, canonicalization and conversion.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">String print = UCUMService.print(&quot;cm&quot;);
-Validator.ValidationResult valResult = UCUMService.validate(&quot;cm&quot;);
-Canonicalizer.CanonicalizationResult canonResult = UCUMService.canonicalize(&quot;[in_i]&quot;);
-Converter.ConversionResult convResult = UCUMService.convert(&quot;[ft_i]&quot;, &quot;[in_i]&quot;);</code></pre>
+<pre translate="no" class="language-java"><code v-pre class="language-java">UCUMService ucumService = new UCUMService();
+LookupResult lookupResult = ucumService.lookup(&quot;meter&quot;);
+String print = ucumService.print(&quot;cm&quot;);
+ValidationResult valResult = ucumService.validate(&quot;cm&quot;);
+CanonicalizationResult canonResult = ucumService.canonicalize(&quot;[in_i]&quot;);
+ConversionResult convResult = ucumService.convert(&quot;[ft_i]&quot;, &quot;[in_i]&quot;);</code></pre>
 </doc-codeblock></div>
 <p>Read more about the parameter and return types of the <code v-pre>UCUMService</code> class in the <a href="../core-lib/">core functionality documentation</a>.</p>
 
