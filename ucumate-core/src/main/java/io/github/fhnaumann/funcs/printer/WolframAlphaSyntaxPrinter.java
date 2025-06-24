@@ -1,8 +1,17 @@
 package io.github.fhnaumann.funcs.printer;
 
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.model.UCUMExpression;
 
 public class WolframAlphaSyntaxPrinter extends Printer {
+
+    public WolframAlphaSyntaxPrinter() {
+        super();
+    }
+
+    public WolframAlphaSyntaxPrinter(ValidatorService validatorService) {
+        super(validatorService);
+    }
 
     @Override
     protected String printOperator(UCUMExpression.Operator operator) {

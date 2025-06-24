@@ -1,8 +1,6 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.compounds.CompoundProvider;
 import io.github.fhnaumann.funcs.Converter;
-import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.persistence.PersistenceProvider;
@@ -14,9 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.*;
 import java.util.List;
 import java.util.ServiceLoader;

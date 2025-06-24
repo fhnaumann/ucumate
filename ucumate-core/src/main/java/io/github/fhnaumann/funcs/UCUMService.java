@@ -1,6 +1,5 @@
 package io.github.fhnaumann.funcs;
 
-import com.google.errorprone.annotations.RestrictedApi;
 import io.github.fhnaumann.funcs.printer.*;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -8,7 +7,6 @@ import io.github.fhnaumann.util.PreciseDecimal;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 /**

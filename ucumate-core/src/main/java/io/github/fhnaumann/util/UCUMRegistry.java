@@ -78,7 +78,6 @@ public class UCUMRegistry {
                  */
                 UCUMExpression.Term term = ((Validator.Success) validatorService.validate(definedUnit.value().function().unit())).term();
                 //UCUMExpression.Term extracted = new UnitExtractor().extractUnits(term);
-                PrettyPrinter pp = new PrettyPrinter();
                 //System.out.println(pp.print(term) + " is extracted to " + pp.print(extracted));
                 yield term;
                 // canonicalization necessary because the UCUM definition uses a term here, which is already covered in the specialfunction.

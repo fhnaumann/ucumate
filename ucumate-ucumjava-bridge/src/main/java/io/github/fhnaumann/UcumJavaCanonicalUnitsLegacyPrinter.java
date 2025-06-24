@@ -8,6 +8,10 @@ import io.github.fhnaumann.model.UCUMExpression;
  */
 public class UcumJavaCanonicalUnitsLegacyPrinter extends Printer {
 
+    public UcumJavaCanonicalUnitsLegacyPrinter() {
+        super();
+    }
+
     @Override
     protected String printComponentExponent(UCUMExpression.ComponentExponent componentExponent) {
         String sign = componentExponent.exponent().exponent() < 0 ? "-" : "";

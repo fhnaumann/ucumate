@@ -13,6 +13,10 @@ public class UcumJavaLegacyPrinter extends Printer {
 
     private static final Logger log = LoggerFactory.getLogger(UcumJavaLegacyPrinter.class);
 
+    public UcumJavaLegacyPrinter() {
+        super();
+    }
+
     @Override
     protected String printComponentExponent(UCUMExpression.ComponentExponent componentExponent) {
         int exp = componentExponent.exponent().exponent();

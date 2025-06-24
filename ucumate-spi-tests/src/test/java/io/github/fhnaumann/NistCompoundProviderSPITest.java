@@ -2,7 +2,6 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.compounds.CompoundProvider;
 import io.github.fhnaumann.funcs.Converter;
-import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.Printer;
 import org.junit.jupiter.api.Test;

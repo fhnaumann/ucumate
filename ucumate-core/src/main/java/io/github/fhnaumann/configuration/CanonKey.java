@@ -1,7 +1,6 @@
 package io.github.fhnaumann.configuration;
 
 import io.github.fhnaumann.funcs.PrinterService;
-import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;

@@ -1,10 +1,14 @@
 package io.github.fhnaumann.funcs.printer;
 
 import io.github.fhnaumann.funcs.PrinterService;
+import io.github.fhnaumann.funcs.UCUMService;
+import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Provides methods to print the UCUMExpression model (and its subclasses) to a string representation.
@@ -13,12 +17,22 @@ import java.util.Map;
  */
 public class Printer implements PrinterService {
 
+    private static final ValidatorService DEFAULT_VALIDATOR = new Validator();
+
     private static final Map<PrintType, Printer> DEFAULT_PRINTERS = Map.of(
-            PrintType.UCUM_SYNTAX, new UCUMSyntaxPrinter(),
-            PrintType.EXPRESSIVE_UCUM_SYNTAX, new ExpressiveUCUMSyntaxPrinter(),
-            PrintType.COMMON_MATH_SYNTAX, new WolframAlphaSyntaxPrinter(),
-            PrintType.LATEX_SYNTAX, new LatexPrinter()
+            PrintType.UCUM_SYNTAX, new UCUMSyntaxPrinter(DEFAULT_VALIDATOR),
+            PrintType.EXPRESSIVE_UCUM_SYNTAX, new ExpressiveUCUMSyntaxPrinter(DEFAULT_VALIDATOR),
+            PrintType.COMMON_MATH_SYNTAX, new WolframAlphaSyntaxPrinter(DEFAULT_VALIDATOR),
+            PrintType.LATEX_SYNTAX, new LatexPrinter(DEFAULT_VALIDATOR)
     );
+
+    public Printer() {
+        this.validatorService = DEFAULT_VALIDATOR;
+    }
+
+    public Printer(ValidatorService validatorService) {
+        this.validatorService = validatorService;
+    }
 
     /**
      * The different print types.
@@ -43,9 +57,11 @@ public class Printer implements PrinterService {
         LATEX_SYNTAX
     }
 
+    private final ValidatorService validatorService;
+
     @Override
     public UCUMExpression.Term parseOrError(String input) {
-        return null;
+        return UCUMService.staticParseOrError(input, validatorService);
     }
 
     public String print(UCUMExpression ucumExpression, PrintType printType) {

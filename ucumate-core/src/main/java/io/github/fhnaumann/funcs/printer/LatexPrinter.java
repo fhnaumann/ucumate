@@ -1,5 +1,6 @@
 package io.github.fhnaumann.funcs.printer;
 
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 
@@ -7,6 +8,14 @@ import io.github.fhnaumann.model.UCUMExpression;
  * Renders a UCUMExpression into LaTeX string representation.
  */
 public class LatexPrinter extends Printer {
+
+    public LatexPrinter() {
+        super();
+    }
+
+    public LatexPrinter(ValidatorService validatorService) {
+        super(validatorService);
+    }
 
     private String escapeLaTeXSymbols(String s) {
         return s.replace("\\", "\\textbackslash{}")
