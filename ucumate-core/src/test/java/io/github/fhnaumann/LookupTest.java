@@ -1,7 +1,6 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.funcs.Lookup;
-import io.github.fhnaumann.funcs.LookupService;
+import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeAll;

@@ -25,21 +25,21 @@ Assuming the `ucumate.enableMolMassConversion` property is enabled, you can conv
 to a mass unit.
 
 ```java
-UCUMService.convert("1", "mol", "g", "18.01528"); // 18.01528 is the substance coefficient in water
+ucumService.convert("1", "mol", "g", "18.01528"); // 18.01528 is the substance coefficient in water
 ```
 
 If you don't provide the substance coefficient, then the conversion will fail because ucumate will try to convert to the
 dimensionless unit.
 
 ```java
-UCUMService.convert("1", "mol", "g"); // yields a BaseDimensionMismatch because mol->g without substance coefficient is not possible
-UCUMService.convert("1", "mol", "1"); // yields 6.02214076*10^23
+ucumService.convert("1", "mol", "g"); // yields a BaseDimensionMismatch because mol->g without substance coefficient is not possible
+ucumService.convert("1", "mol", "1"); // yields 6.02214076*10^23
 ```
 
 Conversely, if `ucumate.enableMolMassConversion` is set to `false`, then converting mole to gram will always fail
 
 ```java
-UCUMService.convert("1", "mol", "g", "18.01528"); // yields a BaseDimensionMismatch because mol<->mass conversion is disabled application-wide
+ucumService.convert("1", "mol", "g", "18.01528"); // yields a BaseDimensionMismatch because mol<->mass conversion is disabled application-wide
 ```
 
 ### Substance's Molar Mass Values
@@ -58,7 +58,7 @@ This lets you define the coefficient optionally by a different `name`, `casNr`, 
 
 ```java
 // Use a casNr instead of a decimal number.
-Converter.ConversionResult result = UCUMService.convert("1", "mol", "g", "1309-37-1");
+Converter.ConversionResult result = ucumService.convert("1", "mol", "g", "1309-37-1");
 System.out.println(result); // conversionFactor=159.688
 ```
 
@@ -71,8 +71,8 @@ of `[pH]` to a mass unit.
 
 ```java
 // Assuming ucumate.enableMolMassConversion=true
-UCUMService.convert("1", "[pH]", "g", "18.01528"); // yields a TermContainsPHAndCanonicalizingToMass failure result
-UCUMService.convert("1", "[pH]", "/l"); // yields a Success
+ucumService.convert("1", "[pH]", "g", "18.01528"); // yields a TermContainsPHAndCanonicalizingToMass failure result
+ucumService.convert("1", "[pH]", "/l"); // yields a Success
 ```
 
 ### Caching and Storing Behaviour

@@ -3,8 +3,6 @@
 
 ## Problem
 
-
-
 Conversion factors are usually exact numbers (even decimals) that have infinite precision. I.e. the conversion factor from
 inches to cm is 2.54. It is a decimal number and in a different context it has a limited precision of 3. However, in the
 context of unit conversion it has unlimited precision. The conversion factor is exactly that, no uncertainty.
