@@ -2,10 +2,8 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.Lookup;
 import io.github.fhnaumann.funcs.LookupService;
-import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -37,7 +35,7 @@ public class LookupTest {
         LookupService.LookupResult lookupResult = lookupService.lookup(input);
         if(!anyMatch) {
             assertThat(lookupResult)
-                    .isInstanceOf(LookupService.Failure.class);
+                    .isInstanceOf(LookupService.NoMatch.class);
         }
         else if(directMatch) {
            assertThat(lookupResult)
@@ -62,7 +60,17 @@ public class LookupTest {
         return Stream.of(
                 arguments("m", true, true, List.of("m")),
                 arguments("g", true, true, List.of("g")),
-                arguments("meter", true, false, List.of("m", "m[H2O]", "m[Hg]", "[BAU]", "[m/s2/Hz^(1/2)]"))
+                arguments("GS", true, false, List.of("G")),
+                arguments("magnetic flux density", true, false, List.of("G", "T")),
+                arguments("Wb/m2", true, false, List.of("T")),
+                arguments("meter", true, false, List.of("m", "m[H2O]", "m[Hg]", "[BAU]", "[m/s2/Hz^(1/2)]")),
+                arguments("°C", true, false, List.of("Cel", "cal_[15]", "cal_[20]")),
+                arguments("&#176;C", true, false, List.of("Cel", "cal_[15]", "cal_[20]")),
+                arguments("&deg;C", true, false, List.of("Cel", "cal_[15]", "cal_[20]")),
+                arguments("a<sub>t</sub>", false, false, List.of()), // searching with tags is not supported
+                arguments("ft_i", true, false, List.of("[ft_i]")),
+                arguments("Q", true, false, List.of("C", "[hp_Q]", "[kp_Q]", "[hp'_Q]", "[gal_us]")),
+                arguments("gfdbdfbdfb", false, false, List.of())
         );
     }
 }

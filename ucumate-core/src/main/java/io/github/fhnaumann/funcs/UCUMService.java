@@ -6,6 +6,8 @@ import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -89,8 +91,8 @@ public class UCUMService implements IUCUMService {
     }
 
     @Override
-    public LookupResult lookup(String input) {
-        return lookupService.lookup(input);
+    public LookupResult lookup(String input, Collection<MatchType> allowedMatchTypes, Comparator<MatchType> comparator) {
+        return lookupService.lookup(input, allowedMatchTypes, comparator);
     }
 
     @Override
