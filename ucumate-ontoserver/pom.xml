@@ -25,6 +25,11 @@
         </dependency>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
+            <artifactId>ucumate-error-feedback</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-persistence</artifactId>
             <version>1.0.3-SNAPSHOT</version>
         </dependency>
