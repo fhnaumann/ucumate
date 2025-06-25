@@ -1,11 +1,13 @@
 package io.github.fhnaumann.configuration;
 
+import io.github.fhnaumann.util.LogUtil;
 import io.github.fhnaumann.util.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -15,10 +17,23 @@ import java.util.Set;
 public class ConfigurationRegistry {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigurationRegistry.class);
+
     private static volatile Configuration instance;
-    private static final String DEFAULT_CONFIG_FILE = "ucumate.properties";
+    private static final String FALLBACK_CONFIG_FILE = "ucumate_fallback.properties";
+    private static final String DEV_CONFIG_FILE = "ucumate.properties";
+
+    private static final List<String> SUPPORTED_UCUM_VERSIONS = List.of("2.2", "2.1");
 
     public static void initialize(Configuration configuration) {
+        if(configuration == null) {
+            // reset to the default values (ignore all user set values)
+            log.warn("Loading default values because ConfigurationRegistry#initialize has been called with null. This should only be used for testing.");
+            configuration = Configuration.fromProps(loadFallBackConfig());
+        }
+        logConfig(configuration);
+        if(!SUPPORTED_UCUM_VERSIONS.contains(configuration.getUCUMVersion())) {
+            LogUtil.logAndThrow(log, "Unknown UCUM version '{}' encountered! Only {} are supported.", configuration.getUCUMVersion(), SUPPORTED_UCUM_VERSIONS);
+        }
         boolean persistenceModuleOnClassPath = ReflectionUtil.isClassPresent("io.github.fhnaumann.providers.SQLitePersistenceProvider");
         if(configuration.isEnableSQLitePersistence() && !persistenceModuleOnClassPath) {
             log.warn("SQLite Persistence enabled but SQLitePersistenceProvider was not found. Did you include the 'ucumate-persistence' module in your pom.xml?");
@@ -31,6 +46,12 @@ public class ConfigurationRegistry {
         FeatureFlagsContext.set(flags);
 
         instance = configuration;
+    }
+
+    private static void logConfig(Configuration configuration) {
+        Properties props = configuration.asProps();
+        log.debug("Loading configuration with:");
+        props.forEach((key, value) -> log.debug("\n{}={}", key, value));
     }
 
     public static FeatureFlags getFeatureFlags(Configuration configuration) {
@@ -51,24 +72,40 @@ public class ConfigurationRegistry {
         if(instance == null) {
             synchronized (ConfigurationRegistry.class) {
                 if(instance == null) {
-                    // use default configuration
-                    initialize(loadDefault());
+                    initialize(loadConfig());
                 }
             }
         }
         return instance;
     }
 
-    private static Configuration loadDefault() {
+    private static Configuration loadConfig() {
+        Properties fallbackProps = loadFallBackConfig();
+        Properties devProps = loadDevConfig();
+        Properties merged = Configuration.merge(devProps, fallbackProps);
+        return Configuration.fromProps(merged);
+    }
+
+    private static Properties loadDevConfig() {
         Properties props = new Properties();
-        try (var stream = ConfigurationRegistry.class.getClassLoader()
-                .getResourceAsStream(DEFAULT_CONFIG_FILE)) {
+        try (var stream = ConfigurationRegistry.class.getClassLoader().getResourceAsStream(DEV_CONFIG_FILE)) {
             if (stream != null) {
                 props.load(stream);
-                return Configuration.fromProps(props);
+            }
+        } catch (IOException e) {
+            log.warn("No configuration file found at {}. Use system properties or the fluent builder to initialize the configuration. Otherwise the default values will be used.", DEV_CONFIG_FILE);
+        }
+        return props;
+    }
+
+    private static Properties loadFallBackConfig() {
+        Properties props = new Properties();
+        try (var fallBackStream = ConfigurationRegistry.class.getClassLoader().getResourceAsStream(FALLBACK_CONFIG_FILE)) {
+            if (fallBackStream != null) {
+                props.load(fallBackStream);
+                return props;
             } else {
-                log.error("Failed to load default configuration props!");
-                return Configuration.fromProps(new Properties());
+                return LogUtil.logAndThrow(log, "Failed to load fallback props at {}", FALLBACK_CONFIG_FILE);
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to load default configuration file", e);

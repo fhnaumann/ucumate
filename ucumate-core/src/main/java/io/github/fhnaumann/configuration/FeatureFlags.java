@@ -44,8 +44,12 @@ public final class FeatureFlags {
     }
 
     public static FeatureFlags of(Set<Flag> flags) {
+        if (flags.isEmpty() && !(flags instanceof EnumSet<Flag>)) {
+            flags = EnumSet.noneOf(Flag.class);
+        }
         int mask = computeBitmask(flags);
-        return INTERNED.computeIfAbsent(mask, m -> new FeatureFlags(EnumSet.copyOf(flags)));
+        Set<Flag> finalFlags = flags;
+        return INTERNED.computeIfAbsent(mask, m -> new FeatureFlags(EnumSet.copyOf(finalFlags)));
     }
 
     public static FeatureFlags of(Flag... flags) {

@@ -1,8 +1,10 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.printer.*;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
 
 import java.util.Collection;
@@ -25,6 +27,7 @@ public class UCUMService implements IUCUMService {
     private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = loadService(CanonicalizerService.class, new Canonicalizer(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
     private static final LookupService DEFAULT_LOOKUP_SERVICE = loadService(LookupService.class, new Lookup());
 
+    private UcumVersion ucumVersion;
     private CanonicalizerService canonicalizerService;
     private ConverterService converterService;
     private ValidatorService validatorService;
@@ -33,7 +36,16 @@ public class UCUMService implements IUCUMService {
     private LookupService lookupService;
 
     public UCUMService() {
+        this(ConfigurationRegistry.get().getDefaultUCUMVersion());
+    }
+
+    public UCUMService(String ucumVersion) {
+        this(UcumVersion.fromVersionString(ucumVersion));
+    }
+
+    public UCUMService(UcumVersion ucumVersion) {
         this(
+                ucumVersion,
                 DEFAULT_CANONICALIZER_SERVICE,
                 DEFAULT_CONVERTER_SERVICE,
                 DEFAULT_VALIDATOR_SERVICE,
@@ -43,7 +55,8 @@ public class UCUMService implements IUCUMService {
         );
     }
 
-    public UCUMService(CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService, LookupService lookupService) {
+    public UCUMService(UcumVersion ucumVersion, CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService, LookupService lookupService) {
+        this.ucumVersion = ucumVersion;
         this.canonicalizerService = canonicalizerService;
         this.converterService = converterService;
         this.validatorService = validatorService;
@@ -153,6 +166,16 @@ public class UCUMService implements IUCUMService {
     @Override
     public void setLookupService(LookupService lookupService) {
         this.lookupService = lookupService;
+    }
+
+    @Override
+    public UcumVersion getUCUMVersion() {
+        return ucumVersion;
+    }
+
+    @Override
+    public void setUCUMVersion(UcumVersion ucumVersion) {
+        this.ucumVersion = ucumVersion;
     }
 
     public PrinterService getPrinterService() {

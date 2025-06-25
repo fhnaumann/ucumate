@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Felix Naumann
  */
-public interface ValidatorService {
+public interface ValidatorService extends UcumVersioning {
 
     /**
      * Validates a given string.
@@ -17,14 +17,14 @@ public interface ValidatorService {
      * @return A ValidationResult with information about the validity.
      *
      * @see UCUMService#validateToBool(String)
-     * @see Validator.ValidationResult
+     * @see ValidationResult
      */
-    public Validator.ValidationResult validate(String input);
+    public ValidationResult validate(String input);
 
     /**
      * Validate a given String and return a boolean.
      * @param input A string containing a potential UCUMTerm.
-     * @return A boolean that was mapped from {@link Validator.ValidationResult} where {@link Validator.Success} -> true and {@link Validator.Failure} -> false.
+     * @return A boolean that was mapped from {@link ValidationResult} where {@link Success} -> true and {@link Failure} -> false.
      *
      * @see UCUMService#validate(String)
      */

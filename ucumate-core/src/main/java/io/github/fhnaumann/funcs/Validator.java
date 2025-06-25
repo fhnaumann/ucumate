@@ -6,6 +6,7 @@ import io.github.fhnaumann.NewUCUMParser;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.model.CanonicalUCUMSyntaxVisitor;
 import io.github.fhnaumann.model.UCUMSyntaxVisitor;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -19,22 +20,33 @@ public class Validator implements ValidatorService {
 
     private static final Logger log = LoggerFactory.getLogger(Validator.class);
 
+    private UcumVersion ucumVersion;
+
+    public Validator() {
+        this(UcumVersion.fromVersionString(ConfigurationRegistry.get().getDefaultUCUMVersion()));
+    }
+
+    public Validator(UcumVersion ucumVersion) {
+        this.ucumVersion = ucumVersion;
+    }
     /**
      * Internal use only!
      * @param input The string input that is definitely in a canonical form
+     * @param version The UCUM version.
      * @return The parsed canonical term, avoiding expensive calls to {@link Canonicalizer}.
      */
-    public static UCUMExpression.CanonicalTerm parseCanonical(String input) {
-        return (UCUMExpression.CanonicalTerm) validateImpl(input, new CanonicalUCUMSyntaxVisitor(UCUMRegistry.getInstance()));
+    public static UCUMExpression.CanonicalTerm parseCanonical(String input, UcumVersion version) {
+        return (UCUMExpression.CanonicalTerm) validateImpl(input, new CanonicalUCUMSyntaxVisitor(UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(version)));
     }
 
     /**
      * Internal use only!
-     * @param input The string input that
+     * @param input The string input that is guaranteed to be valid.
+     * @param version The UCUM version.
      * @return The validation result. Avoids infinite recursion by bypassing registry here.
      */
-    public static Term parseByPassChecks(String input) {
-        return validateImpl(input, new UCUMSyntaxVisitor(UCUMRegistry.getInstance()));
+    public static Term parseByPassChecks(String input, UcumVersion version) {
+        return validateImpl(input, new UCUMSyntaxVisitor(UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(version)));
     }
 
     public ValidationResult validate(String input) {
@@ -59,7 +71,7 @@ public class Validator implements ValidatorService {
         */
         try {
             ValidationResult result;
-            Term term = validateImpl(input, new UCUMSyntaxVisitor(UCUMRegistry.getInstance()));
+            Term term = validateImpl(input, new UCUMSyntaxVisitor(UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(ucumVersion)));
             if(!ConfigurationRegistry.get().isAllowAnnotAfterParens() && hasAnnotationAfterParens(term)) {
                 log.warn("Encountered term {} with an annotation on parenthesis but the property {} is disabled.", input, "ucumate.allowAnnotAfterParens");
                 result = new Failure();
@@ -110,5 +122,15 @@ public class Validator implements ValidatorService {
             case UCUMExpression.AnnotTerm annotTerm -> annotTerm.term() instanceof UCUMExpression.ParenTerm;
             case UCUMExpression.ParenTerm parenTerm -> hasAnnotationAfterParens(parenTerm.term());
         };
+    }
+
+    @Override
+    public UcumVersion getUCUMVersion() {
+        return ucumVersion;
+    }
+
+    @Override
+    public void setUCUMVersion(UcumVersion ucumVersion) {
+        this.ucumVersion = ucumVersion;
     }
 }

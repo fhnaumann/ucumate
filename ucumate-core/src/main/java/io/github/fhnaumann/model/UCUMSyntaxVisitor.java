@@ -8,6 +8,7 @@ import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.ValidatorService.ParserException;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression.Operator;
+import io.github.fhnaumann.util.IUCUMRegistry;
 import io.github.fhnaumann.util.ParseUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
 import org.slf4j.Logger;
@@ -16,11 +17,11 @@ import org.slf4j.LoggerFactory;
 public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
 
     private static final Logger log = LoggerFactory.getLogger(UCUMSyntaxVisitor.class);
-    private final UCUMRegistry registry;
+    private final IUCUMRegistry registry;
 
     private final PrinterService printerService = new Printer(new Validator());
 
-    public UCUMSyntaxVisitor(UCUMRegistry registry) {
+    public UCUMSyntaxVisitor(IUCUMRegistry registry) {
         this.registry = registry;
     }
 

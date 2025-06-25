@@ -26,7 +26,7 @@ public class PersistenceRegistry implements PersistenceProvider {
 
     private PersistenceRegistry() {}
 
-    private static final String CACHE_SETTINGS_PROPERTY_FILE_NAME = "ucumate.properties";
+    private static final String CACHE_SETTINGS_PROPERTY_FILE_NAME = "ucumate_fallback.properties";
 
     public static InMemoryPersistenceProvider cache;
     private static final Map<String, PersistenceProvider> additionalProviders = new HashMap<>();
@@ -99,7 +99,7 @@ public class PersistenceRegistry implements PersistenceProvider {
                 logger.debug("Picked up: {}", props);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load ucumate.properties", e);
+            throw new RuntimeException("Failed to load ucumate_fallback.properties", e);
         }
         return props;
     }
