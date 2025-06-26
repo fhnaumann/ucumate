@@ -27,6 +27,6 @@ public class PropertiesTest {
     @Test
     public void test_fallback_property_is_used_when_missing_in_provided_properties() {
         // The src/test/resources/ucumate.properties does not contain "ucumate.enablePrefixOnNonMetricUnits"
-        assertThat(config.isEnablePrefixOnNonMetricUnits()).isEqualTo(false);
+        assertThat(config.isEnablePrefixOnNonMetricUnits()).isEqualTo(true);
     }
 }

@@ -6,8 +6,10 @@ import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.ParseUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
+import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -56,12 +58,13 @@ public class SyntaxMatchHelper {
     private static final Map<String, Score> WRONG_UNIT_CODES_TO_CORRECT_UNIT_CODES = createWrongToCorrectUnitCodes();
 
     private static Map<String, Score> createWrongToCorrectUnitCodes() {
-        return UCUMRegistry.getInstance().getAll().stream()
+        // TODO: This uses UCUM version 2.2 but may also be used for other versions because afaik nothing here changes between versions
+        return UCUMRegistry.getInstance().getAll(UcumVersion.V2_2).stream()
                 .filter(UCUMDefinition.UCUMUnit.class::isInstance)
                 .map(UCUMDefinition.UCUMUnit.class::cast)
                 .flatMap(unit -> generateVariants(unit).stream())
                 .collect(Collectors.toMap(
-                        stringEntryEntry -> stringEntryEntry.getKey(),
+                        Map.Entry::getKey,
                         entry -> new Score(Set.of(entry.getValue().getKey()), entry.getValue().getValue()),
                          (score1, score2) -> {
                             Set<UCUMDefinition.UCUMUnit> mergedUnits = new HashSet<>();
@@ -136,8 +139,8 @@ public class SyntaxMatchHelper {
         return ErrorMessages.get(rbString, failureResult.failedText());
     }
 
-    public static String analyseUnitForErrorDetails(String invalidInput) {
-        UCUMRegistry registry = UCUMRegistry.getInstance();
+    public static String analyseUnitForErrorDetails(String invalidInput, UcumVersion version) {
+        VersionSpecificUCUMRegistry registry = UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(version);
         // 1) look for prefix
         // 2) look for unit
         // 3) look for exponent
@@ -165,7 +168,7 @@ public class SyntaxMatchHelper {
         return ErrorMessages.get("unit_correction", invalidInput, matchedUnitsString);
     }
 
-    private static List<Map.Entry<UCUMDefinition.UCUMUnit, Integer>> lookForUnits(String invalidInput, UCUMRegistry registry) {
+    private static List<Map.Entry<UCUMDefinition.UCUMUnit, Integer>> lookForUnits(String invalidInput, VersionSpecificUCUMRegistry registry) {
         List<Map.Entry<UCUMDefinition.UCUMUnit, Integer>> list = new ArrayList<>();
         for(int i=invalidInput.length(); i>0; i--) {
             String potentialUnit = invalidInput.substring(0, i);
@@ -180,17 +183,6 @@ public class SyntaxMatchHelper {
             }
         }
         return list.stream().distinct().sorted(Map.Entry.comparingByValue()).toList();
-    }
-
-    private static UCUMDefinition.UCUMPrefix lookForPrefix(String invalidInput, UCUMRegistry registry) {
-        for(int i=1; i<invalidInput.length(); i++) {
-            String potentialPrefix = invalidInput.substring(0, i);
-            Optional<UCUMDefinition.UCUMPrefix> optionalUCUMPrefix = registry.getPrefix(potentialPrefix);
-            if(optionalUCUMPrefix.isPresent()) {
-                return optionalUCUMPrefix.get();
-            }
-        }
-        return null;
     }
 
     public static void searchForAnyUnbalancedParens(TokenStream tokenStream, ParserRuleContext root, List<String> errorMessages) {

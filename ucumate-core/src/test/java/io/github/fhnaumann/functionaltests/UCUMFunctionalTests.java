@@ -4,9 +4,11 @@ import io.github.fhnaumann.TestCaseLoader;
 import io.github.fhnaumann.TestUtil;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.Printer;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
+import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -29,7 +31,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 @Tag("functional-tests")
 public class UCUMFunctionalTests {
 
-    private static UCUMRegistry registry;
+    private static VersionSpecificUCUMRegistry registry;
 
     /*
     These are "wrong" and therefore ucumate has (partially) different results. See the online documentation of ucumate
@@ -43,7 +45,7 @@ public class UCUMFunctionalTests {
 
     @BeforeAll
     public static void init() {
-        registry = UCUMRegistry.getInstance();
+        registry = UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(UcumVersion.V2_2);
         printerService = new Printer();
         validatorService = new Validator();
         converterService = new Converter(printerService, validatorService);

@@ -11,6 +11,7 @@ import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.persistence.PersistenceProvider;
 import io.github.fhnaumann.util.PreciseDecimal;
 import org.slf4j.Logger;
@@ -32,11 +33,13 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
     private static final PrinterService printer = new UCUMSyntaxPrinter();
 
+    private final UcumVersion ucumVersion;
     public final Connection connection;
     protected final String canonicalTableName;
     protected final String validateTableName;
 
-    public JDBCPersistenceProvider(Connection connection, String canonicalTableName, String validateTableName) {
+    public JDBCPersistenceProvider(UcumVersion ucumVersion, Connection connection, String canonicalTableName, String validateTableName) {
+        this.ucumVersion = ucumVersion;
         this.connection = connection;
         this.canonicalTableName = canonicalTableName != null ? canonicalTableName : "ucumate_canonical";
         this.validateTableName = validateTableName != null ? validateTableName : "ucumate_validate";
@@ -48,6 +51,11 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
     public abstract void createValidateTable();
     public abstract String getCanonicalUpsertQuery();
     public abstract String getValidateUpsertQuery();
+
+    @Override
+    public UcumVersion getVersion() {
+        return ucumVersion;
+    }
 
     protected void executeSQLFile(String path) {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(path)) {
@@ -99,7 +107,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             if (rs.next()) {
                 PreciseDecimal magnitude = new PreciseDecimal(rs.getString("magnitude"));
                 PreciseDecimal cfPrefix = new PreciseDecimal(rs.getString("cfPrefix"));
-                UCUMExpression.Term term = Validator.parseCanonical(rs.getString("term"));
+                UCUMExpression.Term term = Validator.parseCanonical(rs.getString("term"), ucumVersion);
                 boolean special = rs.getBoolean("special");
                 UCUMDefinition.UCUMFunction ucumFunction = null;
                 if(special) {
@@ -143,7 +151,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             if (rs.next()) {
                 boolean valid = rs.getBoolean("valid");
                 if(valid) {
-                    UCUMExpression.Term parsedKey = Validator.parseByPassChecks(key.expression());
+                    UCUMExpression.Term parsedKey = Validator.parseByPassChecks(key.expression(), ucumVersion);
                     return new Validator.Success(parsedKey);
                 }
                 else {
@@ -167,11 +175,16 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
             while (rs.next()) {
                 String key = rs.getString("unit_key");
+                ValKey valKey = ValKey.fromStorageKey(key);
+                if(valKey.version() != getVersion()) {
+                    // Don't return if the provider version does not match the stored unit version
+                    continue;
+                }
                 boolean valid = rs.getBoolean("valid");
 
                 Validator.ValidationResult result;
                 if (valid) {
-                    UCUMExpression.Term parsed = Validator.parseByPassChecks(key);
+                    UCUMExpression.Term parsed = Validator.parseByPassChecks(valKey.expression(), ucumVersion);
                     result = new Validator.Success(parsed);
                 } else {
                     result = new Validator.Failure();
@@ -199,12 +212,15 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
             while (rs.next()) {
                 String unitKey = rs.getString("unit_key");
-                CanonKey canonKey = CanonKey.fromStorageKey(unitKey);
+                CanonKey canonKey = CanonKey.fromStorageKey(unitKey, ucumVersion);
+                if(canonKey.version() != getVersion()) {
+                    continue;
+                }
                 String magnitudeStr = rs.getString("magnitude");
                 String cfPrefixStr = rs.getString("cfPrefix");
                 String termStr = rs.getString("term");
                 boolean special = rs.getBoolean("special");
-                UCUMExpression.Term term = Validator.parseCanonical(termStr);
+                UCUMExpression.Term term = Validator.parseCanonical(termStr, ucumVersion);
                 PreciseDecimal magnitude = new PreciseDecimal(magnitudeStr);
                 PreciseDecimal cfPrefix = new PreciseDecimal(cfPrefixStr);
 

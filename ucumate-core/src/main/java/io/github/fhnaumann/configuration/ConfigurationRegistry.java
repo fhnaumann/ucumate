@@ -22,7 +22,7 @@ public class ConfigurationRegistry {
     private static final String FALLBACK_CONFIG_FILE = "ucumate_fallback.properties";
     private static final String DEV_CONFIG_FILE = "ucumate.properties";
 
-    private static final List<String> SUPPORTED_UCUM_VERSIONS = List.of("2.2", "2.1");
+    public static final List<String> SUPPORTED_UCUM_VERSIONS = List.of("2.2", "2.1");
 
     public static void initialize(Configuration configuration) {
         if(configuration == null) {
@@ -51,7 +51,7 @@ public class ConfigurationRegistry {
     private static void logConfig(Configuration configuration) {
         Properties props = configuration.asProps();
         log.debug("Loading configuration with:");
-        props.forEach((key, value) -> log.debug("\n{}={}", key, value));
+        props.forEach((key, value) -> log.debug("{} = {}", key, value));
     }
 
     public static FeatureFlags getFeatureFlags(Configuration configuration) {

@@ -5,8 +5,10 @@ import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.ParseUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
+import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,14 +20,14 @@ import java.util.List;
 public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpression> {
 
     private static final Logger log = LoggerFactory.getLogger(MyFeedbackVisitor.class);
-    private final UCUMRegistry registry;
+    private final VersionSpecificUCUMRegistry registry;
 
     private final List<String> errorMessages;
 
     private final Printer printer = new Printer();
 
-    public MyFeedbackVisitor(UCUMRegistry registry, List<String> errorMessages) {
-        this.registry = registry;
+    public MyFeedbackVisitor(UcumVersion version, UCUMRegistry registry, List<String> errorMessages) {
+        this.registry = registry.getVersionSpecificUCUMRegistry(version);
         this.errorMessages = errorMessages;
     }
 

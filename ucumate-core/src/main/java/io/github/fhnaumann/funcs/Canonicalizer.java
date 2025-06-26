@@ -14,26 +14,29 @@ import io.github.fhnaumann.model.UCUMExpression.*;
 import io.github.fhnaumann.model.special.SpecialUnits;
 import io.github.fhnaumann.model.special.SpecialUnitsFunctionProvider;
 import io.github.fhnaumann.util.PreciseDecimal;
+import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Canonicalizer implements CanonicalizerService {
 
-    private static final UCUMRegistry registry = UCUMRegistry.getInstance();
     private static final Logger log = LoggerFactory.getLogger(Canonicalizer.class);
 
     private UcumVersion ucumVersion;
     private final PrinterService printerService;
     private final ValidatorService validatorService;
 
+    private final VersionSpecificUCUMRegistry registry;
+
     public Canonicalizer(UcumVersion ucumVersion, PrinterService printerService, ValidatorService validatorService) {
         this.ucumVersion = ucumVersion;
         this.printerService = printerService;
         this.validatorService = validatorService;
+        this.registry = UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(ucumVersion);
     }
 
     public Canonicalizer(PrinterService printerService, ValidatorService validatorService) {
-        this(UcumVersion.fromVersionString(ConfigurationRegistry.get().getDefaultUCUMVersion()), printerService, validatorService);
+        this(UcumVersion.fromVersionString(ConfigurationRegistry.get().getUCUMVersion()), printerService, validatorService);
     }
 
     @Override
@@ -196,7 +199,7 @@ public class Canonicalizer implements CanonicalizerService {
 
 
             boolean isSpecial = canonicalStep.specialHandlingActive() && canonicalStep.specialFunction() != null;
-            boolean isMolInvolved = MolMassUtil.containsMol(term);
+            boolean isMolInvolved = MolMassUtil.containsMol(term, ucumVersion);
             if(isSpecial && isMolInvolved && substanceMolarMassCoeff != null && ConfigurationRegistry.get().isEnableMolMassConversion()) {
                 // as for UCUM version 2.2 this only affects "[pH]"
                 log.warn("Conversion involving the special unit '[pH]' to a mass unit is not supported.");

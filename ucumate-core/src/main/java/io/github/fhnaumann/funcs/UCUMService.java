@@ -1,11 +1,14 @@
 package io.github.fhnaumann.funcs;
 
+import com.google.common.base.Preconditions;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.printer.*;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
+import io.github.fhnaumann.util.UCUMRegistry;
+import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -20,12 +23,14 @@ import java.util.ServiceLoader;
  */
 public class UCUMService implements IUCUMService {
 
-    private static final ValidatorService DEFAULT_VALIDATOR_SERVICE = loadService(ValidatorService.class, new Validator());
+    private static final UcumVersion SELECTED_UCUM_VERSION = ConfigurationRegistry.get().getUCUMVersionAsEnum();
+
+    private static final ValidatorService DEFAULT_VALIDATOR_SERVICE = loadService(ValidatorService.class, new Validator(SELECTED_UCUM_VERSION));
     private static final PrinterService DEFAULT_PRINTER_SERVICE = loadService(PrinterService.class, new Printer());
-    private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = loadService(RelationCheckerService.class, new RelationChecker(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final ConverterService DEFAULT_CONVERTER_SERVICE = loadService(ConverterService.class, new Converter(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = loadService(CanonicalizerService.class, new Canonicalizer(DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final LookupService DEFAULT_LOOKUP_SERVICE = loadService(LookupService.class, new Lookup());
+    private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = loadService(RelationCheckerService.class, new RelationChecker(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final ConverterService DEFAULT_CONVERTER_SERVICE = loadService(ConverterService.class, new Converter(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = loadService(CanonicalizerService.class, new Canonicalizer(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final LookupService DEFAULT_LOOKUP_SERVICE = loadService(LookupService.class, new Lookup(SELECTED_UCUM_VERSION));
 
     private UcumVersion ucumVersion;
     private CanonicalizerService canonicalizerService;
@@ -36,7 +41,7 @@ public class UCUMService implements IUCUMService {
     private LookupService lookupService;
 
     public UCUMService() {
-        this(ConfigurationRegistry.get().getDefaultUCUMVersion());
+        this(ConfigurationRegistry.get().getUCUMVersion());
     }
 
     public UCUMService(String ucumVersion) {
@@ -56,13 +61,13 @@ public class UCUMService implements IUCUMService {
     }
 
     public UCUMService(UcumVersion ucumVersion, CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService, LookupService lookupService) {
-        this.ucumVersion = ucumVersion;
         this.canonicalizerService = canonicalizerService;
         this.converterService = converterService;
         this.validatorService = validatorService;
         this.relationCheckerService = relationCheckerService;
         this.printerService = printerService;
         this.lookupService = lookupService;
+        setUCUMVersion(ucumVersion);
     }
 
     private static <T> T loadService(Class<T> clazz, T fallback) {
@@ -123,8 +128,13 @@ public class UCUMService implements IUCUMService {
         return canonicalizerService;
     }
 
+    private void checkSameVersion(UcumVersioning versioning) {
+        Preconditions.checkArgument(getUCUMVersion() == versioning.getUCUMVersion(), "Cannot use service ({}) with a different version than the composite version ({}).", versioning.getUCUMVersion(), getUCUMVersion());
+    }
+
     @Override
     public void setCanonicalizerService(CanonicalizerService canonicalizerService) {
+        checkSameVersion(canonicalizerService);
         this.canonicalizerService = canonicalizerService;
     }
 
@@ -135,6 +145,7 @@ public class UCUMService implements IUCUMService {
 
     @Override
     public void setConverterService(ConverterService converterService) {
+        checkSameVersion(converterService);
         this.converterService = converterService;
     }
 
@@ -145,6 +156,7 @@ public class UCUMService implements IUCUMService {
 
     @Override
     public void setValidatorService(ValidatorService validatorService) {
+        checkSameVersion(validatorService);
         this.validatorService = validatorService;
     }
 
@@ -155,6 +167,7 @@ public class UCUMService implements IUCUMService {
 
     @Override
     public void setRelationCheckerService(RelationCheckerService relationCheckerService) {
+        checkSameVersion(relationCheckerService);
         this.relationCheckerService = relationCheckerService;
     }
 
@@ -165,6 +178,7 @@ public class UCUMService implements IUCUMService {
 
     @Override
     public void setLookupService(LookupService lookupService) {
+        checkSameVersion(lookupService);
         this.lookupService = lookupService;
     }
 
@@ -175,6 +189,11 @@ public class UCUMService implements IUCUMService {
 
     @Override
     public void setUCUMVersion(UcumVersion ucumVersion) {
+        validatorService.setUCUMVersion(ucumVersion);
+        relationCheckerService.setUCUMVersion(ucumVersion);
+        canonicalizerService.setUCUMVersion(ucumVersion);
+        converterService.setUCUMVersion(ucumVersion);
+        lookupService.setUCUMVersion(ucumVersion);
         this.ucumVersion = ucumVersion;
     }
 
@@ -184,5 +203,9 @@ public class UCUMService implements IUCUMService {
 
     public void setPrinterService(PrinterService printerService) {
         this.printerService = printerService;
+    }
+
+    public VersionSpecificUCUMRegistry getUCUMRegistry() {
+        return UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(getUCUMVersion());
     }
 }

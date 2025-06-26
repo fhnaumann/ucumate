@@ -1,5 +1,6 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.providers.MySQLPersistenceProvider;
 import org.testcontainers.containers.MySQLContainer;
@@ -32,7 +33,7 @@ public class MysqlPersistenceIntegrationTest extends DBPersistenceIntegrationTes
                     mysql.getUsername(),
                     mysql.getPassword()
             );
-            PersistenceRegistry.register("mysql", new MySQLPersistenceProvider(connection, null, null));
+            PersistenceRegistry.register("mysql", new MySQLPersistenceProvider(UcumVersion.V2_2, connection, null, null));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

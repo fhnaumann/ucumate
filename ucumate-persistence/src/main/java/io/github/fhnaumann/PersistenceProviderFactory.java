@@ -18,30 +18,12 @@ import java.sql.SQLException;
  */
 public class PersistenceProviderFactory {
 
-    public static PostgresPersistenceProvider createPostgres(String jdbcUrl, String username, String password) {
-        HikariDataSource ds = ConnectionPoolFactory.getOrCreate(jdbcUrl, username, password);
-        try {
-            return new PostgresPersistenceProvider(ds.getConnection(), null, null);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static MySQLPersistenceProvider createMySQL(String jdbcUrl, String username, String password) {
-        HikariDataSource ds = ConnectionPoolFactory.getOrCreate(jdbcUrl, username, password);
-        try {
-            return new MySQLPersistenceProvider(ds.getConnection(), null, null);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static SQLitePersistenceProvider createDefaultSQLiteProvider() {
         Path defaultSQLitePath = Paths.get(ConfigurationRegistry.get().getSqliteDBPath());
         String jdbcUrl = "jdbc:sqlite:" + defaultSQLitePath.toAbsolutePath();
         HikariDataSource ds = ConnectionPoolFactory.getOrCreate(jdbcUrl, "", "");
         try {
-            return new SQLitePersistenceProvider(ds.getConnection(), null, null);
+            return new SQLitePersistenceProvider(ConfigurationRegistry.get().getUCUMVersionAsEnum(), ds.getConnection(), null, null);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to create SQLitePersistenceProvider", e);
         }
@@ -60,10 +42,5 @@ public class PersistenceProviderFactory {
         } catch (Exception e) {
             throw new RuntimeException("Could not resolve path for SQLite DB", e);
         }
-    }
-
-
-    public static MongoDBPersistenceProvider createMongoDB(MongoClient client) {
-        return new MongoDBPersistenceProvider(client, "ucumate");
     }
 }

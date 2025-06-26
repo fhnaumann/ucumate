@@ -6,6 +6,7 @@ import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.Printer;
+import io.github.fhnaumann.model.UcumVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,8 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
 
     private static final Logger logger = LoggerFactory.getLogger(InMemoryPersistenceProvider.class);
 
+    private final UcumVersion ucumVersion;
+
     private Cache<CanonKey, Canonicalizer.CanonicalStepResult> canonCache;
     private Cache<ValKey, Validator.ValidationResult> valCache;
 
@@ -28,11 +31,8 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
 
     private boolean enabled;
 
-    public InMemoryPersistenceProvider(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public InMemoryPersistenceProvider(int canonCacheMaxSize, int valCacheMaxSize, boolean recordStats) {
+    public InMemoryPersistenceProvider(UcumVersion ucumVersion, int canonCacheMaxSize, int valCacheMaxSize, boolean recordStats) {
+        this.ucumVersion = ucumVersion;
         if(recordStats) {
             canonCache = Caffeine.newBuilder().maximumSize(canonCacheMaxSize).recordStats().build();
             valCache = Caffeine.newBuilder().maximumSize(valCacheMaxSize).recordStats().build();
@@ -92,7 +92,7 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
     public void saveValidated(ValKey key, Validator.ValidationResult value) {
         if(isEnabled()) {
             valCache.put(key, value);
-            logger.debug("Saved key={} in cache.", key);
+            logger.debug("Saved key = {}, value = {} in cache.", key, value);
         }
     }
 
@@ -109,6 +109,11 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
     @Override
     public Map<ValKey, Validator.ValidationResult> getAllValidated() {
         return valCache.asMap();
+    }
+
+    @Override
+    public UcumVersion getVersion() {
+        return ucumVersion;
     }
 
     @Override

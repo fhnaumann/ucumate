@@ -10,8 +10,10 @@ import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.funcs.printer.WolframAlphaSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
 import io.github.fhnaumann.util.UCUMRegistry;
+import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 
 import java.math.BigDecimal;
 
@@ -27,7 +29,7 @@ public class TestUtil {
     private static final UCUMSyntaxPrinter ucumSyntaxPrinter = new UCUMSyntaxPrinter();
     private static final WolframAlphaSyntaxPrinter wolframAlphaSyntaxPrinter = new WolframAlphaSyntaxPrinter();
 
-    private static final UCUMRegistry ucumRegistry = UCUMRegistry.getInstance();
+    private static final VersionSpecificUCUMRegistry ucumRegistry = UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(UcumVersion.V2_2);
 
     public static final UCUMDefinition.UCUMPrefix giga = getUCUMPrefix("G");
     public static final UCUMDefinition.UCUMPrefix mega = getUCUMPrefix("M");

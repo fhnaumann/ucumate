@@ -1,22 +1,20 @@
 package io.github.fhnaumann.configuration;
 
+import io.github.fhnaumann.model.UcumVersion;
+
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class Configuration {
 
-    private final List<String> supportedUCUMVersions;
-    private final String defaultUCUMVersion;
+    private final String ucumVersion;
     private final Boolean enablePrefixOnNonMetricUnits;
     private final Boolean enableMolMassConversion;
     private final Boolean allowAnnotAfterParens;
     private final Boolean enableSQLitePersistence;
     private final String sqliteDBPath;
 
-    private Configuration(List<String> supportedUCUMVersions, String defaultUCUMVersion, Boolean enablePrefixOnNonMetricUnits, Boolean enableMolMassConversion, Boolean allowAnnotAfterParens, Boolean enableSQLitePersistence, String sqliteDBPath) {
-        this.supportedUCUMVersions = supportedUCUMVersions;
-        this.defaultUCUMVersion = defaultUCUMVersion;
+    private Configuration(String ucumVersion, Boolean enablePrefixOnNonMetricUnits, Boolean enableMolMassConversion, Boolean allowAnnotAfterParens, Boolean enableSQLitePersistence, String sqliteDBPath) {
+        this.ucumVersion = ucumVersion;
         this.enablePrefixOnNonMetricUnits = enablePrefixOnNonMetricUnits;
         this.enableMolMassConversion = enableMolMassConversion;
         this.allowAnnotAfterParens = allowAnnotAfterParens;
@@ -28,12 +26,12 @@ public class Configuration {
         return ConfigurationRegistry.getFeatureFlags(this);
     }
 
-    public List<String> getSupportedUCUMVersions() {
-        return List.copyOf(supportedUCUMVersions);
+    public String getUCUMVersion() {
+        return ucumVersion;
     }
 
-    public String getDefaultUCUMVersion() {
-        return defaultUCUMVersion;
+    public UcumVersion getUCUMVersionAsEnum() {
+        return UcumVersion.fromVersionString(getUCUMVersion());
     }
 
     public boolean isEnablePrefixOnNonMetricUnits() {
@@ -59,8 +57,7 @@ public class Configuration {
     @Override
     public String toString() {
         return "Configuration{" +
-                "supportedUCUMVersions=" + supportedUCUMVersions +
-                ", defaultUCUMVersion='" + defaultUCUMVersion + '\'' +
+                ", ucumVersion='" + ucumVersion + '\'' +
                 ", enablePrefixOnNonMetricUnits=" + enablePrefixOnNonMetricUnits +
                 ", enableMolMassConversion=" + enableMolMassConversion +
                 ", allowAnnotAfterParens=" + allowAnnotAfterParens +
@@ -76,23 +73,20 @@ public class Configuration {
     public Properties asProps() {
         Properties props = new Properties();
         // Some variables may be null if the builder was used to construct them
-        if(supportedUCUMVersions != null) {
-            props.put("ucumate.ucumVersion.supported", String.join(",", supportedUCUMVersions));
-        }
-        if(defaultUCUMVersion != null) {
-            props.put("ucumate.ucumVersion.default", defaultUCUMVersion);
+        if(ucumVersion != null) {
+            props.put("ucumate.ucumVersion", ucumVersion);
         }
         if(enablePrefixOnNonMetricUnits != null) {
-            props.put("ucumate.enablePrefixOnNonMetricUnits", enablePrefixOnNonMetricUnits);
+            props.put("ucumate.enablePrefixOnNonMetricUnits", Boolean.toString(enablePrefixOnNonMetricUnits));
         }
         if(enableMolMassConversion != null) {
-            props.put("ucumate.enableMolMassConversion", enableMolMassConversion);
+            props.put("ucumate.enableMolMassConversion", Boolean.toString(enableMolMassConversion));
         }
         if(allowAnnotAfterParens != null) {
-            props.put("ucumate.allowAnnotAfterParens", allowAnnotAfterParens);
+            props.put("ucumate.allowAnnotAfterParens", Boolean.toString(allowAnnotAfterParens));
         }
         if(enableSQLitePersistence != null) {
-            props.put("ucumate.persistence.sqlite.enable", enableSQLitePersistence);
+            props.put("ucumate.persistence.sqlite.enable", Boolean.toString(enableSQLitePersistence));
         }
         if(sqliteDBPath != null) {
             props.put("ucumate.persistence.sqlite.dbpath", sqliteDBPath);
@@ -104,8 +98,7 @@ public class Configuration {
         Properties mergeWithSystemProps = mergeWithSystemProps(properties);
         Properties interpolatedProps = interpolateProps(mergeWithSystemProps);
         return new Configuration(
-                Arrays.asList(interpolatedProps.getProperty("ucumate.ucumVersion.supported").split(",")),
-                interpolatedProps.getProperty("ucumate.ucumVersion.default"),
+                interpolatedProps.getProperty("ucumate.ucumVersion"),
                 Boolean.parseBoolean(interpolatedProps.getProperty("ucumate.enablePrefixOnNonMetricUnits")),
                 Boolean.parseBoolean(interpolatedProps.getProperty("ucumate.enableMolMassConversion")),
                 Boolean.parseBoolean(interpolatedProps.getProperty("ucumate.allowAnnotAfterParens")),
@@ -144,21 +137,15 @@ public class Configuration {
     }
 
     public static class Builder {
-        private List<String> supportedUCUMVersions;
-        private String defaultUCUMVersion;
+        private String ucumVersion;
         private Boolean enablePrefixOnNonMetricUnits;
-        private Boolean enableMolMassConversion = true;
-        private Boolean allowAnnotAfterParens = true;
+        private Boolean enableMolMassConversion;
+        private Boolean allowAnnotAfterParens;
         private Boolean enableSQLitePersistence;
         private String sqliteDBPath;
 
-        public Builder withSupportedUCUMVersions(Collection<String> supportedUCUMVersions) {
-            this.supportedUCUMVersions = new ArrayList<>(supportedUCUMVersions);
-            return this;
-        }
-
-        public Builder withDefaultUCUMVersion(String defaultUCUMVersion) {
-            this.defaultUCUMVersion = defaultUCUMVersion;
+        public Builder withUCUMVersion(String ucumVersion) {
+            this.ucumVersion = ucumVersion;
             return this;
         }
 
@@ -195,7 +182,7 @@ public class Configuration {
             value already exists. Therefore, it's necessary to merge the props here.
              */
             Configuration oldConfiguration = ConfigurationRegistry.get();
-            Configuration newConfiguration = new Configuration(supportedUCUMVersions, defaultUCUMVersion, enablePrefixOnNonMetricUnits, enableMolMassConversion, allowAnnotAfterParens, enableSQLitePersistence, sqliteDBPath);
+            Configuration newConfiguration = new Configuration(ucumVersion, enablePrefixOnNonMetricUnits, enableMolMassConversion, allowAnnotAfterParens, enableSQLitePersistence, sqliteDBPath);
             Properties merged = merge(newConfiguration.asProps(), oldConfiguration.asProps());
             return Configuration.fromProps(merged);
         }

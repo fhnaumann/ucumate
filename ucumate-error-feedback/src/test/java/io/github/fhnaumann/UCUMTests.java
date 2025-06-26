@@ -1,7 +1,9 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
@@ -25,9 +27,11 @@ public class UCUMTests {
 
     @BeforeAll
     public void initalSetup() throws IOException {
+        ConfigurationRegistry.initialize(null);
         testSuite = TestCaseLoader.load();
         service = new UCUMService();
-        service.setValidatorService(new FeedbackValidator());
+        service.setValidatorService(new FeedbackValidator(UcumVersion.V2_2));
+
     }
 
     public static Stream<TestCase.ValidateTestCase> validateTestCases() {
@@ -84,18 +88,14 @@ public class UCUMTests {
     @ParameterizedTest(name="{0}")
     @MethodSource("commensurableTestCases")
     public void testCommensurability(TestCase.CommensurableTestCase testCase) {
-        RelationChecker.RelationResult result = service.checkCommensurable(Validator.parseByPassChecks(testCase.expr1()), Validator.parseByPassChecks(testCase.expr2()), false);
+        RelationChecker.RelationResult result = service.checkCommensurable(testCase.expr1(), testCase.expr2(), false);
         assertEquals(testCase.commensurable(), result instanceof RelationChecker.IsCommensurable, testCase.toString());
     }
 
     @ParameterizedTest(name="{0}")
     @MethodSource("convertTestCases")
     public void testConversion(TestCase.ConvertTestCase testCase) {
-        PreciseDecimal fromFactor = new PreciseDecimal(testCase.conversionFactor());
-        PreciseDecimal toFactor = new PreciseDecimal(testCase.resultingConversionFactor());
-        UCUMExpression.Term from = Validator.parseByPassChecks(testCase.from());
-        UCUMExpression.Term to = Validator.parseByPassChecks(testCase.to());
-        Converter.ConversionResult result = service.convert(fromFactor, from, to, testCase.substanceMolarMassCoeff() != null ? new PreciseDecimal(testCase.substanceMolarMassCoeff()) : null);
+        Converter.ConversionResult result = service.convert(testCase.conversionFactor(), testCase.from(), testCase.to(), testCase.substanceMolarMassCoeff());
         if(testCase.valid()) {
             Assertions.assertThat(result)
                 .withFailMessage("%s: Unexpected validation error while testing the conversion: %s".formatted(testCase.id(), result))

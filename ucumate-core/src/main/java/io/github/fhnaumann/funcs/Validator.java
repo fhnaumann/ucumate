@@ -23,7 +23,7 @@ public class Validator implements ValidatorService {
     private UcumVersion ucumVersion;
 
     public Validator() {
-        this(UcumVersion.fromVersionString(ConfigurationRegistry.get().getDefaultUCUMVersion()));
+        this(UcumVersion.fromVersionString(ConfigurationRegistry.get().getUCUMVersion()));
     }
 
     public Validator(UcumVersion ucumVersion) {

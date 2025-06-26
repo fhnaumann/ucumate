@@ -2,15 +2,18 @@ package io.github.fhnaumann.funcs;
 
 import io.github.fhnaumann.model.UCUMExpression.CanonicalTerm;
 import io.github.fhnaumann.model.UCUMExpression.Term;
+import io.github.fhnaumann.model.UcumVersion;
 
 import java.util.Map;
 
 public class RelationChecker implements RelationCheckerService {
 
+    private UcumVersion ucumVersion;
     private final PrinterService printerService;
     private final ValidatorService validatorService;
 
-    public RelationChecker(PrinterService printerService, ValidatorService validatorService) {
+    public RelationChecker(UcumVersion ucumVersion, PrinterService printerService, ValidatorService validatorService) {
+        this.ucumVersion = ucumVersion;
         this.printerService = printerService;
         this.validatorService = validatorService;
     }
@@ -56,4 +59,13 @@ public class RelationChecker implements RelationCheckerService {
         return UCUMService.staticParseOrError(input, validatorService);
     }
 
+    @Override
+    public UcumVersion getUCUMVersion() {
+        return ucumVersion;
+    }
+
+    @Override
+    public void setUCUMVersion(UcumVersion ucumVersion) {
+        this.ucumVersion = ucumVersion;
+    }
 }

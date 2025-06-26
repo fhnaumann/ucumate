@@ -1,6 +1,7 @@
 package io.github.fhnaumann.adapters;
 
 import io.github.fhnaumann.model.UCUMDefinition;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.UCUMRegistry;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -27,7 +28,7 @@ public class UCUMConceptCodeAdapter {
     public static class UCUMDefinitionDeserializer<T extends UCUMDefinition.Concept> extends JsonDeserializer<T> {
         @Override
         public T deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
-            return (T) registry.getConcept(jsonParser.getValueAsString()).orElseThrow();
+            return (T) registry.getConcept(jsonParser.getValueAsString(), UcumVersion.V2_2).orElseThrow();
         }
     }
 }

@@ -2,6 +2,8 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
+import io.github.fhnaumann.funcs.UCUMService;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.UCUMRegistry;
 import org.junit.jupiter.api.Test;
 
@@ -16,25 +18,27 @@ public class UCUMVersioningTest {
     @Test
     public void test_default_UCUM_version_is_2_2() {
         ConfigurationRegistry.initialize(null);
-        assertThat(UCUMRegistry.getInstance().getLoadedUCUMEssenceVersion()).isEqualTo("2.2");
+        assertThat(new UCUMService().getUCUMVersion()).isEqualTo(UcumVersion.V2_2);
     }
 
     @Test
     public void test_UCUM_version_2_2_is_loaded() {
         ConfigurationRegistry.initialize(Configuration.builder().withUCUMVersion("2.2").build());
 
-        assertThat(UCUMRegistry.getInstance().getLoadedUCUMEssenceVersion()).isEqualTo("2.2");
-        assertThat(UCUMRegistry.getInstance().getUCUMUnit("[NTU]")).isNotEmpty();
-        assertThat(UCUMRegistry.getInstance().getUCUMUnit("[FNU]")).isNotEmpty();
+        UCUMService service = new UCUMService();
+        assertThat(service.getUCUMVersion()).isEqualTo(UcumVersion.V2_2);
+        assertThat(service.getUCUMRegistry().getUCUMUnit("[NTU]")).isNotEmpty();
+        assertThat(service.getUCUMRegistry().getUCUMUnit("[FNU]")).isNotEmpty();
     }
 
     @Test
     public void test_UCUM_version_2_1_is_loaded() {
         ConfigurationRegistry.initialize(Configuration.builder().withUCUMVersion("2.1").build());
 
-        assertThat(UCUMRegistry.getInstance().getLoadedUCUMEssenceVersion()).isEqualTo("2.1");
-        assertThat(UCUMRegistry.getInstance().getUCUMUnit("[NTU]")).isEmpty();
-        assertThat(UCUMRegistry.getInstance().getUCUMUnit("[FNU]")).isEmpty();
+        UCUMService service = new UCUMService();
+        assertThat(service.getUCUMVersion()).isEqualTo(UcumVersion.V2_1);
+        assertThat(service.getUCUMRegistry().getUCUMUnit("[NTU]")).isEmpty();
+        assertThat(service.getUCUMRegistry().getUCUMUnit("[FNU]")).isEmpty();
     }
 
     @Test

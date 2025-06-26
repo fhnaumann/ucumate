@@ -2,6 +2,7 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.api.InstanceOfAssertFactory;
 import org.junit.jupiter.api.BeforeAll;
@@ -41,7 +42,7 @@ public class TestParseErrors {
 
     @BeforeAll
     public static void init() {
-        validatorService = new FeedbackValidator();
+        validatorService = new FeedbackValidator(UcumVersion.V2_2);
     }
 
     @ParameterizedTest

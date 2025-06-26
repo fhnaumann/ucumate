@@ -67,7 +67,7 @@ public class UcumateToUcumJavaService implements UcumService {
         This returns an empty list because it implements all special units.
          */
         UCUMRegistry registry = UCUMRegistry.getInstance();
-        return registry.getAll().stream()
+        return registry.getAll(newUCUMService.getUCUMVersion()).stream()
                 .filter(concept -> !newUCUMService.validateToBool(concept.code()))
                 .map(concept -> "%s is invalid according to ucumate but exists in the provided essence file.".formatted(concept.code()))
                 .toList();
@@ -76,10 +76,10 @@ public class UcumateToUcumJavaService implements UcumService {
     @Override
     public List<Concept> search(ConceptKind kind, String text, boolean isRegex) {
         Collection<UCUMDefinition.Concept> poolOfConceptsToSearchFrom = new HashSet<>(switch (kind) {
-            case PREFIX -> UCUMRegistry.getInstance().getPrefixes();
-            case BASEUNIT -> UCUMRegistry.getInstance().getBaseUnits();
-            case UNIT -> UCUMRegistry.getInstance().getDefinedUnits();
-            case null -> UCUMRegistry.getInstance().getAll();
+            case PREFIX -> newUCUMService.getUCUMRegistry().getPrefixes();
+            case BASEUNIT -> newUCUMService.getUCUMRegistry().getBaseUnits();
+            case UNIT -> newUCUMService.getUCUMRegistry().getDefinedUnits();
+            case null -> newUCUMService.getUCUMRegistry().getAll();
         });
         return poolOfConceptsToSearchFrom
                 .stream()
@@ -127,7 +127,7 @@ public class UcumateToUcumJavaService implements UcumService {
 
     @Override
     public Set<String> getProperties() {
-        return UCUMRegistry.getInstance().getDefinedUnits().stream()
+        return newUCUMService.getUCUMRegistry().getDefinedUnits().stream()
                 .map(UCUMDefinition.UCUMUnit::property)
                 .collect(Collectors.toSet());
     }
@@ -199,7 +199,7 @@ public class UcumateToUcumJavaService implements UcumService {
 
     @Override
     public List<DefinedUnit> getDefinedForms(String code) throws UcumException {
-        Optional<UCUMDefinition.BaseUnit> optBaseUnit = UCUMRegistry.getInstance().getBaseUnit(code);
+        Optional<UCUMDefinition.BaseUnit> optBaseUnit = newUCUMService.getUCUMRegistry().getBaseUnit(code);
         if (optBaseUnit.isEmpty()) {
             return List.of();
         }
@@ -207,7 +207,7 @@ public class UcumateToUcumJavaService implements UcumService {
         UCUMExpression.CanonicalTerm baseUnitAsTerm = (UCUMExpression.CanonicalTerm) SoloTermBuilder.builder().withoutPrefix(baseUnit).noExpNoAnnot().asTerm().build();
 
         List<UCUMDefinition.DefinedUnit> result = new ArrayList<>();
-        for (UCUMDefinition.DefinedUnit definedUnit : UCUMRegistry.getInstance().getDefinedUnits()) {
+        for (UCUMDefinition.DefinedUnit definedUnit : newUCUMService.getUCUMRegistry().getDefinedUnits()) {
             var term = SoloTermBuilder.builder()
                     .withoutPrefix(definedUnit)
                     .noExpNoAnnot()

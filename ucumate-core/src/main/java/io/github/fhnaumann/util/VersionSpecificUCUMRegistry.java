@@ -37,7 +37,7 @@ public class VersionSpecificUCUMRegistry implements IUCUMRegistry {
 
     public VersionSpecificUCUMRegistry(UcumVersion version) {
         this.version = version;
-        final String ucumEssenceFileString = "ucum-essence-%s.xml".formatted(version.getVersion());
+        final String ucumEssenceFileString = "ucum-essence-%s.xml".formatted(version.getVersion().replace(".", "_"));
         this.ucumEssence = loadUCUMEssence(VersionSpecificUCUMRegistry.class.getClassLoader().getResourceAsStream(ucumEssenceFileString));
         this.prefixes = identityFromList(ucumEssence.prefixes());
         this.baseUnits = identityFromList(ucumEssence.baseUnits());
