@@ -10,24 +10,24 @@
     <meta name="generator" content="Retype 3.10.1">
 
     <!-- Primary Meta Tags -->
-    <title>Feature Flags</title>
-    <meta name="title" content="Feature Flags">
-    <meta name="description" content="The UCUM specification has some ambiguity, and therefore it is not easy to agree on what might be valid UCUM syntax and what not.">
+    <title>Managing UCUM Versions</title>
+    <meta name="title" content="Managing UCUM Versions">
+    <meta name="description" content="ucumate currently supports two UCUM versions: 2.1 and 2.2. The default version is 2.2 but you can change that">
 
     <!-- Canonical -->
-    <link rel="canonical" href="https://fhnaumann.github.io/ucumate/feature_flags/">
+    <link rel="canonical" href="https://fhnaumann.github.io/ucumate/ucum_versions/">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://fhnaumann.github.io/ucumate/feature_flags/">
-    <meta property="og:title" content="Feature Flags">
-    <meta property="og:description" content="The UCUM specification has some ambiguity, and therefore it is not easy to agree on what might be valid UCUM syntax and what not.">
+    <meta property="og:url" content="https://fhnaumann.github.io/ucumate/ucum_versions/">
+    <meta property="og:title" content="Managing UCUM Versions">
+    <meta property="og:description" content="ucumate currently supports two UCUM versions: 2.1 and 2.2. The default version is 2.2 but you can change that">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/feature_flags/">
-    <meta property="twitter:title" content="Feature Flags">
-    <meta property="twitter:description" content="The UCUM specification has some ambiguity, and therefore it is not easy to agree on what might be valid UCUM syntax and what not.">
+    <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/ucum_versions/">
+    <meta property="twitter:title" content="Managing UCUM Versions">
+    <meta property="twitter:description" content="ucumate currently supports two UCUM versions: 2.1 and 2.2. The default version is 2.2 but you can change that">
 
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
@@ -179,99 +179,36 @@
                                             </svg>
                                         </li>
                                         <li class="pr-4">
-                                            <a href="../feature_flags/" class="pr-4">
-                                                Feature Flags
+                                            <a href="../ucum_versions/" class="pr-4">
+                                                Managing UCUM Versions
                                             </a>
                                         </li>
                                     </ol>
                                 </nav>
                 
                                 <!-- Page content  -->
-<doc-anchor-target id="feature-flags" class="break-words">
+<doc-anchor-target id="managing-ucum-versions" class="break-words">
     <h1>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#feature-flags">#</doc-anchor-trigger>
-        <span>Feature Flags</span>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#managing-ucum-versions">#</doc-anchor-trigger>
+        <span>Managing UCUM Versions</span>
     </h1>
 </doc-anchor-target>
-<p>The UCUM specification has some ambiguity, and therefore it is not easy to agree on what might be valid UCUM syntax and what not.
-<code v-pre>ucumate</code> provides some feature flags that let the developer choose by which rules to play by.</p>
-<doc-anchor-target id="setting-feature-flags">
-    <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#setting-feature-flags">#</doc-anchor-trigger>
-        <span>Setting Feature Flags</span>
-    </h2>
-</doc-anchor-target>
-<p>To enable or disable these settings application wide, you can use properties of the provided builder class.</p>
-<doc-anchor-target id="properties">
-    <h3>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#properties">#</doc-anchor-trigger>
-        <span>Properties</span>
-    </h3>
-</doc-anchor-target>
-<p>Create a <code v-pre>ucumate.properties</code> file in your resource folder.</p>
+<p><code v-pre>ucumate</code> currently supports two UCUM versions: <code v-pre>2.1</code> and <code v-pre>2.2</code>. The default version is <code v-pre>2.2</code> but you can change that
+via the properties.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-properties"><code v-pre class="language-properties">ucumate.enablePrefixOnNonMetricUnits=true
-ucumate.enableMolMassConversion=true
-ucumate.allowAnnotAfterParens=true</code></pre>
+<pre translate="no" class="language-properties"><code v-pre class="language-properties"># inside ucumate.properties
+ucumate.ucumVersion=2.2</code></pre>
 </doc-codeblock></div>
-<doc-anchor-target id="builder">
-    <h3>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#builder">#</doc-anchor-trigger>
-        <span>Builder</span>
-    </h3>
-</doc-anchor-target>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre translate="no" class="language-java"><code v-pre class="language-java">Configuration configuration = Configuration.builder()
-        .enablePrefixOnNonMetricUnits(true)
-        .enableMolMassConversion(true)
-        .allowAnnotAfterParens(true)
-        .build();
-ConfigurationRegistry.initialize(configuration);</code></pre>
+<pre translate="no" class="language-java"><code v-pre class="language-java">ConfigurationRegistry.initialize(Configuration.builder().withUCUMVersion(&quot;2.2&quot;).build());</code></pre>
 </doc-codeblock></div>
-<doc-anchor-target id="prefixes-on-non-metric-units">
-    <h3>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#prefixes-on-non-metric-units">#</doc-anchor-trigger>
-        <span>Prefixes on Non-Metric Units</span>
-    </h3>
-</doc-anchor-target>
-<p>The UCUM specification mentions that prefixes (i.e. <code v-pre>centi</code>, <code v-pre>mili</code>, ...) may only be used on metric units. For example,
-<code v-pre>meter</code> may be prefixed with <code v-pre>centi</code> to form <code v-pre>centimeter</code> (UCUM syntax: <code v-pre>cm</code>). Forming <code v-pre>centifoot</code> (UCUM syntax: <code v-pre>c[ft_i]</code>)
-would be invalid. Sometimes this behaviour is desired and therefore this flag exists.</p>
-<div class="flex mb-6">
-    <div class="shrink-0 w-1.5 rounded-tl-lg rounded-bl-lg bg-blue-300"></div>
-    <div class="flex w-full py-4 border border-l-0 border-gray-300 rounded-tr-lg rounded-br-lg doc-callout bg-white dark:bg-dark-700 dark:border-dark-700" role="alert">
-        <div class="flex items-center ml-4 h-7">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mb-px text-blue-300" width="22" height="22" viewBox="0 0 24 24" role="presentation">
-                <g fill="currentColor"><g>
-                    <path d="M12 1C5.93 1 1 5.93 1 12s4.93 11 11 11 11-4.93 11-11S18.07 1 12 1zm0 20c-4.96 0-9-4.04-9-9s4.04-9 9-9 9 4.04 9 9-4.04 9-9 9z"></path>
-                    <path d="M12 11c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1s1-.45 1-1v-4c0-.55-.45-1-1-1zM12.01 7c-.56 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"></path>
-                    <path fill="none" d="M0 0h24v24H0z"></path>
-                </g></g>
-            </svg>
-        </div>
-        <div class="pr-5 ml-3 w-full">
-            <h5>The <code v-pre>da</code> Problem</h5>
-<p>If prefixes on non-metric units are disabled, then <code v-pre>da</code> matches the <code v-pre>deka</code> prefix which just by itself is invalid UCUM syntax.
-If enabled, then <code v-pre>da</code> matches <code v-pre>deci year</code>.</p>
-        </div>
-    </div>
-</div>
-<doc-anchor-target id="annotations-on-parenthesis">
-    <h3>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#annotations-on-parenthesis">#</doc-anchor-trigger>
-        <span>Annotations on Parenthesis</span>
-    </h3>
-</doc-anchor-target>
-<p>It is not clear whether <code v-pre>(m.s){annot}</code> is valid or not. Some common UCUM code lists include such codes, hence this flag exists.</p>
-<doc-anchor-target id="mol---mass-conversion">
-    <h3>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#mol---mass-conversion">#</doc-anchor-trigger>
-        <span>Mol &lt;-&gt; Mass Conversion</span>
-    </h3>
-</doc-anchor-target>
-<p>The UCUM specification explicitly states that mol (and any unit defined on it) canonicalizes to avogadro&#x27;s number (dimensionless).
-This is sometimes undesirable as in different context it can also canonicalize to a mass (usually gram). This requires an
-additional parameter, the substance&#x27;s molar mass coefficient.</p>
+<p>You can also specify the desired version on a per-service basis. Explicitly providing a version will override the version
+specified in the properties.</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre translate="no" class="language-java"><code v-pre class="language-java">UCUMService defaultService = new UCUMService(); // uses what is in the `ucumate.ucumVersion` property
+UCUMService service2_1 = new UCUMService(&quot;2.1&quot;);
+UCUMService service2_2 = new UCUMService(&quot;2.2&quot;);</code></pre>
+</doc-codeblock></div>
 
                                 
                                 <!-- Required only on API pages -->
@@ -281,20 +218,20 @@ additional parameter, the substance&#x27;s molar mass coefficient.</p>
                             
                                 <nav id="retype-nextprev" class="print:hidden flex mt-14">
                                     <div class="w-1/2">
-                                        <a class="px-5 py-4 h-full flex items-center break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-l-lg transition-colors duration-150 relative hover:z-5" href="../exact_math/">
+                                        <a class="px-5 py-4 h-full flex items-center break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-l-lg transition-colors duration-150 relative hover:z-5" href="../feature_flags/">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="mr-3" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" overflow="visible"><path d="M19 11H7.41l5.29-5.29a.996.996 0 10-1.41-1.41l-7 7a1 1 0 000 1.42l7 7a1.024 1.024 0 001.42-.01.996.996 0 000-1.41L7.41 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
                                             <span>
                                                 <span class="block text-xs font-normal text-gray-400 dark:text-dark-400">Previous</span>
-                                                <span class="block mt-1">Exact Math</span>
+                                                <span class="block mt-1">Feature Flags</span>
                                             </span>
                                         </a>
                                     </div>
                             
                                     <div class="w-1/2">
-                                        <a class="px-5 py-4 -mx-px h-full flex items-center justify-end break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-r-lg transition-colors duration-150 relative hover:z-5" href="../ucum_versions/">
+                                        <a class="px-5 py-4 -mx-px h-full flex items-center justify-end break-normal font-medium text-blue-500 dark:text-blue-400 border border-gray-300 hover:border-gray-400 dark:border-dark-650 dark:hover:border-dark-450 rounded-r-lg transition-colors duration-150 relative hover:z-5" href="../mol_mass_conversion/">
                                             <span>
                                                 <span class="block text-xs font-normal text-right text-gray-400 dark:text-dark-400">Next</span>
-                                                <span class="block mt-1">Managing UCUM Versions</span>
+                                                <span class="block mt-1">Mole <-> Mass Conversion</span>
                                             </span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="ml-3" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" overflow="visible"><path d="M19.92 12.38a1 1 0 00-.22-1.09l-7-7a.996.996 0 10-1.41 1.41l5.3 5.3H5c-.55 0-1 .45-1 1s.45 1 1 1h11.59l-5.29 5.29a.996.996 0 000 1.41c.19.2.44.3.7.3s.51-.1.71-.29l7-7c.09-.09.16-.21.21-.33z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
                                         </a>
@@ -338,6 +275,6 @@ additional parameter, the substance&#x27;s molar mass coefficient.</p>
 
     <div id="retype-overlay-target"></div>
 
-    <script data-cfasync="false">window.__DOCS__ = { "title": "Feature Flags", level: 1, icon: "file", hasPrism: true, hasMermaid: false, hasMath: false, tocDepth: 23 }</script>
+    <script data-cfasync="false">window.__DOCS__ = { "title": "Managing UCUM Versions", level: 1, icon: "file", hasPrism: true, hasMermaid: false, hasMath: false, tocDepth: 23 }</script>
 </body>
 </html>
