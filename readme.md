@@ -1,9 +1,11 @@
 # ucumate
 
-Ucumate is a developer-friendly Java library for parsing, validating, canonicalizing, 
-and converting units of measure based on the Unified Code for Units of Measure (UCUM) standard.
-It provides validation, canonicalization, and conversion support with high decimal precision if desired. 
-Furthermore, all special units are supported.
+ucumate is a developer-friendly Java library for working with units of measure based on the [UCUM standard](https://ucum.org/). At its core, 
+it provides validation, canonicalization, conversion, and printing support with automatic caching. Optional features 
+enable persistent database storage, mole-to-mass conversions, and high-precision calculation of conversion factors 
+for special units. 
+
+An [online demo](https://virtuous-respect-production.up.railway.app/) is also available.
 
 ```xml
 <dependency>
@@ -13,11 +15,29 @@ Furthermore, all special units are supported.
 </dependency>
 ```
 
+```xml
+<repositories>
+  <repository>
+    <name>Central Portal Snapshots</name>
+    <id>central-portal-snapshots</id>
+    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    <releases>
+      <enabled>false</enabled>
+    </releases>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+  </repository>
+</repositories>
+```
+
 ```java
-String print = UCUMService.print("cm");
-Validator.ValidationResult valResult = UCUMService.validate("cm");
-Canonicalizer.CanonicalizationResult canonResult = UCUMService.canonicalize("[in_i]");
-Converter.ConversionResult convResult = UCUMService.convert("[ft_i]", "[in_i]");
+UCUMService ucumService = new UCUMService(); // default version is 2.2, but you can also specify a different version
+LookupResult lookupResult = ucumService.lookup("meter");
+String print = ucumService.print("cm");
+ValidationResult valResult = ucumService.validate("cm");
+CanonicalizationResult canonResult = ucumService.canonicalize("[in_i]");
+ConversionResult convResult = ucumService.convert("[ft_i]", "[in_i]");
 ```
 
 Read more about the usage in the [documentation](https://fhnaumann.github.io/ucumate/).

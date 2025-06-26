@@ -2,6 +2,7 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
+import io.github.fhnaumann.model.UcumVersion;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +25,7 @@ public class LookupTest {
 
     @BeforeAll
     public static void init() {
-        lookupService = new Lookup();
+        lookupService = new Lookup(UcumVersion.V2_2);
         printer = new UCUMSyntaxPrinter();
     }
 

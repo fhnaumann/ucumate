@@ -30,6 +30,7 @@ public class TestFeatureFlagAnnotAfterParens {
     @ParameterizedTest
     @MethodSource("provide_expressions")
     public void test(String expression, boolean allowAnnotAfterParens, boolean expectedValid) {
+        ConfigurationRegistry.initialize(null);
         ConfigurationRegistry.initialize(Configuration.builder().allowAnnotAfterParens(allowAnnotAfterParens).build());
 
         boolean actualValid = validatorService.validateToBool(expression);

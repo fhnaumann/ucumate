@@ -1,5 +1,7 @@
 package io.github.fhnaumann.providers;
 
+import io.github.fhnaumann.model.UcumVersion;
+
 import java.sql.Connection;
 
 /**
@@ -7,8 +9,8 @@ import java.sql.Connection;
  */
 public class MySQLPersistenceProvider extends JDBCPersistenceProvider {
 
-    public MySQLPersistenceProvider(Connection connection, String canonicalTableName, String validateTableName) {
-        super(connection, canonicalTableName, validateTableName);
+    public MySQLPersistenceProvider(UcumVersion ucumVersion, Connection connection, String canonicalTableName, String validateTableName) {
+        super(ucumVersion, connection, canonicalTableName, validateTableName);
     }
 
     @Override

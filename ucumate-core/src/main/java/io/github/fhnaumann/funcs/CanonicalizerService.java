@@ -7,7 +7,7 @@ import io.github.fhnaumann.util.PreciseDecimal;
 /**
  * @author Felix Naumann
  */
-public interface CanonicalizerService extends QuickParse {
+public interface CanonicalizerService extends UcumVersioning, QuickParse {
 
     /**
      * Canonicalize a UCUMTerm that is given as a string.

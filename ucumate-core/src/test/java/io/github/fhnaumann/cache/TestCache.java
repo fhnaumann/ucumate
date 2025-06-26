@@ -5,6 +5,7 @@ import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.Printer;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ public class TestCache {
         assertThat(valResult).isInstanceOf(Validator.Failure.class);
         System.out.println(ConfigurationRegistry.get());
         System.out.println(PersistenceRegistry.cache.isEnabled());
-        Validator.ValidationResult allEnabledValResult = PersistenceRegistry.getInstance().getValidated(new ValKey(expression, ALL_ENABLED.asFeatureFlags()));
+        Validator.ValidationResult allEnabledValResult = PersistenceRegistry.getInstance().getValidated(new ValKey(expression, ALL_ENABLED.asFeatureFlags(), UcumVersion.V2_2));
         assertThat(allEnabledValResult).isInstanceOf(Validator.Success.class);
     }
 

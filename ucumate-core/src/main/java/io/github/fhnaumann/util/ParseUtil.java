@@ -30,7 +30,7 @@ public class ParseUtil {
         };
     }
 
-    private static MatchResult computeMatchResult(String textMaybeWithUCUMUnit, String partialText, UCUMRegistry registry) {
+    private static MatchResult computeMatchResult(String textMaybeWithUCUMUnit, String partialText, IUCUMRegistry registry) {
         Optional<UCUMDefinition.UCUMUnit> optionalUCUMUnit = registry.getUCUMUnit(partialText);
         if(optionalUCUMUnit.isPresent()) {
             UCUMDefinition.UCUMUnit ucumUnit = optionalUCUMUnit.get();
@@ -69,7 +69,7 @@ public class ParseUtil {
         };
     }
 
-    public static MatchResult separatePrefixFromUnit(String textMaybeWithUCUMUnit, UCUMRegistry registry) {
+    public static MatchResult separatePrefixFromUnit(String textMaybeWithUCUMUnit, IUCUMRegistry registry) {
         List<MatchResult> matchResults = IntStream.iterate(textMaybeWithUCUMUnit.length() - 1,
                                                            i -> i >= 0,
                                                            i -> i - 1

@@ -3,6 +3,7 @@ package io.github.fhnaumann.funcs;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.sorter.AlphabeticalSorter;
 import io.github.fhnaumann.model.UCUMDefinition.*;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.util.MolMassUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
@@ -13,25 +14,44 @@ import io.github.fhnaumann.model.UCUMExpression.*;
 import io.github.fhnaumann.model.special.SpecialUnits;
 import io.github.fhnaumann.model.special.SpecialUnitsFunctionProvider;
 import io.github.fhnaumann.util.PreciseDecimal;
+import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Canonicalizer implements CanonicalizerService {
 
-    private static final UCUMRegistry registry = UCUMRegistry.getInstance();
     private static final Logger log = LoggerFactory.getLogger(Canonicalizer.class);
 
+    private UcumVersion ucumVersion;
     private final PrinterService printerService;
     private final ValidatorService validatorService;
 
-    public Canonicalizer(PrinterService printerService, ValidatorService validatorService) {
+    private final VersionSpecificUCUMRegistry registry;
+
+    public Canonicalizer(UcumVersion ucumVersion, PrinterService printerService, ValidatorService validatorService) {
+        this.ucumVersion = ucumVersion;
         this.printerService = printerService;
         this.validatorService = validatorService;
+        this.registry = UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(ucumVersion);
+    }
+
+    public Canonicalizer(PrinterService printerService, ValidatorService validatorService) {
+        this(UcumVersion.fromVersionString(ConfigurationRegistry.get().getUCUMVersion()), printerService, validatorService);
     }
 
     @Override
     public Term parseOrError(String input) {
         return UCUMService.staticParseOrError(input, validatorService);
+    }
+
+    @Override
+    public UcumVersion getUCUMVersion() {
+        return ucumVersion;
+    }
+
+    @Override
+    public void setUCUMVersion(UcumVersion ucumVersion) {
+        this.ucumVersion = ucumVersion;
     }
 
     public record CanonicalStepResult(
@@ -179,7 +199,7 @@ public class Canonicalizer implements CanonicalizerService {
 
 
             boolean isSpecial = canonicalStep.specialHandlingActive() && canonicalStep.specialFunction() != null;
-            boolean isMolInvolved = MolMassUtil.containsMol(term);
+            boolean isMolInvolved = MolMassUtil.containsMol(term, ucumVersion);
             if(isSpecial && isMolInvolved && substanceMolarMassCoeff != null && ConfigurationRegistry.get().isEnableMolMassConversion()) {
                 // as for UCUM version 2.2 this only affects "[pH]"
                 log.warn("Conversion involving the special unit '[pH]' to a mass unit is not supported.");

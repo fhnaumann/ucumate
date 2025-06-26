@@ -3,6 +3,7 @@ package io.github.fhnaumann.model;
 import io.github.fhnaumann.NewUCUMBaseVisitor;
 import io.github.fhnaumann.NewUCUMParser;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.util.IUCUMRegistry;
 import io.github.fhnaumann.util.ParseUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
 
@@ -10,9 +11,9 @@ import io.github.fhnaumann.util.UCUMRegistry;
  * @author Felix Naumann
  */
 public class CanonicalUCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
-    private final UCUMRegistry registry;
+    private final IUCUMRegistry registry;
 
-    public CanonicalUCUMSyntaxVisitor(UCUMRegistry registry) {
+    public CanonicalUCUMSyntaxVisitor(IUCUMRegistry registry) {
         this.registry = registry;
     }
 

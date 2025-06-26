@@ -4,6 +4,7 @@ package io.github.fhnaumann.configuration;
  * @author Felix Naumann
  */
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 public final class FeatureFlags {
 
     private static final String DELIMITER = "::cfg=";
+    private static final String VERSION_PREFIX = "::ver=";
 
     public enum Flag {
         PREFIX_ON_NON_METRIC,
@@ -44,8 +46,12 @@ public final class FeatureFlags {
     }
 
     public static FeatureFlags of(Set<Flag> flags) {
+        if (flags.isEmpty() && !(flags instanceof EnumSet<Flag>)) {
+            flags = EnumSet.noneOf(Flag.class);
+        }
         int mask = computeBitmask(flags);
-        return INTERNED.computeIfAbsent(mask, m -> new FeatureFlags(EnumSet.copyOf(flags)));
+        Set<Flag> finalFlags = flags;
+        return INTERNED.computeIfAbsent(mask, m -> new FeatureFlags(EnumSet.copyOf(finalFlags)));
     }
 
     public static FeatureFlags of(Flag... flags) {
@@ -105,18 +111,20 @@ public final class FeatureFlags {
         return "FeatureFlags" + flags;
     }
 
-    public static String toStorageKey(String expression, FeatureFlags flags) {
-        return expression + DELIMITER + flags.bitmask;
+    public static String toStorageKey(String expression, FeatureFlags flags, UcumVersion version) {
+        return expression + DELIMITER + flags.bitmask + VERSION_PREFIX + version.getVersion();
     }
 
     public static ValKey fromStorageKey(String storageKey) {
-        int idx = storageKey.indexOf(DELIMITER);
-        if (idx == -1) {
+        int cfgIdx = storageKey.indexOf(DELIMITER);
+        int verIdx = storageKey.indexOf(VERSION_PREFIX);
+        if (cfgIdx == -1 || verIdx == -1) {
             throw new IllegalArgumentException("Invalid storage key format: " + storageKey);
         }
-        String expr = storageKey.substring(0, idx);
-        int bitmask = Integer.parseInt(storageKey.substring(idx + DELIMITER.length()));
-        return new ValKey(expr, fromBitmask(bitmask));
+        String expr = storageKey.substring(0, cfgIdx);
+        int bitmask = Integer.parseInt(storageKey.substring(cfgIdx + DELIMITER.length(), verIdx));
+        String version = storageKey.substring(verIdx + VERSION_PREFIX.length());
+        return new ValKey(expr, fromBitmask(bitmask), UcumVersion.fromVersionString(version));
     }
 
     private static FeatureFlags fromBitmask(int bitmask) {

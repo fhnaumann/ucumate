@@ -1,8 +1,10 @@
 package io.github.fhnaumann.funcs;
 
 import io.github.fhnaumann.model.UCUMDefinition;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
 import io.github.fhnaumann.util.UCUMRegistry;
+import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +20,20 @@ public class Lookup implements LookupService {
 
     private static final Logger log = LoggerFactory.getLogger(Lookup.class);
 
-    private static final UCUMRegistry registry = UCUMRegistry.getInstance();
+    private final VersionSpecificUCUMRegistry registry;
 
     private static final Set<String> WARN_ON_ENCOUNTER = Set.of(".", "/", "+", "-");
-    private static final Map<String, UCUMDefinition.UCUMUnit> unitsNormallyWithSbWithoutSb = removeSbFromSbUnits();
+    private final Map<String, UCUMDefinition.UCUMUnit> unitsNormallyWithSbWithoutSb;
 
-    private static Map<String, UCUMDefinition.UCUMUnit> removeSbFromSbUnits() {
+    private UcumVersion ucumVersion;
+
+    public Lookup(UcumVersion ucumVersion) {
+        this.ucumVersion = ucumVersion;
+        this.registry = UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(ucumVersion);
+        this.unitsNormallyWithSbWithoutSb = removeSbFromSbUnits();
+    }
+
+    private Map<String, UCUMDefinition.UCUMUnit> removeSbFromSbUnits() {
         return registry.getDefinedUnits().stream()
                 .filter(definedUnit -> definedUnit.code().contains("[") && definedUnit.code().contains("]"))
                 .collect(Collectors.toMap(
@@ -119,4 +129,13 @@ public class Lookup implements LookupService {
     }
 
 
+    @Override
+    public UcumVersion getUCUMVersion() {
+        return ucumVersion;
+    }
+
+    @Override
+    public void setUCUMVersion(UcumVersion ucumVersion) {
+        this.ucumVersion = ucumVersion;
+    }
 }
