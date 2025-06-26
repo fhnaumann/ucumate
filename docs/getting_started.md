@@ -34,7 +34,7 @@ order: 99
 Use the `UCUMService` class to access the core functionality. This includes lookup, printing, validation, canonicalization and conversion.
 
 ```java
-UCUMService ucumService = new UCUMService();
+UCUMService ucumService = new UCUMService(); // default version is 2.2, but you can also specify a different version
 LookupResult lookupResult = ucumService.lookup("meter");
 String print = ucumService.print("cm");
 ValidationResult valResult = ucumService.validate("cm");
