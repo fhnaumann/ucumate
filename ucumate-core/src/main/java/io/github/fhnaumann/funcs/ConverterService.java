@@ -7,7 +7,7 @@ import io.github.fhnaumann.util.PreciseDecimal;
 /**
  * @author Felix Naumann
  */
-public interface ConverterService extends QuickParse {
+public interface ConverterService extends UcumVersioning, QuickParse {
 
     /**
      * Convert a UCUMTerm to another UCUMTerm.

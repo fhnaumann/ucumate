@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Stream;
 
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class PersistenceRegistry implements PersistenceProvider {
 
     private PersistenceRegistry() {}
 
-    private static final String CACHE_SETTINGS_PROPERTY_FILE_NAME = "ucumate.properties";
+    private static final String CACHE_SETTINGS_PROPERTY_FILE_NAME = "ucumate_fallback.properties";
 
     public static InMemoryPersistenceProvider cache;
     private static final Map<String, PersistenceProvider> additionalProviders = new HashMap<>();
@@ -77,7 +78,8 @@ public class PersistenceRegistry implements PersistenceProvider {
                     cache.setEnabled(false);
                 }
             }
-            cache = new InMemoryPersistenceProvider(maxCanonSize, maxValSize, recordStats);
+            UcumVersion version = ConfigurationRegistry.get().getUCUMVersionAsEnum();
+            cache = new InMemoryPersistenceProvider(version, maxCanonSize, maxValSize, recordStats);
             cache.setEnabled(true);
             if(preHeat) {
                 List<String> mergedCodes = Stream.concat(overrideInsteadOfAdd ? new ArrayList<String>().stream() : defaultPreHeatCodes.stream(), preHeatCodes.stream())
@@ -99,7 +101,7 @@ public class PersistenceRegistry implements PersistenceProvider {
                 logger.debug("Picked up: {}", props);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load ucumate.properties", e);
+            throw new RuntimeException("Failed to load ucumate_fallback.properties", e);
         }
         return props;
     }
@@ -227,6 +229,11 @@ public class PersistenceRegistry implements PersistenceProvider {
             return Map.of();
         }
         return additionalProviders.entrySet().stream().findFirst().get().getValue().getAllValidated();
+    }
+
+    @Override
+    public UcumVersion getVersion() {
+        return ConfigurationRegistry.get().getUCUMVersionAsEnum();
     }
 
     @Override

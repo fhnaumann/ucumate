@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * @author Felix Naumann
  */
-public interface LookupService {
+public interface LookupService extends UcumVersioning {
 
     /**
      * Lookup a UCUM unit with other properties besides the code.

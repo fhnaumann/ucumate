@@ -36,7 +36,7 @@ You will need the core implementation.
 </dependency>
 ```
 
-If you used [Ucum-java](https://github.com/FHIR/Ucum-java) previously you can use the [drop-in replacement module](ucumate_ucumjava_bridge.md).
+If you used [Ucum-java](https://github.com/FHIR/Ucum-java) previously, you can use the [drop-in replacement module](ucumate_ucumjava_bridge.md).
 
 ```xml
 <dependency>

@@ -1,9 +1,11 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.SpecialChecker;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.UCUMRegistry;
 import org.antlr.v4.runtime.*;
 
@@ -15,7 +17,18 @@ import java.util.List;
  */
 public class FeedbackValidator implements ValidatorService {
 
-    private static final ValidatorService normalValidator = new Validator();
+    private UcumVersion ucumVersion;
+
+    private final ValidatorService normalValidator;
+
+    public FeedbackValidator() {
+        this(ConfigurationRegistry.get().getUCUMVersionAsEnum());
+    }
+
+    public FeedbackValidator(UcumVersion ucumVersion) {
+        this.ucumVersion = ucumVersion;
+        this.normalValidator = new Validator(ucumVersion);
+    }
 
     @Override
     public ValidationResult validate(String input) {
@@ -53,7 +66,7 @@ public class FeedbackValidator implements ValidatorService {
 
             SyntaxMatchHelper.searchForAnyUnbalancedParens(tokens, tree, errorMessages);
 
-            MyFeedbackVisitor visitor = new MyFeedbackVisitor(UCUMRegistry.getInstance(), new ArrayList<>());
+            MyFeedbackVisitor visitor = new MyFeedbackVisitor(ucumVersion, UCUMRegistry.getInstance(), new ArrayList<>());
             UCUMExpression.Term term = (UCUMExpression.Term) visitor.visit(tree);
 
             if(term != null) {
@@ -80,7 +93,7 @@ public class FeedbackValidator implements ValidatorService {
         } catch (Validator.ParserException | LexerException e) {
             //e.printStackTrace();
 
-            String analysedMessage = SyntaxMatchHelper.analyseUnitForErrorDetails(input);
+            String analysedMessage = SyntaxMatchHelper.analyseUnitForErrorDetails(input, ucumVersion);
             if(analysedMessage != null) {
                 errorMessages.add(analysedMessage);
             }
@@ -95,5 +108,16 @@ public class FeedbackValidator implements ValidatorService {
             }
             return new Failure(errorMessages);
         }
+    }
+
+    @Override
+    public UcumVersion getUCUMVersion() {
+        return ucumVersion;
+    }
+
+    @Override
+    public void setUCUMVersion(UcumVersion ucumVersion) {
+        normalValidator.setUCUMVersion(ucumVersion);
+        this.ucumVersion = ucumVersion;
     }
 }

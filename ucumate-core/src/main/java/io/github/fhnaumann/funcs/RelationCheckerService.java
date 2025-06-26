@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * @author Felix Naumann
  */
-public interface RelationCheckerService extends QuickParse {
+public interface RelationCheckerService extends UcumVersioning, QuickParse {
 
     /**
      * Checks the relation between two UCUMTerms.

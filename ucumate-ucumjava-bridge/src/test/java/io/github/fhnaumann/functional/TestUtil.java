@@ -9,6 +9,7 @@ import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.funcs.printer.WolframAlphaSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
 import io.github.fhnaumann.util.UCUMRegistry;
 
@@ -17,6 +18,8 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 public class TestUtil {
+
+    private static final UcumVersion VERSION = UcumVersion.V2_2;
 
     private static final BigDecimal EPSILON = new BigDecimal("0.00001");
 
@@ -51,12 +54,12 @@ public class TestUtil {
     public static final PreciseDecimal FIVE = new PreciseDecimal("5");
 
     public static UCUMDefinition.UCUMUnit getUCUMUnit(String code) {
-        return ucumRegistry.getUCUMUnit(code)
+        return ucumRegistry.getUCUMUnit(code, VERSION)
                            .orElseThrow(() -> new IllegalStateException("UCUM unit '%s' not found!".formatted(code)));
     }
 
     public static UCUMDefinition.UCUMPrefix getUCUMPrefix(String prefix) {
-        return ucumRegistry.getPrefix(prefix)
+        return ucumRegistry.getPrefix(prefix, VERSION)
                            .orElseThrow(() -> new IllegalStateException("UCUM prefix '%s' not found!".formatted(prefix)));
     }
 

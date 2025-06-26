@@ -15,6 +15,7 @@ import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.persistence.PersistenceProvider;
 import io.github.fhnaumann.util.PreciseDecimal;
 import org.bson.Document;
@@ -29,13 +30,15 @@ import static com.mongodb.client.model.Filters.eq;
  */
 public class MongoDBPersistenceProvider implements PersistenceProvider {
 
+    private final UcumVersion ucumVersion;
     private final MongoClient client;
     private final MongoCollection<Document> canonicalColl;
     private final MongoCollection<Document> validationColl;
 
     private static final PrinterService printer = new UCUMSyntaxPrinter();
 
-    public MongoDBPersistenceProvider(MongoClient client, String dbName) {
+    public MongoDBPersistenceProvider(UcumVersion ucumVersion, MongoClient client, String dbName) {
+        this.ucumVersion = ucumVersion;
         this.client = client;
         MongoDatabase db = client.getDatabase(dbName);
         this.canonicalColl = db.getCollection("ucumate_canonical");
@@ -71,7 +74,7 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
         }
         PreciseDecimal magnitude = new PreciseDecimal(doc.getString("magnitude"));
         PreciseDecimal cfPrefix = new PreciseDecimal(doc.getString("cfPrefix"));
-        UCUMExpression.Term term = Validator.parseCanonical(doc.getString("term"));
+        UCUMExpression.Term term = Validator.parseCanonical(doc.getString("term"), ucumVersion);
         boolean special = doc.getBoolean("special", false);
         UCUMDefinition.UCUMFunction func = null;
 
@@ -87,14 +90,22 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
+    public UcumVersion getVersion() {
+        return ucumVersion;
+    }
+
+    @Override
     public Map<CanonKey, Canonicalizer.CanonicalStepResult> getAllCanonical() {
         Map<CanonKey, Canonicalizer.CanonicalStepResult> resultMap = new HashMap<>();
 
         for (Document doc : canonicalColl.find()) {
             String unitKey = doc.getString("unit_key");
-            CanonKey canonKey = CanonKey.fromStorageKey(unitKey);
+            CanonKey canonKey = CanonKey.fromStorageKey(unitKey, ucumVersion);
+            if(canonKey.version() != ucumVersion) {
+                continue;
+            }
             String termStr = doc.getString("term");
-            UCUMExpression.Term term = Validator.parseCanonical(termStr);
+            UCUMExpression.Term term = Validator.parseCanonical(termStr, ucumVersion);
             PreciseDecimal magnitude = new PreciseDecimal(doc.getString("magnitude"));
             PreciseDecimal cfPrefix = new PreciseDecimal(doc.getString("cfPrefix"));
 
@@ -134,7 +145,7 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
 
         boolean valid = doc.getBoolean("valid", false);
         if(valid) {
-            return new Validator.Success(Validator.parseByPassChecks(key.expression()));
+            return new Validator.Success(Validator.parseByPassChecks(key.expression(), ucumVersion));
         } else {
             return new Validator.Failure();
         }
@@ -147,10 +158,13 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
         for(Document doc : validationColl.find()) {
             String key = doc.getString("unit_key");
             ValKey valKey = ValKey.fromStorageKey(key);
+            if(valKey.version() != ucumVersion) {
+                continue;
+            }
             boolean valid = doc.getBoolean("valid", false);
 
             Validator.ValidationResult result = valid
-                    ? new Validator.Success(Validator.parseByPassChecks(valKey.expression()))
+                    ? new Validator.Success(Validator.parseByPassChecks(valKey.expression(), ucumVersion))
                     : new Validator.Failure();
 
             resultMap.put(valKey, result);

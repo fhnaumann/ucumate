@@ -3,6 +3,7 @@ package io.github.fhnaumann;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
 import io.github.fhnaumann.util.UCUMRegistry;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,21 +28,19 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 @Tag("functional-tests")
 public class UCUMFunctionalTests {
 
-    private static UCUMRegistry registry;
-
     /*
     These are "wrong" and therefore ucumate has (partially) different results. See the online documentation of ucumate
     to see the individual reasoning for each test case that is listed here.
      */
     private static List<String> TESTS_TO_SKIP = List.of("1-108", "3-115", "3-121", "3-122", "3-123", "3-124", "3-128");
 
-    private static ValidatorService validatorService = new FeedbackValidator();
+    private static ValidatorService validatorService = new FeedbackValidator(UcumVersion.V2_2);
     private static PrinterService printerService = new Printer();
     private static ConverterService converterService = new Converter(printerService, validatorService);
 
     @BeforeAll
     public static void init() {
-        registry = UCUMRegistry.getInstance();
+
     }
 
     private enum FunctionalTestType {

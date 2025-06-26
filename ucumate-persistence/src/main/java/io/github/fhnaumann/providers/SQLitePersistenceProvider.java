@@ -3,6 +3,7 @@ package io.github.fhnaumann.providers;
 import io.github.fhnaumann.ConnectionPoolFactory;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
+import io.github.fhnaumann.model.UcumVersion;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,11 +16,15 @@ public class SQLitePersistenceProvider extends JDBCPersistenceProvider {
 
 
     public SQLitePersistenceProvider() throws SQLException {
-        super(ConnectionPoolFactory.getOrCreate("jdbc:sqlite:%s".formatted(ConfigurationRegistry.get().getSqliteDBPath()), "", "").getConnection(), null, null);
+        super(
+                ConfigurationRegistry.get().getUCUMVersionAsEnum(),
+                ConnectionPoolFactory.getOrCreate("jdbc:sqlite:%s".formatted(ConfigurationRegistry.get().getSqliteDBPath()), "", "").getConnection(),
+                null,
+                null);
     }
 
-    public SQLitePersistenceProvider(Connection connection, String canonicalTableName, String validateTableName) {
-        super(connection, canonicalTableName, validateTableName);
+    public SQLitePersistenceProvider(UcumVersion ucumVersion, Connection connection, String canonicalTableName, String validateTableName) {
+        super(ucumVersion, connection, canonicalTableName, validateTableName);
     }
 
     @Override

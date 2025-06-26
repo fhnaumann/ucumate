@@ -2,6 +2,7 @@ package io.github.fhnaumann;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.providers.MongoDBPersistenceProvider;
 import org.testcontainers.containers.MongoDBContainer;
@@ -22,7 +23,7 @@ public class MongoDBPersistenceIntegrationTest extends DBPersistenceIntegrationT
     @Override
     protected void registerPersistenceProvider() {
         client = MongoClients.create(mongo.getReplicaSetUrl());
-        PersistenceRegistry.register("mongo", new MongoDBPersistenceProvider(client, "ucumate"));
+        PersistenceRegistry.register("mongo", new MongoDBPersistenceProvider(UcumVersion.V2_2, client, "ucumate"));
     }
 
     @Override
