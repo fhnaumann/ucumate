@@ -79,7 +79,7 @@ public class Validator implements ValidatorService {
                 return result;
             }
             SpecialChecker.SpecialCheckResult specialCheckResult = SpecialChecker.checkForSpecialUnitInTerm(term, new SpecialChecker.SpecialCheckResult(false, false,false));
-            result = specialCheckResult.isValid() ? new Success(term) : new Failure();
+            result = specialCheckResult.isValid() ? createSuccess(term) : new Failure();
             PersistenceRegistry.getInstance().saveValidated(input, result);
             return result;
         } catch (LexerException | ParserException e) {
@@ -87,6 +87,17 @@ public class Validator implements ValidatorService {
             PersistenceRegistry.getInstance().saveValidated(input, result);
             return result;
         }
+    }
+
+    private static Success createSuccess(Term term) {
+        return switch (term) {
+            case UCUMExpression.ComponentTerm componentTerm -> new SimpleSuccess(componentTerm);
+            case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> new ComplexSuccess(annotOnlyTerm); // todo annot only should be a simpleSuccess
+            case UCUMExpression.ParenTerm parenTerm -> createSuccess(parenTerm.term()) instanceof SimpleSuccess ? createSuccess(parenTerm) : new ComplexSuccess(parenTerm);
+            case UCUMExpression.AnnotTerm annotTerm -> createSuccess(annotTerm.term()) instanceof SimpleSuccess ? createSuccess(annotTerm) : new ComplexSuccess(annotTerm);
+            case UCUMExpression.BinaryTerm binaryTerm -> new ComplexSuccess(binaryTerm);
+            case UCUMExpression.UnaryDivTerm unaryDivTerm -> new ComplexSuccess(unaryDivTerm);
+        };
     }
 
     private static Term validateImpl(String input, NewUCUMBaseVisitor<UCUMExpression> visitor) {
