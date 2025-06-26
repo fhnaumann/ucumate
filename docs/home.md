@@ -3,9 +3,12 @@ order: 100
 ---
 # ucumate
 
-ucumate is a developer-friendly Java library for parsing, validating, canonicalizing, and converting units of measure 
-based on the [Unified Code for Units of Measure (UCUM)](https://ucum.org/) standard. It provides validation, canonicalization, and
-conversion support with high decimal precision if desired. Furthermore, all *special units* are supported. 
+ucumate is a developer-friendly Java library for working with units of measure based on the [UCUM standard](https://ucum.org/). At its core,
+it provides validation, canonicalization, conversion, and printing support with automatic caching. Optional features
+enable persistent database storage, mole-to-mass conversions, and high-precision calculation of conversion factors
+for special units.
+
+An [online demo](https://virtuous-respect-production.up.railway.app/) is also available.
 
 This library requires Java 21 to run.
 Currently, all dependencies are hosted on the maven central snapshot repository, you need to add it to your `pom.xml`
