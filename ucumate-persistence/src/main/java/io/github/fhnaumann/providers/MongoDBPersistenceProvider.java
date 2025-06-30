@@ -7,10 +7,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.funcs.Canonicalizer;
-import io.github.fhnaumann.funcs.PrinterService;
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
@@ -145,7 +142,7 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
 
         boolean valid = doc.getBoolean("valid", false);
         if(valid) {
-            return new Validator.Success(Validator.parseByPassChecks(key.expression(), ucumVersion));
+            return new ValidatorService.ComplexSuccess(Validator.parseByPassChecks(key.expression(), ucumVersion));
         } else {
             return new Validator.Failure();
         }
@@ -164,7 +161,7 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
             boolean valid = doc.getBoolean("valid", false);
 
             Validator.ValidationResult result = valid
-                    ? new Validator.Success(Validator.parseByPassChecks(valKey.expression(), ucumVersion))
+                    ? new ValidatorService.ComplexSuccess(Validator.parseByPassChecks(valKey.expression(), ucumVersion))
                     : new Validator.Failure();
 
             resultMap.put(valKey, result);

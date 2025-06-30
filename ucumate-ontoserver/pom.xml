@@ -19,6 +19,24 @@
 
     <dependencies>
         <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-base</artifactId>
+            <version>8.2.0</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-structures-r4</artifactId>
+            <version>8.2.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
             <version>1.0.3-SNAPSHOT</version>
@@ -33,11 +51,11 @@
             <artifactId>ucumate-persistence</artifactId>
             <version>1.0.3-SNAPSHOT</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-validation</artifactId>
             <version>8.2.0</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-core</artifactId>

@@ -91,10 +91,7 @@ public class Validator implements ValidatorService {
 
     private static Success createSuccess(Term term) {
         return switch (term) {
-            case UCUMExpression.ComponentTerm componentTerm -> new SimpleSuccess(componentTerm);
-            case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> new ComplexSuccess(annotOnlyTerm); // todo annot only should be a simpleSuccess
-            case UCUMExpression.ParenTerm parenTerm -> createSuccess(parenTerm.term()) instanceof SimpleSuccess ? createSuccess(parenTerm) : new ComplexSuccess(parenTerm);
-            case UCUMExpression.AnnotTerm annotTerm -> createSuccess(annotTerm.term()) instanceof SimpleSuccess ? createSuccess(annotTerm) : new ComplexSuccess(annotTerm);
+            case UCUMExpression.SingleUnitTerm singleUnitTerm -> new SimpleSuccess(singleUnitTerm);
             case UCUMExpression.BinaryTerm binaryTerm -> new ComplexSuccess(binaryTerm);
             case UCUMExpression.UnaryDivTerm unaryDivTerm -> new ComplexSuccess(unaryDivTerm);
         };

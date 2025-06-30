@@ -7,7 +7,6 @@ import ca.uhn.fhir.context.support.ValidationSupportContext;
 import ca.uhn.fhir.context.support.ValueSetExpansionOptions;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import org.hl7.fhir.common.hapi.validation.support.RemoteTerminologyServiceValidationSupport;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**

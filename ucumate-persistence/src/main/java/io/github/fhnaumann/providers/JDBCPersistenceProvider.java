@@ -3,10 +3,7 @@ package io.github.fhnaumann.providers;
 import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.funcs.Canonicalizer;
-import io.github.fhnaumann.funcs.PrinterService;
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
@@ -152,7 +149,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
                 boolean valid = rs.getBoolean("valid");
                 if(valid) {
                     UCUMExpression.Term parsedKey = Validator.parseByPassChecks(key.expression(), ucumVersion);
-                    return new Validator.Success(parsedKey);
+                    return new ValidatorService.ComplexSuccess(parsedKey);
                 }
                 else {
                     return new Validator.Failure();
@@ -185,7 +182,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
                 Validator.ValidationResult result;
                 if (valid) {
                     UCUMExpression.Term parsed = Validator.parseByPassChecks(valKey.expression(), ucumVersion);
-                    result = new Validator.Success(parsed);
+                    result = new ValidatorService.ComplexSuccess(parsed);
                 } else {
                     result = new Validator.Failure();
                 }

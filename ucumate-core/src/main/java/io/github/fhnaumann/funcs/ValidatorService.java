@@ -44,10 +44,10 @@ public interface ValidatorService extends UcumVersioning {
 
     public record ComplexSuccess(UCUMExpression.Term term) implements Success {}
 
-    public record SimpleSuccess(UCUMExpression.ComponentTerm componentTerm) implements Success {
+    public record SimpleSuccess(UCUMExpression.SingleUnitTerm singleUnitTerm) implements Success {
         @Override
         public UCUMExpression.Term term() {
-            return componentTerm;
+            return singleUnitTerm;
         }
     }
 

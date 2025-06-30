@@ -79,14 +79,16 @@ public sealed interface UCUMExpression permits UCUMDefinition, UCUMExpression.An
     sealed interface CanonicalTerm extends CanoncialUCUMExpression, Term {}
     sealed interface MixedTerm extends MixedUCUMExpression, Term {}
 
-    sealed interface ComponentTerm extends Term {
+    sealed interface SingleUnitTerm extends Term {}
+
+    sealed interface ComponentTerm extends SingleUnitTerm {
         Component component();
     }
-    sealed interface AnnotTerm extends Term {
+    sealed interface AnnotTerm extends SingleUnitTerm {
         Term term();
         Annotation annotation();
     }
-    sealed interface ParenTerm extends Term {
+    sealed interface ParenTerm extends SingleUnitTerm {
         Term term();
     }
     sealed interface BinaryTerm extends Term {
@@ -103,7 +105,7 @@ public sealed interface UCUMExpression permits UCUMDefinition, UCUMExpression.An
 
     record Annotation(String annotation) implements UCUMExpression {}
 
-    record AnnotOnlyTerm(Annotation annotation) implements CanonicalTerm, MixedTerm {}
+    record AnnotOnlyTerm(Annotation annotation) implements CanonicalTerm, MixedTerm, SingleUnitTerm {}
 
     record CanonicalComponentTerm(CanonicalComponent component) implements CanonicalTerm, ComponentTerm {}
     record CanonicalAnnotTerm(CanonicalTerm term, Annotation annotation) implements CanonicalTerm, AnnotTerm {}

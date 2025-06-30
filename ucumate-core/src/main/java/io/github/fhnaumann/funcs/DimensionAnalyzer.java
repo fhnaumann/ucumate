@@ -9,7 +9,7 @@ import java.util.Map;
 public class DimensionAnalyzer {
 
     public sealed interface ComparisonResult {}
-    public record Success() implements ComparisonResult {}
+    public record DimensionsMatch() implements ComparisonResult {}
     public record Failure(Map<Dimension, Integer> difference) implements ComparisonResult {}
 
 
@@ -18,7 +18,7 @@ public class DimensionAnalyzer {
         Map<Dimension, Integer> otherTermDims = analyze(otherTerm, 1);
         Map<Dimension, Integer> result = MapUtil.calculateDiff(termDims, otherTermDims, true);
         if(result.isEmpty()) {
-            return new Success();
+            return new DimensionsMatch();
         }
         else {
             return new Failure(result);
@@ -62,7 +62,7 @@ public class DimensionAnalyzer {
     private static Map<Dimension, Integer> analyzeUnit(UCUMExpression.CanonicalUnit unit, int sign) {
         return switch(unit) {
             case UCUMExpression.CanonicalSimpleUnit canonicalSimpleUnit -> Map.of(Dimension.fromUCUMEssenceString(canonicalSimpleUnit.ucumUnit().dim()), Math.abs(sign)); // was: just 'sign'
-            case UCUMExpression.IntegerUnit integerUnit -> Map.of(); //Map.of(Dimension.NO_DIMENSION, 1); // sign does not matter here (I think?)
+            case UCUMExpression.IntegerUnit integerUnit -> Map.of(Dimension.NO_DIMENSION, 1); //Map.of(Dimension.NO_DIMENSION, 1); // sign does not matter here (I think?)
         };
     }
 

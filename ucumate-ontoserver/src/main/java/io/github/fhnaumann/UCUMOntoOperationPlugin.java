@@ -25,13 +25,13 @@ public class UCUMOntoOperationPlugin implements OntoOperationPlugin {
         this.lookupCodeOperation = new UCUMLookupCodeOperation();
 
         // register infispan
-        PersistenceRegistry.register("infispan", new InfinispanPersistenceProvider());
+        //PersistenceRegistry.register("infispan", new InfinispanPersistenceProvider());
 
         // load code system supplements
     }
 
     @Override
-    public ValueSet expand(ValueSet valueSet, String textFilter) {
+    public ExpandCodeResult expand(ValueSet valueSet, String textFilter) {
         return null;
     }
 

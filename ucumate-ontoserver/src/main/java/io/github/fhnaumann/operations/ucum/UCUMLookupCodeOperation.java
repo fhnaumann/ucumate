@@ -22,7 +22,7 @@ public class UCUMLookupCodeOperation implements LookupCodeOperation {
 
     @Override
     public LookupCodeResult lookup(Coding coding, Collection<CodeType> properties) {
-
+        return null;
     }
 
 

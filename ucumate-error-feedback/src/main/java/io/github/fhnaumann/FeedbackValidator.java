@@ -85,7 +85,7 @@ public class FeedbackValidator implements ValidatorService {
             errorMessages.addAll(visitor.getErrorMessages());
             // not all errors throw an actual exceptions, some just add an error message
             if(errorMessages.isEmpty()) {
-                return new Success(term);
+                return new ComplexSuccess(term);
             }
             else {
                 return new Failure(errorMessages);

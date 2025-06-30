@@ -46,7 +46,7 @@ public class RelationChecker implements RelationCheckerService {
         DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(term1, term2);
         return switch (comparisonResult) {
             case DimensionAnalyzer.Failure failure -> new NotCommensurable(failure.difference());
-            case DimensionAnalyzer.Success success -> new IsCommensurable();
+            case DimensionAnalyzer.DimensionsMatch dimensionsMatch -> new IsCommensurable();
         };
     }
 
