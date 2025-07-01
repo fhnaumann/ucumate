@@ -4,7 +4,7 @@ import io.github.fhnaumann.PluginUtil;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.operations.ucum.InvalidInputException;
-import io.github.fhnaumann.operations.ucum.UCUMExpandCodeOperation;
+import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
 import io.github.fhnaumann.util.LogUtil;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.slf4j.Logger;
@@ -39,12 +39,12 @@ public class CanonicalFilter implements ApplyFilter {
         return switch (operator) {
             case EQUAL -> applyWithEqualFilter(term);
             case IN -> applyWithInFilter(term);
-            default -> LogUtil.logAndThrow(log, UCUMExpandCodeOperation.ExpandCodeOperationException.class, "The operator '{}' is not supported for UCUM valuesets. Only '{}' are supported.", operator, List.of(ValueSet.FilterOperator.EQUAL, ValueSet.FilterOperator.IN));
+            default -> LogUtil.logAndThrow(log, UCUMExpandOperation.ExpandCodeOperationException.class, "The operator '{}' is not supported for UCUM valuesets. Only '{}' are supported.", operator, List.of(ValueSet.FilterOperator.EQUAL, ValueSet.FilterOperator.IN));
         };
     }
 
     private List<UCUMExpression.Term> applyWithInFilter(UCUMExpression.Term term) {
-        return LogUtil.logAndThrow(log, UCUMExpandCodeOperation.ExpandCodeOperationException.class, "'IN' operator is not yet implemented.");
+        return LogUtil.logAndThrow(log, UCUMExpandOperation.ExpandCodeOperationException.class, "'IN' operator is not yet implemented.");
     }
 
     private List<UCUMExpression.Term> applyWithEqualFilter(UCUMExpression.Term term) {

@@ -1,13 +1,12 @@
 package io.github.fhnaumann.operations.ucum.filters;
 
 import io.github.fhnaumann.PluginUtil;
-import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.operations.ucum.InvalidInputException;
-import io.github.fhnaumann.operations.ucum.UCUMExpandCodeOperation;
+import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
 import io.github.fhnaumann.util.LogUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
 import org.hl7.fhir.r4.model.ValueSet;
@@ -41,11 +40,11 @@ public class BasePropertyFilter implements ApplyFilter {
     @Override
     public Collection<UCUMExpression.Term> apply(String propertyName, ValueSet.FilterOperator operator) throws InvalidInputException {
         if(!KNOWN_PROPERTIES.contains(propertyName)) {
-            return LogUtil.logAndThrow(log, UCUMExpandCodeOperation.ExpandCodeOperationException.class, "Unknown property '{}'. Only {} are known properties.", propertyName, KNOWN_PROPERTIES);
+            return LogUtil.logAndThrow(log, UCUMExpandOperation.ExpandCodeOperationException.class, "Unknown property '{}'. Only {} are known properties.", propertyName, KNOWN_PROPERTIES);
         }
         return switch (operator) {
             case EQUAL -> handleEqual(propertyName);
-            default -> LogUtil.logAndThrow(log, UCUMExpandCodeOperation.ExpandCodeOperationException.class, "Only '=' (equal) is supported on the property filter.");
+            default -> LogUtil.logAndThrow(log, UCUMExpandOperation.ExpandCodeOperationException.class, "Only '=' (equal) is supported on the property filter.");
         };
     }
 

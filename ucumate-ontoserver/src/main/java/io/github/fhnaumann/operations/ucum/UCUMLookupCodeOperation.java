@@ -18,10 +18,18 @@ public class UCUMLookupCodeOperation implements LookupCodeOperation {
             "codeCaseInsensitive", "unitName", "property", "metric", "special", "class", "dimensionality", "canonical", "commonSyntax", "latexSyntax"
     );
 
-    private final UCUMService ucumService = new UCUMService();
+    private final UCUMService ucumService;
+
+    public UCUMLookupCodeOperation() {
+        this.ucumService = new UCUMService();
+    }
 
     @Override
     public LookupCodeResult lookup(Coding coding, Collection<CodeType> properties) {
+        /*
+        code, display, and name are always returned.
+        Additional property are returned as requested.
+         */
         return null;
     }
 

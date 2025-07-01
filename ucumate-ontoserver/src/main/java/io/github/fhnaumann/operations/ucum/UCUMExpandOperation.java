@@ -5,30 +5,34 @@ import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
-import io.github.fhnaumann.operations.ExpandCodeOperation;
+import io.github.fhnaumann.operations.ExpandOperation;
 import io.github.fhnaumann.operations.ucum.filters.ApplyFilter;
 import io.github.fhnaumann.operations.ucum.filters.BasePropertyFilter;
 import io.github.fhnaumann.operations.ucum.filters.CanonicalFilter;
 import io.github.fhnaumann.util.LogUtil;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Inherited;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 /**
+ * Implementation of the $expand operation for UCUM ValueSets.
  * @author Felix Naumann
  */
-public class UCUMExpandCodeOperation implements ExpandCodeOperation {
+public class UCUMExpandOperation implements ExpandOperation {
 
-    private static final Logger log = LoggerFactory.getLogger(UCUMExpandCodeOperation.class);
+    private static final Logger log = LoggerFactory.getLogger(UCUMExpandOperation.class);
     private final Map<String, ApplyFilter> filterProperties;
 
     private final UCUMService service;
 
-    public UCUMExpandCodeOperation(UCUMService service) {
+    public UCUMExpandOperation(UCUMService service) {
         this.service = service;
         // may be used in valueset.compose
         this.filterProperties = Map.of(
@@ -37,8 +41,19 @@ public class UCUMExpandCodeOperation implements ExpandCodeOperation {
         );
     }
 
+    /**
+     * {@inheritDoc}
+     * <br>
+     * Since there are infinitely many UCUM terms, the expand operation is limited to the union of the units defined by
+     * UCUM itself (~3000 <i>simple units</i>) and any encountered UCUM expression in the past of this app instance.
+     * <br>
+     * If no include filters or concepts are defined, then all known codes are used.
+     * @param valueSet The ValueSet to be expanded. Expected to be normalized and only to contain codes from one system.
+     * @param textFilter Additional text filter that can be applied to filter the expanded codes.
+     * @return
+     */
     @Override
-    public ExpandCodeResult expand(ValueSet valueSet, String textFilter) {
+    public ExpandResult expand(ValueSet valueSet, String textFilter) {
         /*
         The value set may...
         * have codes explicitly listed in compose.include
@@ -63,16 +78,24 @@ public class UCUMExpandCodeOperation implements ExpandCodeOperation {
             extractedIncludeTerms.removeAll(extractedExcludeTerms);
 
             extractedIncludeTerms = applyTextFiltering(textFilter, extractedIncludeTerms);
-
             return new PerfectSuccess(addToVsExpansion(valueSet, extractedIncludeTerms));
         } catch (ExpandCodeOperationException e) {
-            return new Failure(e.getMessage());
+            return new Failure(constructOutcomeFrom(e));
         }
+    }
+
+    private OperationOutcome constructOutcomeFrom(ExpandCodeOperationException e) {
+        OperationOutcome operationOutcome = new OperationOutcome();
+        operationOutcome.addIssue()
+                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
+                .setCode(e.isParserException() ? OperationOutcome.IssueType.CODEINVALID : OperationOutcome.IssueType.NOTSUPPORTED)
+                .setDetails(new CodeableConcept().setText(e.getMessage()));
+        return operationOutcome;
     }
 
     private Set<UCUMExpression.Term> extractExplicitCodesOrFilteredCodes(List<ValueSet.ConceptSetComponent> conceptSetComponents) {
         return conceptSetComponents.stream()
-                .map(conceptSetComponent -> extractExplicitCodesOrFilteredCodes(conceptSetComponent, Mode.INTERSECTION))
+                .map(this::extractExplicitCodesOrFilteredCodes)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
     }
@@ -105,44 +128,44 @@ public class UCUMExpandCodeOperation implements ExpandCodeOperation {
         try {
             return new HashSet<>(applyFilter.apply(expression, operator));
         } catch (InvalidInputException e) {
-            return LogUtil.logAndThrow(log, ExpandCodeOperationException.class, "The input '{}' is invalid and therefore could not be expanded.", expression);
+            throw new ExpandCodeOperationException("The input '%s' is invalid and therefore could not be expanded.".formatted(expression), true);
         }
     }
 
-    private Set<UCUMExpression.Term> extractExplicitCodesOrFilteredCodes(ValueSet.ConceptSetComponent conceptSetComponent, Mode mode) {
+    private Set<UCUMExpression.Term> extractExplicitCodesOrFilteredCodes(ValueSet.ConceptSetComponent conceptSetComponent) {
         if(conceptSetComponent.hasConcept()) {
             return extractExplicitCodes(conceptSetComponent);
         }
         else if(conceptSetComponent.hasFilter()) {
-            return extractAndApplyFilters(conceptSetComponent, mode);
+            return extractAndApplyIntersectionFilters(conceptSetComponent);
         }
         else {
             throw new RuntimeException();
         }
     }
 
-    private Set<UCUMExpression.Term> extractAndApplyFilters(ValueSet.ConceptSetComponent conceptSetComponent, Mode mode) {
-        return switch (mode) {
-            case UNION -> conceptSetComponent.getFilter().stream()
-                    .map(f -> createBasedOnFilter(f.getProperty(), f.getOp(), f.getValue()))
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toSet());
-            case INTERSECTION -> conceptSetComponent.getFilter().stream()
-                    .map(f -> createBasedOnFilter(f.getProperty(), f.getOp(), f.getValue()))
-                    .reduce(intersectingReducer())
-                    .orElseGet(Set::of);
-        };
+    private Set<UCUMExpression.Term> extractAndApplyIntersectionFilters(ValueSet.ConceptSetComponent conceptSetComponent) {
+        return conceptSetComponent.getFilter().stream()
+                .map(f -> createBasedOnFilter(f.getProperty(), f.getOp(), f.getValue()))
+                .reduce(intersectingReducer())
+                .orElseGet(Set::of);
     }
 
     private Set<UCUMExpression.Term> extractExplicitCodes(ValueSet.ConceptSetComponent conceptSetComponent) {
         return conceptSetComponent.getConcept().stream()
                 .map(ValueSet.ConceptReferenceComponent::getCode)
                 .map(service::validate)
-                .filter(ValidatorService.Success.class::isInstance)
-                .map(ValidatorService.Success.class::cast)
-                .map(ValidatorService.Success::term)
+                .map(this::extractSuccessOrThrow)
                 .collect(Collectors.toSet());
     }
+
+    private UCUMExpression.Term extractSuccessOrThrow(ValidatorService.ValidationResult result) {
+        return switch (result) {
+            case ValidatorService.Success success -> success.term();
+            case ValidatorService.Failure failure -> throw new ExpandCodeOperationException(String.join(",", failure.errorMessages()), true);
+        };
+    }
+
 
     private static BinaryOperator<Set<UCUMExpression.Term>> intersectingReducer() {
         return (terms, terms2) -> {
@@ -152,16 +175,25 @@ public class UCUMExpandCodeOperation implements ExpandCodeOperation {
         };
     }
 
-    private enum Mode {
-        INTERSECTION, UNION;
-    }
-
     public static class ExpandCodeOperationException extends RuntimeException {
+
+        private final boolean parserException;
+
         public ExpandCodeOperationException() {
+            this.parserException = false;
         }
 
         public ExpandCodeOperationException(String message) {
+            this(message, false);
+        }
+
+        public ExpandCodeOperationException(String message, boolean parserException) {
             super(message);
+            this.parserException = parserException;
+        }
+
+        public boolean isParserException() {
+            return parserException;
         }
     }
 

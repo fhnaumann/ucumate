@@ -4,11 +4,13 @@ import ca.uhn.fhir.context.FhirContext;
 import io.github.fhnaumann.builders.CacheConfig;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.model.UcumVersion;
-import io.github.fhnaumann.operations.ExpandCodeOperation;
-import io.github.fhnaumann.operations.ucum.UCUMExpandCodeOperation;
+import io.github.fhnaumann.operations.ExpandOperation;
+import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
+import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -19,17 +21,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Felix Naumann
  */
-public class ExpandCodeOperationTest {
+public class ExpandOperationTest {
 
     public static String URI = "http://unitsofmeasure.org";
 
-    private ExpandCodeOperation plugin;
+    private ExpandOperation plugin;
 
     @BeforeEach
     public void setup() {
         PersistenceRegistry.disableInMemoryCache(true);
         PersistenceRegistry.initCache(CacheConfig.builder().enable().preHeat(true).build());
-        plugin = new UCUMExpandCodeOperation(new UCUMService());
+        plugin = new UCUMExpandOperation(new UCUMService());
     }
 
     @Test
@@ -59,7 +61,8 @@ public class ExpandCodeOperationTest {
     public void test_filters_on_same_include_are_intersected() {
         ValueSet vs = create_include_canonical_filter_implicit_codes_vs(null, "m", true);
         vs = create_include_canonical_filter_implicit_codes_vs(vs, "[ft_i]", false);
-        print_json(vs);
+        ValueSet actualExpanded = perform_expand(plugin, vs, "foot");
+        assert_expansion_contains_codes(actualExpanded, "[ft_br]", "[ft_i]", "[ft_us]");
     }
 
     @Test
@@ -70,10 +73,49 @@ public class ExpandCodeOperationTest {
     }
 
     @Test
+    public void test_parsing_error_returns_operation_outcome_with_code_invalid() {
+        ValueSet vs = create_include_explicit_codes_vs(null, "m", "not_a_real_code", "s");
+        OperationOutcome actualOperationOutcome = perform_invalid_expand(plugin, vs, null);
+        assert_operation_outcome(actualOperationOutcome, OperationOutcome.IssueType.CODEINVALID);
+    }
+
+    @Test
+    public void test_wrong_operator_in_canonical_filter_returns_operation_outcome_with_not_supported() {
+        ValueSet vs = create_include_canonical_filter_implicit_codes_vs(null, "m", false);
+        // manually override test setup to create invalid scenario
+        vs.getCompose().getIncludeFirstRep().getFilterFirstRep().setOp(ValueSet.FilterOperator.EXISTS);
+        OperationOutcome actualOperationOutcome = perform_invalid_expand(plugin, vs, null);
+        assert_operation_outcome(actualOperationOutcome, OperationOutcome.IssueType.NOTSUPPORTED);
+    }
+
+    @Test
+    public void test_wrong_operator_in_property_filter_returns_operation_outcome_with_not_supported() {
+        ValueSet vs = create_include_property_filter_implicit_codes_vs(null, "mass", false);
+        // manually override test setup to create invalid scenario
+        vs.getCompose().getIncludeFirstRep().getFilterFirstRep().setOp(ValueSet.FilterOperator.EXISTS);
+        OperationOutcome actualOperationOutcome = perform_invalid_expand(plugin, vs, null);
+        assert_operation_outcome(actualOperationOutcome, OperationOutcome.IssueType.NOTSUPPORTED);
+    }
+
+    @Test
+    public void test_wrong_property_name_in_property_filter_returns_operation_outcome_with_not_supported() {
+        ValueSet vs = create_include_property_filter_implicit_codes_vs(null, "not_a_property", false);
+        OperationOutcome actualOperationOutcome = perform_invalid_expand(plugin, vs, null);
+        assert_operation_outcome(actualOperationOutcome, OperationOutcome.IssueType.NOTSUPPORTED);
+    }
+
+    @Test
+    @Disabled("too many codes returned")
     public void test_expand_code_operation_returns_all_known_codes() {
         ValueSet vs = new ValueSet();
         ValueSet actualExpanded = perform_expand(plugin, vs, null);
         assert_expansion_contains_codes(actualExpanded, "TODO");
+    }
+
+    private static void assert_operation_outcome(OperationOutcome actual, OperationOutcome.IssueType expectedIssueType) {
+        assertThat(actual.hasIssue()).isTrue();
+        assertThat(actual.getIssue().size()).isEqualTo(1);
+        assertThat(actual.getIssueFirstRep().getCode()).isEqualTo(expectedIssueType);
     }
 
     private static void print_json(ValueSet valueSet) {
@@ -81,8 +123,12 @@ public class ExpandCodeOperationTest {
         System.out.println(print);
     }
 
-    private static ValueSet perform_expand(ExpandCodeOperation plugin, ValueSet valueSet, String textFilter) {
-        return ((ExpandCodeOperation.Success) plugin.expand(valueSet, textFilter)).valueSet();
+    private static OperationOutcome perform_invalid_expand(ExpandOperation plugin, ValueSet valueSet, String textFilter) {
+        return ((ExpandOperation.Failure) plugin.expand(valueSet, textFilter)).outcome();
+    }
+
+    private static ValueSet perform_expand(ExpandOperation plugin, ValueSet valueSet, String textFilter) {
+        return ((ExpandOperation.Success) plugin.expand(valueSet, textFilter)).valueSet();
     }
 
     private static void assert_expansion_contains_codes(ValueSet actualExpanded, String... expectedExpandedCodes) {
