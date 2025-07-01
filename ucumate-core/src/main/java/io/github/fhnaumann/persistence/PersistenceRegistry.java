@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PropertiesUtil;
+import io.github.fhnaumann.util.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,7 +138,7 @@ public class PersistenceRegistry implements PersistenceProvider {
         if(ConfigurationRegistry.get().isEnableSQLitePersistence()) {
             ServiceLoader.load(PersistenceProvider.class).forEach(persistenceProvider -> {
                 String name = persistenceProvider.getClass().getSimpleName();
-                // don't overwrite if already exists
+                // only overwrite if not already exists
                 if(additionalProviders.get(name) == null) {
                     register(name, persistenceProvider);
                 }

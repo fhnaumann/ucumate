@@ -1,5 +1,7 @@
 package io.github.fhnaumann.util;
 
+import java.util.ServiceLoader;
+
 /**
  * @author Felix Naumann
  */
@@ -12,5 +14,10 @@ public class ReflectionUtil {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    public static <T> T loadService(Class<T> clazz, T fallback) {
+        ServiceLoader<T> loader = ServiceLoader.load(clazz);
+        return loader.findFirst().orElse(fallback);
     }
 }

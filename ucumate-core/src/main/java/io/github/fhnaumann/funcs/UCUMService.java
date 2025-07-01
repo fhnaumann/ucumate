@@ -7,12 +7,12 @@ import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
+import io.github.fhnaumann.util.ReflectionUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.ServiceLoader;
 
 /**
  * This class provides all the functionality of the ucumate library in a centralized place.
@@ -25,12 +25,12 @@ public class UCUMService implements IUCUMService {
 
     private static final UcumVersion SELECTED_UCUM_VERSION = ConfigurationRegistry.get().getUCUMVersionAsEnum();
 
-    private static final ValidatorService DEFAULT_VALIDATOR_SERVICE = loadService(ValidatorService.class, new Validator(SELECTED_UCUM_VERSION));
-    private static final PrinterService DEFAULT_PRINTER_SERVICE = loadService(PrinterService.class, new Printer());
-    private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = loadService(RelationCheckerService.class, new RelationChecker(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final ConverterService DEFAULT_CONVERTER_SERVICE = loadService(ConverterService.class, new Converter(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = loadService(CanonicalizerService.class, new Canonicalizer(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final LookupService DEFAULT_LOOKUP_SERVICE = loadService(LookupService.class, new Lookup(SELECTED_UCUM_VERSION));
+    private static final ValidatorService DEFAULT_VALIDATOR_SERVICE = ReflectionUtil.loadService(ValidatorService.class, new Validator(SELECTED_UCUM_VERSION));
+    private static final PrinterService DEFAULT_PRINTER_SERVICE = ReflectionUtil.loadService(PrinterService.class, new Printer());
+    private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = ReflectionUtil.loadService(RelationCheckerService.class, new RelationChecker(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final ConverterService DEFAULT_CONVERTER_SERVICE = ReflectionUtil.loadService(ConverterService.class, new Converter(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = ReflectionUtil.loadService(CanonicalizerService.class, new Canonicalizer(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final LookupService DEFAULT_LOOKUP_SERVICE = ReflectionUtil.loadService(LookupService.class, new Lookup(SELECTED_UCUM_VERSION));
 
     private UcumVersion ucumVersion;
     private CanonicalizerService canonicalizerService;
@@ -68,11 +68,6 @@ public class UCUMService implements IUCUMService {
         this.printerService = printerService;
         this.lookupService = lookupService;
         setUCUMVersion(ucumVersion);
-    }
-
-    private static <T> T loadService(Class<T> clazz, T fallback) {
-        ServiceLoader<T> loader = ServiceLoader.load(clazz);
-        return loader.findFirst().orElse(fallback);
     }
 
     @Override
