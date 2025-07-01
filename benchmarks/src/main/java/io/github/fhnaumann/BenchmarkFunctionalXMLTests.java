@@ -34,12 +34,15 @@ public class BenchmarkFunctionalXMLTests {
     private List<Element> conversionCases;
 
     private UcumEssenceService service;
+    private UCUMService ucumateService;
 
     @Param({"disable", "enable", "enableWithPreHeat"})
     public String ucumateCaching;
 
     @Setup(Level.Iteration)
     public void loadData() throws IOException, ParserConfigurationException, SAXException, UcumException {
+        ucumateService = new UCUMService();
+
         validationCases = new ArrayList<>();
         conversionCases = new ArrayList<>();
 
@@ -74,7 +77,7 @@ public class BenchmarkFunctionalXMLTests {
     @Benchmark
     public void benchmarkUcumateValidation() {
         for (Element test : validationCases) {
-            UCUMService.validate(test.getAttribute("unit"));
+            ucumateService.validate(test.getAttribute("unit"));
         }
     }
 
@@ -84,7 +87,7 @@ public class BenchmarkFunctionalXMLTests {
             String value = test.getAttribute("value");
             String srcUnit = test.getAttribute("srcUnit");
             String dstUnit = test.getAttribute("dstUnit");
-            UCUMService.convert(value, srcUnit, dstUnit);
+            ucumateService.convert(value, srcUnit, dstUnit);
         }
     }
 

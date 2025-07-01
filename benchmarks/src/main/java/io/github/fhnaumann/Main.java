@@ -20,8 +20,8 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws IOException, UcumException, ParserConfigurationException, SAXException {
-        UCUMService.validate("g.m2-1");
-        //org.openjdk.jmh.Main.main(args);
+        //UCUMService.validate("g.m2-1");
+        org.openjdk.jmh.Main.main(args);
 
 
         //logger.debug("TEST");

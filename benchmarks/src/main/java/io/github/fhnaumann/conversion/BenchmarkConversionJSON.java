@@ -4,6 +4,7 @@ import io.github.fhnaumann.BenchmarkSetup;
 import io.github.fhnaumann.TestCase;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
+import io.github.fhnaumann.validation.BenchmarkValidationJSON;
 import org.fhir.ucum.Decimal;
 import org.fhir.ucum.UcumException;
 import org.openjdk.jmh.annotations.*;
@@ -26,8 +27,17 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 public class BenchmarkConversionJSON {
 
+    public static void main(String[] args) throws UcumException, IOException, ParserConfigurationException, SAXException {
+        BenchmarkConversionJSON obj = new BenchmarkConversionJSON();
+        obj.ucumateCaching = "enable";
+        obj.loadData();
+        obj.benchmarkUcumateConversion();
+        //obj.benchmarkucumJavaConversion();
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(BenchmarkConversionJSON.class);
 
+    private UCUMService ucumateService;
     private BenchmarkSetup.Data data;
 
     @Param({"disable", "enable", "enableWithPreHeat"})
@@ -35,6 +45,7 @@ public class BenchmarkConversionJSON {
 
     @Setup(Level.Iteration)
     public void loadData() throws IOException, ParserConfigurationException, SAXException, UcumException {
+        this.ucumateService = new UCUMService();
         data = BenchmarkSetup.loadSetup(ucumateCaching);
     }
 
@@ -51,10 +62,10 @@ public class BenchmarkConversionJSON {
     }
 
     @Benchmark
-    public void benchmarkUcumateValidation() {
+    public void benchmarkUcumateConversion() {
         // logger.warn("Cache size: " + PersistenceRegistry.getInstance().getAllCanonical().size());
         for (TestCase.ConvertTestCase testCase : data.convertCases()) {
-            UCUMService.convert(testCase.conversionFactor(), testCase.from(), testCase.to());
+            ucumateService.convert(testCase.conversionFactor(), testCase.from(), testCase.to());
             //logger.warn("After Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
         }
     }
