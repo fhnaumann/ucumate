@@ -2,8 +2,7 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
-import io.github.fhnaumann.operations.ucum.UCUMLookupCodeOperation;
-import org.hl7.fhir.r4.model.CodeType;
+import io.github.fhnaumann.operations.ucum.UCUMLookupOperation;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ValueSet;
@@ -17,13 +16,13 @@ import java.util.Collection;
 public class UCUMOntoOperationPlugin implements OntoOperationPlugin {
 
     private UCUMService service;
-    private UCUMLookupCodeOperation lookupCodeOperation;
+    private UCUMLookupOperation lookupCodeOperation;
 
     @Override
     public void initialize() {
         service = new UCUMService();
 
-        this.lookupCodeOperation = new UCUMLookupCodeOperation();
+        this.lookupCodeOperation = new UCUMLookupOperation(service);
 
         // register infispan
         //PersistenceRegistry.register("infispan", new InfinispanPersistenceProvider());
@@ -37,7 +36,7 @@ public class UCUMOntoOperationPlugin implements OntoOperationPlugin {
     }
 
     @Override
-    public LookupCodeResult lookup(Coding coding, Collection<CodeType> properties) {
+    public LookupResult lookup(Coding coding, Collection<String> properties) {
         return lookupCodeOperation.lookup(coding, properties);
     }
 

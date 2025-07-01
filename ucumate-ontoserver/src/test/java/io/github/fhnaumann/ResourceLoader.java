@@ -7,6 +7,8 @@ import java.io.InputStream;
  */
 public class ResourceLoader {
 
+    public static String URI = "http://unitsofmeasure.org";
+
     public static InputStream load(String filename) {
         return ResourceLoader.class.getClassLoader().getResourceAsStream(filename);
     }

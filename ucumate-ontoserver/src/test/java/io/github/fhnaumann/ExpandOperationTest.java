@@ -16,14 +16,13 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.github.fhnaumann.ResourceLoader.URI;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Felix Naumann
  */
 public class ExpandOperationTest {
-
-    public static String URI = "http://unitsofmeasure.org";
 
     private ExpandOperation plugin;
 
