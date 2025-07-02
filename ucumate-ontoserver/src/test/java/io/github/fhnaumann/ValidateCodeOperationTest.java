@@ -4,6 +4,7 @@ import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.operations.ValidateCodeOperation;
 import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
 import io.github.fhnaumann.operations.ucum.UCUMValidateCodeOperation;
+import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ValueSet;
@@ -116,7 +117,7 @@ public class ValidateCodeOperationTest {
         assertThat(success.result()).isFalse();
         ValidateCodeOperation.Detail detail = success.details().get(coding);
         assertThat(detail.valid()).isFalse();
-        assertThat(detail.message()).isEqualTo("The code '[ft_i]' is invalid: '[ft_i]' is valid itself but it is not in the expanded ValueSet.");
+        assertThat(detail.message()).isEqualTo("The code '[ft_i]' is invalid: '[ft_i]' is valid itself but it is not in the expanded ValueSet/CodeSystem.");
     }
 
     @Test
@@ -165,22 +166,61 @@ public class ValidateCodeOperationTest {
 
     @Test
     public void test_validation_against_canonical_ucum_code_system_validates_against_all_codes() {
-
+        Coding coding = coding("m.s.g/[ft_i]");
+        ValidateCodeOperation.Success success = perform_validate_code(ucum_cs(), coding);
+        assertThat(success.result()).isTrue();
+        ValidateCodeOperation.Detail detail = success.details().get(coding);
+        assertThat(detail.valid()).isTrue();
+        assertThat(detail.display()).isEqualTo("m.s.g/[ft_i]");
+        assertThat(detail.message()).isNull();
     }
 
     @Test
     public void test_validation_against_custom_code_system_with_content_not_present_validates_against_all_codes() {
-
+        CodeSystem codeSystem = new CodeSystem();
+        codeSystem.setUrl("my_custom_url");
+        codeSystem.setContent(CodeSystem.CodeSystemContentMode.NOTPRESENT);
+        Coding coding = coding("m.s.g/[ft_i]");
+        ValidateCodeOperation.Success success = perform_validate_code(codeSystem, coding);
+        assertThat(success.result()).isTrue();
+        ValidateCodeOperation.Detail detail = success.details().get(coding);
+        assertThat(detail.valid()).isTrue();
+        assertThat(detail.display()).isEqualTo("m.s.g/[ft_i]");
+        assertThat(detail.message()).isNull();
     }
 
     @Test
     public void test_validation_against_custom_code_system_with_listed_concepts_fails_if_concept_valid_but_not_in_listed_concepts() {
-
+        Coding coding1 = coding("m");
+        Coding coding2 = coding("g");
+        CodeSystem codeSystem = cs_with_concepts("my_custom_url", coding1, coding2);
+        Coding toBeValidated = coding("s");
+        ValidateCodeOperation.Success success = perform_validate_code(codeSystem, toBeValidated);
+        assertThat(success.result()).isFalse();
+        ValidateCodeOperation.Detail detail = success.details().get(toBeValidated);
+        assertThat(detail.valid()).isFalse();
+        assertThat(detail.message()).isEqualTo("The code 's' is invalid: 's' is valid itself but it is not in the expanded ValueSet/CodeSystem.");
+        assertThat(detail.display()).isNull();
     }
 
     @Test
     public void test_validation_against_custom_code_system_with_listed_concepts_passes_if_concept_valid_and_in_listed_concepts() {
+        Coding coding1 = coding("m");
+        Coding coding2 = coding("g");
+        CodeSystem codeSystem = cs_with_concepts("my_custom_url", coding1, coding2);
+        Coding toBeValidated = coding("g");
+        ValidateCodeOperation.Success success = perform_validate_code(codeSystem, toBeValidated);
+        assertThat(success.result()).isTrue();
+        ValidateCodeOperation.Detail detail = success.details().get(toBeValidated);
+        assertThat(detail.valid()).isTrue();
+        assertThat(detail.message()).isNull();
+        assertThat(detail.display()).isEqualTo("g");
+    }
 
+    private ValidateCodeOperation.Success perform_validate_code(CodeSystem codeSystem, Coding... codings) {
+        CodeableConcept codeableConcept = new CodeableConcept();
+        Arrays.stream(codings).forEach(codeableConcept::addCoding);
+        return (ValidateCodeOperation.Success) plugin.validate(codeSystem, codeableConcept);
     }
 
     private ValidateCodeOperation.Success perform_validate_code(Coding... codings) {
@@ -219,6 +259,23 @@ public class ValidateCodeOperationTest {
 
     private static Coding coding(String code) {
         return new Coding(UCUMOntoOperationPlugin.UCUM_SYSTEM, code, null);
+    }
+
+    private CodeSystem cs_with_concepts(String url, Coding... concepts) {
+        CodeSystem cs = new CodeSystem();
+        cs.setUrl(url);
+        for(Coding coding : concepts) {
+            cs.addConcept()
+                    .setCode(coding.getCode())
+                    .setDisplay(coding.getDisplay());
+        }
+        return cs;
+    }
+
+    private CodeSystem ucum_cs() {
+        CodeSystem cs = new CodeSystem();
+        cs.setUrl(UCUMOntoOperationPlugin.UCUM_SYSTEM);
+        return cs;
     }
 
     private ValueSet ucum_vs() {

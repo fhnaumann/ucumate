@@ -47,8 +47,7 @@ public class UCUMValidateCodeOperation implements ValidateCodeOperation {
                     setComponent.addConcept().setCode(concept.getCode()).setDisplay(concept.getDisplay());
             valueSet.getCompose().getInclude().add(setComponent);
         });
-        validate(valueSet, codeableConcept);
-        return null;
+        return validate(valueSet, codeableConcept);
     }
 
     @Override
@@ -146,7 +145,7 @@ public class UCUMValidateCodeOperation implements ValidateCodeOperation {
             };
         }
         // This is a slight misuse of the ValidatorService return types because the scope here is wider than the return types should allow/cover
-        return new ValidatorService.Failure("'%s' is valid itself but it is not in the expanded ValueSet.".formatted(coding.getCode()));
+        return new ValidatorService.Failure("'%s' is valid itself but it is not in the expanded ValueSet/CodeSystem.".formatted(coding.getCode()));
     }
 
     private boolean hasCode(String code, ValueSet expandedVs) {
