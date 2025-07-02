@@ -9,5 +9,4 @@ import io.github.fhnaumann.operations.ValidateCodeOperation;
  */
 public interface OntoOperationPlugin extends ExpandOperation, LookupOperation, ValidateCodeOperation {
     void initialize();
-
 }

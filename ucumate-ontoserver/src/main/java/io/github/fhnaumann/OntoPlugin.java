@@ -1,9 +1,8 @@
 package io.github.fhnaumann;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.springframework.stereotype.Component;
+
+import java.lang.annotation.*;
 import java.util.Collection;
 
 /**
@@ -11,6 +10,8 @@ import java.util.Collection;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
 public @interface OntoPlugin {
 
     String name();
