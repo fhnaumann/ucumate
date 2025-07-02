@@ -15,6 +15,8 @@ import java.util.Collection;
 @OntoPlugin(name = "UCUMPlugin", systems = "http://unitsofmeasure.org")
 public class UCUMOntoOperationPlugin implements OntoOperationPlugin {
 
+    public static String UCUM_SYSTEM = "http://unitsofmeasure.org";
+
     private UCUMService service;
     private UCUMLookupOperation lookupCodeOperation;
 

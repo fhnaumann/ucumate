@@ -28,7 +28,7 @@ public interface ExpandOperation {
     /**
      * Represents a result from the expand operation.
      */
-    public interface ExpandResult {
+    public sealed interface ExpandResult {
         /**
          * Tests if the result is deemed valid (subclass of {@link Success}) or not (subclass of {@link Failure}).
          * @return true if valid, false otherwise.
@@ -38,7 +38,7 @@ public interface ExpandOperation {
     /**
      * Represents a valid result from the expand operation. It contains the expanded ValueSet.
      */
-    public interface Success extends ExpandResult {
+    public sealed interface Success extends ExpandResult {
         default boolean valid() {
             return true;
         }

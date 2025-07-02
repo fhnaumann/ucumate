@@ -84,6 +84,11 @@ public class UCUMExpandOperation implements ExpandOperation {
         }
     }
 
+    public boolean includesAllUCUMCodes(ValueSet valueSet) {
+        Set<UCUMExpression.Term> extractedIncludeTerms = extractExplicitCodesOrFilteredCodes(valueSet.getCompose().getInclude());
+        return extractedIncludeTerms.isEmpty();
+    }
+
     private OperationOutcome constructOutcomeFrom(ExpandCodeOperationException e) {
         OperationOutcome operationOutcome = new OperationOutcome();
         operationOutcome.addIssue()

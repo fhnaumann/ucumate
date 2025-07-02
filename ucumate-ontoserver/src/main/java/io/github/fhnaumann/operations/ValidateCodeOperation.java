@@ -22,7 +22,7 @@ public interface ValidateCodeOperation {
     public sealed interface ValidateCodeResult {}
 
     public record Success(Map<Coding, Detail> details) implements ValidateCodeResult {
-        boolean result() {
+        public boolean result() {
             return details.values().stream().allMatch(Detail::valid);
         }
     }
