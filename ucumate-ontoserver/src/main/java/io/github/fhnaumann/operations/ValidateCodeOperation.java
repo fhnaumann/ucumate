@@ -1,9 +1,8 @@
 package io.github.fhnaumann.operations;
 
-import org.hl7.fhir.r4.model.CodeType;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.ValueSet;
+import org.hl7.fhir.r4.model.*;
+
+import java.util.Map;
 
 /**
  * @author Felix Naumann
@@ -20,5 +19,17 @@ public interface ValidateCodeOperation {
         return validate(valueSet, new Coding(codeType.getSystem(), codeType.getCode(), codeType.getDisplay()));
     }
 
-    public record ValidateCodeResult(boolean result, String display, String message) {}
+    public sealed interface ValidateCodeResult {}
+
+    public record Success(Map<Coding, Detail> details) implements ValidateCodeResult {
+        boolean result() {
+            return details.values().stream().allMatch(Detail::valid);
+        }
+    }
+
+    public record Detail(boolean valid, String message, String display) {}
+
+    public record Failure(OperationOutcome operationOutcome) implements ValidateCodeResult {}
+
+    public record ValidateCodeResult2(boolean result, String display, String message) {}
 }

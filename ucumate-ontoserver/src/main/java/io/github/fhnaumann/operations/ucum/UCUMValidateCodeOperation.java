@@ -11,6 +11,7 @@ import org.hl7.fhir.r4.model.ValueSet;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -22,38 +23,52 @@ public class UCUMValidateCodeOperation implements ValidateCodeOperation {
 
     @Override
     public ValidateCodeResult validate(ValueSet valueSet, CodeableConcept codeableConcept) {
-        Map<String, ValidatorService.ValidationResult> results = performValidation(codeableConcept);
-        boolean valid = isValid(results);
-        if(valid) {
-            String display = createDisplayMessage(results);
-            String warning = createWarningMessage(results);
-            return new ValidateCodeResult(true, display, warning);
+        Map<Coding, ValidatorService.ValidationResult> results = performValidation(codeableConcept);
+        Map<Coding, Detail> details = createDetails(results);
+        return new Success(details);
+    }
+
+    private Map<Coding, Detail> createDetails(Map<Coding, ValidatorService.ValidationResult> results) {
+        Map<Coding, Detail> details = new LinkedHashMap<>();
+        results.forEach((coding, result) -> {
+            Detail detail = null;
+            if(!displayNullOrEqualToCode(coding)) {
+                String message = "The display '%s' does not match the provided code '%s'. In UCUM code and display are the same.".formatted(coding.getDisplay(), coding.getCode());
+                detail = new Detail(false, message, null);
+            }
+            detail = switch (result) {
+                case ValidatorService.Success success -> new Detail(
+                        detail == null,
+                        detail == null ? addPotentialWarnings(coding.getCode(), success.term()) : detail.message(),
+                        detail == null ? coding.getCode() : null
+                );
+                case ValidatorService.Failure failure -> new Detail(
+                        false,
+                        "The code '%s' is invalid: %s".formatted(coding.getCode(), String.join(",", failure.errorMessages())), null);
+            };
+            details.put(coding, detail);
+        });
+        return details;
+    }
+
+    private String addPotentialWarnings(String code, UCUMExpression.Term term) {
+        if(containsAnnotationImpl(term)) {
+            return "%s: The usage of annotations in UCUM expressions is discouraged.".formatted(code);
         }
-        else {
-            String errorMessage = createErrorMessage(results);
-            return new ValidateCodeResult(false, null, errorMessage);
-        }
+        return null;
     }
 
-    private boolean isValid(Map<String, ValidatorService.ValidationResult> results) {
-        return results.values().stream().allMatch(ValidatorService.Success.class::isInstance);
+    private boolean isValid(Map<Coding, ValidatorService.ValidationResult> results) {
+        return results.values().stream().allMatch(this::isSuccess)
+                && results.keySet().stream().allMatch(this::displayNullOrEqualToCode);
     }
 
-    private String createWarningMessage(Map<String, ValidatorService.ValidationResult> results) {
-        return results.entrySet().stream()
-                .filter(entry -> entry.getValue() instanceof ValidatorService.Success)
-                .map(entry -> Map.entry(entry.getKey(), (ValidatorService.Success) entry.getValue()))
-                .filter(this::containsAnnotation)
-                .map(this::createAnnotationWarningMessage)
-                .collect(Collectors.joining(","));
+    private boolean isSuccess(ValidatorService.ValidationResult result) {
+        return result instanceof ValidatorService.Success;
     }
 
-    private String createAnnotationWarningMessage(Map.Entry<String, ValidatorService.Success> stringSuccessEntry) {
-        return "%s: The usage of annotations in UCUM expressions is discouraged.".formatted(stringSuccessEntry.getKey());
-    }
-
-    private boolean containsAnnotation(Map.Entry<String, ValidatorService.Success> stringSuccessEntry) {
-        return containsAnnotationImpl(stringSuccessEntry.getValue().term());
+    private boolean displayNullOrEqualToCode(Coding coding) {
+        return coding == null || coding.getDisplay().equals(coding.getCode());
     }
 
     private boolean containsAnnotationImpl(UCUMExpression.Term term) {
@@ -63,30 +78,15 @@ public class UCUMValidateCodeOperation implements ValidateCodeOperation {
             case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> true;
             case UCUMExpression.ParenTerm parenTerm -> containsAnnotationImpl(parenTerm.term());
             case UCUMExpression.UnaryDivTerm unaryDivTerm -> containsAnnotationImpl(unaryDivTerm.term());
-            case UCUMExpression.BinaryTerm binaryTerm -> containsAnnotationImpl(binaryTerm.left()) || containsAnnotationImpl(binaryTerm.right());
+            case UCUMExpression.BinaryTerm binaryTerm ->
+                    containsAnnotationImpl(binaryTerm.left()) || containsAnnotationImpl(binaryTerm.right());
         };
     }
 
-    private String createErrorMessage(Map<String, ValidatorService.ValidationResult> results) {
-        return results.entrySet().stream()
-                .filter(entry -> entry.getValue() instanceof ValidatorService.Failure)
-                .map(entry -> Map.entry(entry.getKey(), String.join(",", ((ValidatorService.Failure) entry.getValue()).errorMessages())))
-                .map(entry -> "%s: %s".formatted(entry.getKey(), entry.getValue()))
-                .collect(Collectors.joining(","));
-    }
-
-    private String createDisplayMessage(Map<String, ValidatorService.ValidationResult> results) {
-        return results.entrySet().stream()
-                .filter(entry -> entry.getValue() instanceof ValidatorService.Success)
-                .map(entry -> Map.entry(entry.getKey(), ((ValidatorService.Success) entry.getValue()).term()))
-                .map(entry -> "%s: %s".formatted(entry.getKey(), ucumService.print(entry.getValue(), Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX)))
-                .collect(Collectors.joining(","));
-    }
-
-    private LinkedHashMap<String, ValidatorService.ValidationResult> performValidation(CodeableConcept codeableConcept) {
+    private LinkedHashMap<Coding, ValidatorService.ValidationResult> performValidation(CodeableConcept codeableConcept) {
         return codeableConcept.getCoding().stream()
                 .collect(Collectors.toMap(
-                        Coding::getCode,
+                        Function.identity(),
                         coding -> ucumService.validate(coding.getCode()),
                         (o, o2) -> o,
                         LinkedHashMap::new
