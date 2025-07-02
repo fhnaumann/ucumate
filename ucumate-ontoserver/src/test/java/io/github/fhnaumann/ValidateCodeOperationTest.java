@@ -163,6 +163,26 @@ public class ValidateCodeOperationTest {
         assertThat(warningDetail.message()).isEqualTo("g{annot}: The usage of annotations in UCUM expressions is discouraged.");
     }
 
+    @Test
+    public void test_validation_against_canonical_ucum_code_system_validates_against_all_codes() {
+
+    }
+
+    @Test
+    public void test_validation_against_custom_code_system_with_content_not_present_validates_against_all_codes() {
+
+    }
+
+    @Test
+    public void test_validation_against_custom_code_system_with_listed_concepts_fails_if_concept_valid_but_not_in_listed_concepts() {
+
+    }
+
+    @Test
+    public void test_validation_against_custom_code_system_with_listed_concepts_passes_if_concept_valid_and_in_listed_concepts() {
+
+    }
+
     private ValidateCodeOperation.Success perform_validate_code(Coding... codings) {
         CodeableConcept codeableConcept = new CodeableConcept();
         Arrays.stream(codings).forEach(codeableConcept::addCoding);

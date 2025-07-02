@@ -9,14 +9,16 @@ import java.util.Map;
  */
 public interface ValidateCodeOperation {
 
+    public ValidateCodeResult validate(CodeSystem codeSystem, CodeableConcept codeableConcept);
+
+    public default ValidateCodeResult validate(CodeSystem codeSystem, Coding coding) {
+        return validate(codeSystem, new CodeableConcept(coding));
+    }
+
     public ValidateCodeResult validate(ValueSet valueSet, CodeableConcept codeableConcept);
 
     public default ValidateCodeResult validate(ValueSet valueSet, Coding coding) {
         return validate(valueSet, new CodeableConcept(coding));
-    }
-
-    public default ValidateCodeResult validate(ValueSet valueSet, CodeType codeType) {
-        return validate(valueSet, new Coding(codeType.getSystem(), codeType.getCode(), codeType.getDisplay()));
     }
 
     public sealed interface ValidateCodeResult {}
@@ -30,6 +32,4 @@ public interface ValidateCodeOperation {
     public record Detail(boolean valid, String message, String display) {}
 
     public record Failure(OperationOutcome operationOutcome) implements ValidateCodeResult {}
-
-    public record ValidateCodeResult2(boolean result, String display, String message) {}
 }

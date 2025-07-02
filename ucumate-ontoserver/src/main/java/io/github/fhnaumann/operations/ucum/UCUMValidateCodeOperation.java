@@ -1,5 +1,6 @@
 package io.github.fhnaumann.operations.ucum;
 
+import io.github.fhnaumann.UCUMOntoOperationPlugin;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.Printer;
@@ -7,6 +8,7 @@ import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.operations.ExpandOperation;
 import io.github.fhnaumann.operations.ValidateCodeOperation;
 import io.github.fhnaumann.util.LogUtil;
+import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ValueSet;
@@ -30,6 +32,23 @@ public class UCUMValidateCodeOperation implements ValidateCodeOperation {
     public UCUMValidateCodeOperation(UCUMService service, UCUMExpandOperation ucumExpandOperation) {
         this.ucumService = service;
         this.ucumExpandOperation = ucumExpandOperation;
+    }
+
+    @Override
+    public ValidateCodeResult validate(CodeSystem codeSystem, CodeableConcept codeableConcept) {
+        if(codeSystem.getUrl().equals(UCUMOntoOperationPlugin.UCUM_SYSTEM) || codeSystem.getContent() == CodeSystem.CodeSystemContentMode.NOTPRESENT) {
+            // the canonical UCUM CodeSystem - include *all* UCUM terms (an empty ValueSet)
+            return validate(new ValueSet(), codeableConcept);
+        }
+        // a definitive subset of UCUM codes are provided, only validate against them by copying them into a ValueSet and calling the validate method
+        ValueSet valueSet = new ValueSet();
+        codeSystem.getConcept().forEach(concept -> {
+            ValueSet.ConceptSetComponent setComponent = new ValueSet.ConceptSetComponent();
+                    setComponent.addConcept().setCode(concept.getCode()).setDisplay(concept.getDisplay());
+            valueSet.getCompose().getInclude().add(setComponent);
+        });
+        validate(valueSet, codeableConcept);
+        return null;
     }
 
     @Override
