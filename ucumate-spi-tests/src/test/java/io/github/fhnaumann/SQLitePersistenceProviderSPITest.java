@@ -10,9 +10,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -26,6 +30,7 @@ import static org.assertj.core.api.Fail.fail;
  */
 public class SQLitePersistenceProviderSPITest {
 
+    private static final Logger log = LoggerFactory.getLogger(SQLitePersistenceProviderSPITest.class);
     @TempDir
     private Path sqliteFile;
 
@@ -43,6 +48,11 @@ public class SQLitePersistenceProviderSPITest {
     public void teardown() {
         ConnectionPoolFactory.shutdownAll();
         PersistenceRegistry.getInstance().close();
+        try {
+            Files.deleteIfExists(Paths.get("ucumate.db"));
+        } catch (IOException e) {
+            log.info("Failed to delete ucumate.db");
+        }
     }
 
     @Test

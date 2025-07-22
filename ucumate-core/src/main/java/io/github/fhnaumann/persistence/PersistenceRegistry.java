@@ -1,6 +1,7 @@
 package io.github.fhnaumann.persistence;
 
 import io.github.fhnaumann.configuration.CanonKey;
+import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.Canonicalizer;
@@ -49,7 +50,9 @@ public class PersistenceRegistry implements PersistenceProvider {
      */
     public static void initCache() {
         Properties props = findCacheSettingsFromPropertyFileOnClasspath();
-        initCache(props);
+        Properties mergeWithSystemProps = Configuration.mergeWithSystemProps(props);
+        Properties interpolatedProps = Configuration.interpolateProps(mergeWithSystemProps);
+        initCache(interpolatedProps);
     }
 
     /**
@@ -80,8 +83,8 @@ public class PersistenceRegistry implements PersistenceProvider {
             }
             UcumVersion version = ConfigurationRegistry.get().getUCUMVersionAsEnum();
             cache = new InMemoryPersistenceProvider(version, maxCanonSize, maxValSize, recordStats);
-            cache.setEnabled(true);
-            if(preHeat) {
+            cache.setEnabled(enableCache);
+            if(enableCache && preHeat) {
                 List<String> mergedCodes = Stream.concat(overrideInsteadOfAdd ? new ArrayList<String>().stream() : defaultPreHeatCodes.stream(), preHeatCodes.stream())
                         .distinct()
                         .toList();

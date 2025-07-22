@@ -50,7 +50,7 @@ public class BenchmarkValidationJSON {
     public void benchmarkUcumateValidation() {
         //logger.warn("Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
         for (TestCase.ValidateTestCase testCase : data.validateCases()) {
-            UCUMService.validateToBool(testCase.inputExpression());
+            data.ucumateService().validateToBool(testCase.inputExpression());
             //logger.warn("After Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
         }
     }

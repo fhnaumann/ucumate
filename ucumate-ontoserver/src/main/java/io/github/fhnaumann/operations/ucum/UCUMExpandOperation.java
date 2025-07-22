@@ -47,9 +47,13 @@ public class UCUMExpandOperation implements ExpandOperation {
         );
     }
 
+
     @Override
     public void expand(ValueSet valueSet, ExpansionProfile expansionProfile, ExpansionProcessor expansionProcessor) throws PluginBaseException {
         try {
+            // todo maybe do this in a smarter way by combining include and exclude first before getting all Terms for them
+            // similar to how its done in validate-code
+
             // Process all includes - should be UNION of all include blocks
             Set<UCUMExpression.Term> extractedIncludeTerms = new HashSet<>();
             for (ValueSet.ConceptSetComponent include : valueSet.getCompose().getInclude()) {
@@ -74,7 +78,11 @@ public class UCUMExpandOperation implements ExpandOperation {
             Stream<CodeSystemVersionPair> codeSystemVersionPairStream = getPairsFromResults(results);
             expansionProcessor.codeSystemVersionPairs(codeSystemVersionPairStream);
 
-            expansionProcessor.results(results.stream());
+            if(!results.isEmpty()) {
+                // todo this might be problematic for a lazy stream implementation. Checking the size does not work with laziness, but there has to be a way
+                // to differentiate between "the plugin determined that there 0 results" and "the plugin could not determine anything".
+                expansionProcessor.results(results.stream(), (long) results.size());
+            }
         } catch (WrappingCheckedException e) {
             throw e.getUnderlyingException();
         }

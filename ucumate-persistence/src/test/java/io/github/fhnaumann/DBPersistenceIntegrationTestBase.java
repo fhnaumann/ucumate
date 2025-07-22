@@ -1,10 +1,13 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
+import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.util.PreciseDecimal;
 import org.junit.jupiter.api.*;
@@ -63,7 +66,7 @@ public abstract class DBPersistenceIntegrationTestBase {
     public void can_persist_canonicalization() {
         UCUMExpression.Term parsedTerm = ((Validator.Success) validatorService.validate("g")).term();
         ((CanonicalizerService.Success) canonicalizerService.canonicalize(parsedTerm)).canonicalTerm();
-        Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(parsedTerm);
+        Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(CanonKey.of(parsedTerm, UcumVersion.getLatest()));
         assertThat(canonicalStepResult).isNotNull();
         assertThat("g").isEqualTo(printerService.print(canonicalStepResult.term()));
         assertThat(new PreciseDecimal("1")).isEqualTo(canonicalStepResult.magnitude());
@@ -74,7 +77,7 @@ public abstract class DBPersistenceIntegrationTestBase {
     @Test
     public void can_persist_canonicalization_multiple_steps() {
         canonicalizerService.canonicalize("S");
-        Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(parse("S"));
+        Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(CanonKey.of(parse("S"), UcumVersion.getLatest()));
         assertThat(canonicalStepResult).isNotNull();
         assertThat("C+2.g-1.m-2.s").isEqualTo(printerService.print(canonicalStepResult.term()));
         assertThat(new PreciseDecimal("0.001")).isEqualTo(canonicalStepResult.magnitude());
@@ -85,7 +88,7 @@ public abstract class DBPersistenceIntegrationTestBase {
     @Test
     public void can_persist_canonicalization_special_unit() {
         canonicalizerService.canonicalize("Cel");
-        Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(parse("Cel"));
+        Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(CanonKey.of(parse("Cel"), UcumVersion.getLatest()));
         assertEquals("K", print(canonicalStepResult.term()));
         assertTrue(canonicalStepResult.specialHandlingActive());
         assertNotNull(canonicalStepResult.specialFunction());
@@ -98,7 +101,7 @@ public abstract class DBPersistenceIntegrationTestBase {
     @MethodSource("provideValidationPersistence")
     public void can_persist_validation(String input, boolean valid) {
         validatorService.validate(input);
-        Validator.ValidationResult fromCache = PersistenceRegistry.getInstance().getValidated(input);
+        Validator.ValidationResult fromCache = PersistenceRegistry.getInstance().getValidated(ValKey.of(input, UcumVersion.V2_2));
         boolean actualValid = switch (fromCache) {
             case Validator.Failure failure -> false;
             case Validator.Success success -> true;

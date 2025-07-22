@@ -54,7 +54,7 @@ public class BenchmarkConversionJSON {
     public void benchmarkUcumateValidation() {
         // logger.warn("Cache size: " + PersistenceRegistry.getInstance().getAllCanonical().size());
         for (TestCase.ConvertTestCase testCase : data.convertCases()) {
-            UCUMService.convert(testCase.conversionFactor(), testCase.from(), testCase.to());
+            data.ucumateService().convert(testCase.conversionFactor(), testCase.from(), testCase.to());
             //logger.warn("After Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
         }
     }

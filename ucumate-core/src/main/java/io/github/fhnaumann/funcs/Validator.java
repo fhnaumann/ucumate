@@ -4,6 +4,7 @@ import io.github.fhnaumann.NewUCUMBaseVisitor;
 import io.github.fhnaumann.NewUCUMLexer;
 import io.github.fhnaumann.NewUCUMParser;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
+import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.model.CanonicalUCUMSyntaxVisitor;
 import io.github.fhnaumann.model.UCUMSyntaxVisitor;
 import io.github.fhnaumann.model.UcumVersion;
@@ -50,7 +51,7 @@ public class Validator implements ValidatorService {
     }
 
     public ValidationResult validate(String input) {
-        ValidationResult cached = PersistenceRegistry.getInstance().getValidated(input);
+        ValidationResult cached = PersistenceRegistry.getInstance().getValidated(ValKey.of(input, getUCUMVersion()));
         if(cached != null) {
             /*
             This is redundant for the cache itself, but there is a specific scenario where this is needed:
@@ -58,7 +59,7 @@ public class Validator implements ValidatorService {
             it will have cache hit and return here, but the unit is not saved in any of the additional providers.
              */
             if(PersistenceRegistry.hasAny()) {
-                PersistenceRegistry.getInstance().saveValidated(input, cached);
+                PersistenceRegistry.getInstance().saveValidated(ValKey.of(input, getUCUMVersion()), cached);
             }
             return cached;
         }
@@ -75,16 +76,16 @@ public class Validator implements ValidatorService {
             if(!ConfigurationRegistry.get().isAllowAnnotAfterParens() && hasAnnotationAfterParens(term)) {
                 log.warn("Encountered term {} with an annotation on parenthesis but the property {} is disabled.", input, "ucumate.allowAnnotAfterParens");
                 result = new Failure();
-                PersistenceRegistry.getInstance().saveValidated(input, result);
+                PersistenceRegistry.getInstance().saveValidated(ValKey.of(input, getUCUMVersion()), result);
                 return result;
             }
             SpecialChecker.SpecialCheckResult specialCheckResult = SpecialChecker.checkForSpecialUnitInTerm(term, new SpecialChecker.SpecialCheckResult(false, false,false));
             result = specialCheckResult.isValid() ? createSuccess(term) : new Failure();
-            PersistenceRegistry.getInstance().saveValidated(input, result);
+            PersistenceRegistry.getInstance().saveValidated(ValKey.of(input, getUCUMVersion()), result);
             return result;
         } catch (LexerException | ParserException e) {
             ValidationResult result = new Failure();
-            PersistenceRegistry.getInstance().saveValidated(input, result);
+            PersistenceRegistry.getInstance().saveValidated(ValKey.of(input, getUCUMVersion()), result);
             return result;
         }
     }

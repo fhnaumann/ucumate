@@ -13,7 +13,13 @@ public class Configuration {
     private final Boolean enableSQLitePersistence;
     private final String sqliteDBPath;
 
-    private Configuration(String ucumVersion, Boolean enablePrefixOnNonMetricUnits, Boolean enableMolMassConversion, Boolean allowAnnotAfterParens, Boolean enableSQLitePersistence, String sqliteDBPath) {
+    private Configuration(
+            String ucumVersion,
+            Boolean enablePrefixOnNonMetricUnits,
+            Boolean enableMolMassConversion,
+            Boolean allowAnnotAfterParens,
+            Boolean enableSQLitePersistence,
+            String sqliteDBPath) {
         this.ucumVersion = ucumVersion;
         this.enablePrefixOnNonMetricUnits = enablePrefixOnNonMetricUnits;
         this.enableMolMassConversion = enableMolMassConversion;
@@ -107,7 +113,7 @@ public class Configuration {
                 );
     }
 
-    private static Properties mergeWithSystemProps(Properties properties) {
+    public static Properties mergeWithSystemProps(Properties properties) {
         Properties resolved = new Properties();
         for (String key : properties.stringPropertyNames()) {
             String sysProp = System.getProperty(key);
@@ -128,7 +134,7 @@ public class Configuration {
         return merged;
     }
 
-    private static Properties interpolateProps(Properties properties) {
+    public static Properties interpolateProps(Properties properties) {
         Properties interpolated = new Properties();
         properties.forEach((o, o2) -> {
             interpolated.put(o, o2.toString().replace("${user.dir}", System.getProperty("user.dir")));

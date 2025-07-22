@@ -92,7 +92,6 @@ public class UCUMValidateCodeOperation implements ValidateCodeOperation {
     }
 
     private void handleSuccess(ValueSet valueSet, Coding coding, ExpansionProfile expansionProfile, ValidateProcessor validateProcessor, ValidatorService.Success success) throws PluginUnprocessableEntityException {
-        // todo check if expansion exists, if so, only check expansion, otherwise do stuff with compose below
         /*
          The code is valid, but it may not be included based on the VS composes.
          The easiest way to check would be to expand the VS and check if the code is in the expansion, but that can be expensive.

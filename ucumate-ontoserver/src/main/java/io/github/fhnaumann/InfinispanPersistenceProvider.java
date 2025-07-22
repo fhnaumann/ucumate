@@ -13,6 +13,8 @@ import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,6 +22,7 @@ import java.util.Map;
 /**
  * @author Felix Naumann
  */
+@Service
 public class InfinispanPersistenceProvider implements PersistenceProvider, InMemory {
 
     public static final String CANONICAL_CACHE_NAME = "ucumate-canonical-cache";
@@ -30,7 +33,8 @@ public class InfinispanPersistenceProvider implements PersistenceProvider, InMem
     private final Cache<ValKey, ValidatorService.ValidationResult> valCache;
     private boolean enabled = true;
 
-    public InfinispanPersistenceProvider(EmbeddedCacheManager cacheManager) {
+    @Autowired
+    public InfinispanPersistenceProvider(DefaultCacheManager cacheManager) {
         this.ucumVersion = UcumVersion.V2_2; // todo figure out why a persistence provider needs a ucum version anyway
 
         if (!cacheManager.cacheExists(CANONICAL_CACHE_NAME)) {
