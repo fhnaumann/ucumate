@@ -98,8 +98,7 @@ public class BenchmarkFunctionalJSONTests {
         for (TestCase.CommensurableTestCase testCase : commensurableCases) {
             new UCUMService().checkCommensurable(
                     testCase.expr1(),
-                    testCase.expr2(),
-                    false
+                    testCase.expr2()
             );
         }
     }

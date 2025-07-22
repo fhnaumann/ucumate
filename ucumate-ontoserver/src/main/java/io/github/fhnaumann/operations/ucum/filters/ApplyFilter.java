@@ -1,11 +1,10 @@
 package io.github.fhnaumann.operations.ucum.filters;
 
 import io.github.fhnaumann.model.UCUMExpression;
-import io.github.fhnaumann.operations.ucum.InvalidInputException;
+import io.github.fhnaumann.operations.ucum.issues.InvalidInputException;
 import org.hl7.fhir.r4.model.ValueSet;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Felix Naumann

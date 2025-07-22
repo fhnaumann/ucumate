@@ -97,13 +97,13 @@ public class UCUMService implements IUCUMService {
     }
 
     @Override
-    public RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2, boolean allowMolMassConversion) {
-        return relationCheckerService.checkRelation(term1, term2, allowMolMassConversion);
+    public RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2) {
+        return relationCheckerService.checkRelation(term1, term2);
     }
 
     @Override
-    public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2, boolean allowMolMassConversion) {
-        return relationCheckerService.checkCommensurable(term1, term2, allowMolMassConversion);
+    public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2) {
+        return relationCheckerService.checkCommensurable(term1, term2);
     }
 
     @Override

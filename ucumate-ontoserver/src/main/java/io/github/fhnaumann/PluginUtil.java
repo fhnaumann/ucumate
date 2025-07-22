@@ -1,11 +1,15 @@
 package io.github.fhnaumann;
 
+import au.csiro.ontoserver.OntoOperationPlugin;
 import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
+import io.github.fhnaumann.operations.ucum.Unchecked;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import io.github.fhnaumann.util.LogUtil;
+import io.github.fhnaumann.util.UCUMRegistry;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.slf4j.Logger;
@@ -31,6 +35,14 @@ public class PluginUtil {
     }
 
     private static UCUMExpression.Term fromUCUMUnit(UCUMDefinition.UCUMUnit unit) {
+        return SoloTermBuilder.builder().withoutPrefix(unit).noExpNoAnnot().asTerm().build();
+    }
+
+    public static UCUMExpression.Term getBaseUnitFromBaseProperty(String baseProperty, OntoOperationPlugin plugin, UcumVersion ucumVersion) {
+        UCUMDefinition.BaseUnit unit = UCUMRegistry.getInstance().getBaseUnits(ucumVersion).stream()
+                .filter(baseUnit -> baseUnit.property().equals(baseProperty))
+                .findFirst()
+                .orElseThrow(() -> new Unchecked.UncheckedUnprocessableEntityException("'%s' is not a known base property.".formatted(baseProperty), plugin));
         return SoloTermBuilder.builder().withoutPrefix(unit).noExpNoAnnot().asTerm().build();
     }
 

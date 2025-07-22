@@ -10,6 +10,8 @@
     </parent>
 
     <artifactId>ucumate-ontoserver</artifactId>
+    <!-- command: mvn -pl ucumate-ontoserver clean install -am -DskipTests -->
+    <!-- ontoserver command:  java -Dloader.path=/Users/felixnaumann/Documents/ucumate/ucumate-ontoserver/target/ucumate-ontoserver-1.0.3-SNAPSHOT.jar -jar ontoserver4-6.22.7.jar -->
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -22,7 +24,7 @@
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-base</artifactId>
             <version>8.2.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
@@ -34,7 +36,13 @@
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-structures-r4</artifactId>
             <version>8.2.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>au.csiro.ontoserver</groupId>
+            <artifactId>ontoserver-plugin-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
@@ -46,11 +54,11 @@
             <artifactId>ucumate-error-feedback</artifactId>
             <version>1.0.3-SNAPSHOT</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-persistence</artifactId>
             <version>1.0.3-SNAPSHOT</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -66,7 +74,7 @@
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-core</artifactId>
             <version>16.0.0.Dev01</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -79,6 +87,40 @@
                 <configuration>
                     <argLine>${argLine}</argLine>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <minimizeJar>true</minimizeJar>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

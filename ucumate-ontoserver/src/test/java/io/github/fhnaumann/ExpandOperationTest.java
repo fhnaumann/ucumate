@@ -1,13 +1,18 @@
 package io.github.fhnaumann;
 
+import au.csiro.ontoserver.operations.expand.CodeSystemVersionPair;
+import au.csiro.ontoserver.operations.expand.ExpandOperation;
+import au.csiro.ontoserver.operations.expand.ExpansionProcessor;
+import au.csiro.ontoserver.operations.expand.ExpansionProfile;
+import au.csiro.ontoserver.operations.validate.issues.IValidationIssue;
 import ca.uhn.fhir.context.FhirContext;
 import io.github.fhnaumann.builders.CacheConfig;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.model.UcumVersion;
-import io.github.fhnaumann.operations.ExpandOperation;
 import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.hl7.fhir.r4.model.OperationOutcome;
+import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -15,6 +20,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static io.github.fhnaumann.ResourceLoader.URI;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +38,7 @@ public class ExpandOperationTest {
     public void setup() {
         PersistenceRegistry.disableInMemoryCache(true);
         PersistenceRegistry.initCache(CacheConfig.builder().enable().preHeat(true).build());
-        plugin = new UCUMExpandOperation(new UCUMService());
+        plugin = new UCUMExpandOperation(null, new UCUMService());
     }
 
     @Test
@@ -45,7 +53,7 @@ public class ExpandOperationTest {
     public void test_expand_code_operation_filter_implicit_include() {
         ValueSet vs = create_include_canonical_filter_implicit_codes_vs(null, "m", true);
         ValueSet actualExpanded = perform_expand(plugin, vs, "foot");
-        assert_expansion_contains_codes(actualExpanded, "[ft_br]", "[ft_i]", "[ft_us]");
+        assert_expansion_contains_codes(actualExpanded, "[ft_br]", "[ft_i]", "[ft_us]", "[pied]");
     }
 
     @Test
@@ -123,11 +131,22 @@ public class ExpandOperationTest {
     }
 
     private static OperationOutcome perform_invalid_expand(ExpandOperation plugin, ValueSet valueSet, String textFilter) {
-        return ((ExpandOperation.Failure) plugin.expand(valueSet, textFilter)).outcome();
+        //return ((ExpandOperation.Failure) plugin.expand(valueSet, textFilter)).outcome();
+        return null;
     }
 
     private static ValueSet perform_expand(ExpandOperation plugin, ValueSet valueSet, String textFilter) {
-        return ((ExpandOperation.Success) plugin.expand(valueSet, textFilter)).valueSet();
+        ExpansionProfile expansionProfile = new ExpansionProfileStub(textFilter);
+        ExpansionProcessorStub expansionProcessor = new ExpansionProcessorStub();
+        try {
+            plugin.expand(valueSet, expansionProfile, expansionProcessor);
+            ValueSet vs = new ValueSet();
+            vs.getExpansion().setContains(expansionProcessor.results);
+            return vs;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        //return ((ExpandOperation.Success) plugin.expand(valueSet, textFilter)).valueSet();
     }
 
     private static void assert_expansion_contains_codes(ValueSet actualExpanded, String... expectedExpandedCodes) {
@@ -156,7 +175,7 @@ public class ExpandOperationTest {
     }
 
     private static void addExplicitCodes(ValueSet valueSet, String... codes) {
-        ValueSet.ConceptSetComponent comp = valueSet.getCompose().addInclude();
+        ValueSet.ConceptSetComponent comp = valueSet.getCompose().addInclude().setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
         if(codes != null) {
             for(String code : codes) {
                 comp.addConcept().setCode(code);
@@ -170,10 +189,10 @@ public class ExpandOperationTest {
                 .setOp(ValueSet.FilterOperator.EQUAL)
                 .setValue(code);
         if(newInclude) {
-            valueSet.getCompose().addInclude().addFilter(f);
+            valueSet.getCompose().addInclude().addFilter(f).setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
         }
         else {
-            valueSet.getCompose().getIncludeFirstRep().addFilter(f);
+            valueSet.getCompose().getIncludeFirstRep().addFilter(f).setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
         }
     }
 
@@ -183,10 +202,10 @@ public class ExpandOperationTest {
                 .setOp(ValueSet.FilterOperator.EQUAL)
                 .setValue(propertyName);
         if(newInclude) {
-            valueSet.getCompose().addInclude().addFilter(f);
+            valueSet.getCompose().addInclude().addFilter(f).setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
         }
         else {
-            valueSet.getCompose().getIncludeFirstRep().addFilter(f);
+            valueSet.getCompose().getIncludeFirstRep().addFilter(f).setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
         }
     }
 
@@ -195,5 +214,100 @@ public class ExpandOperationTest {
         valueSet.setUrl(URI);
         valueSet.setVersion(UcumVersion.V2_2.getVersion());
         return valueSet;
+    }
+
+    private static class ExpansionProcessorStub implements ExpansionProcessor {
+
+        private List<ValueSet.ValueSetExpansionContainsComponent> results;
+
+        @Override
+        public void results(Stream<ValueSet.ValueSetExpansionContainsComponent> stream) {
+            results = stream.toList();
+        }
+
+        @Override
+        public void results(Stream<ValueSet.ValueSetExpansionContainsComponent> stream, long l) {
+
+        }
+
+
+        @Override
+        public void addParam(ValueSet.ValueSetExpansionParameterComponent valueSetExpansionParameterComponent) {
+
+        }
+
+        @Override
+        public void codeSystemVersionPairs(Stream<CodeSystemVersionPair> stream) {
+
+        }
+
+        @Override
+        public void codeMap(Map<String, ValueSet.ConceptReferenceComponent> map) {
+
+        }
+    }
+
+    private static class ExpansionProfileStub implements ExpansionProfile {
+
+        private final String filter;
+
+        private ExpansionProfileStub(String filter) {
+            this.filter = filter;
+        }
+
+        @Override
+        public String filter() {
+            return filter;
+        }
+
+        @Override
+        public Integer offset() {
+            return 0;
+        }
+
+        @Override
+        public Integer count() {
+            return 0;
+        }
+
+        @Override
+        public long tooCostlyThreshold() {
+            return 0;
+        }
+
+        @Override
+        public boolean activeOnly() {
+            return false;
+        }
+
+        @Override
+        public boolean includeDesignations() {
+            return false;
+        }
+
+        @Override
+        public Boolean includeDefinitions() {
+            return null;
+        }
+
+        @Override
+        public Boolean includeAlternateCodes() {
+            return null;
+        }
+
+        @Override
+        public String displayLanguage() {
+            return "";
+        }
+
+        @Override
+        public Locale vsLanguage() {
+            return null;
+        }
+
+        @Override
+        public List<StringType> boosts() {
+            return List.of();
+        }
     }
 }

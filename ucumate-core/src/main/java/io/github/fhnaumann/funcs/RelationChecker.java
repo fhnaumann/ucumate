@@ -18,31 +18,36 @@ public class RelationChecker implements RelationCheckerService {
         this.validatorService = validatorService;
     }
 
-    public RelationResult checkRelation(Term term1, Term term2, boolean allowMolMassConversion) {
+    public RelationResult checkRelation(Term term1, Term term2) {
         CanonicalizerService.CanonicalizationResult result1 = new Canonicalizer(printerService, validatorService).canonicalize(term1);
         CanonicalizerService.CanonicalizationResult result2 = new Canonicalizer(printerService, validatorService).canonicalize(term2);
         if(!(result1 instanceof CanonicalizerService.Success success1) || !(result2 instanceof CanonicalizerService.Success success2)) {
             return new Failure();
         }
         boolean strictEqual = checkEquality(term1, term2);
-        boolean equalAfterProcessing = checkEquality(success1.canonicalTerm(), success2.canonicalTerm());
+        boolean equalAfterProcessing = checkEqualityAfterProcessing(success1, success2);
         if(strictEqual || equalAfterProcessing) {
-            return new IsEqual(strictEqual, equalAfterProcessing);
+            return new IsEqual(strictEqual, equalAfterProcessing, success1.canonicalTerm());
         }
-        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm(), allowMolMassConversion);
+        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm());
     }
 
-    public CommensurableResult checkCommensurable(Term term1, Term term2, boolean allowMolMassConversion) {
+    private boolean checkEqualityAfterProcessing(CanonicalizerService.Success success1, CanonicalizerService.Success success2) {
+        return checkEquality(success1.canonicalTerm(), success2.canonicalTerm())
+                && success1.magnitude().equals(success2.magnitude());
+    }
+
+    public CommensurableResult checkCommensurable(Term term1, Term term2) {
         CanonicalizerService.CanonicalizationResult result1 = new Canonicalizer(printerService, validatorService).canonicalize(term1);
         CanonicalizerService.CanonicalizationResult result2 = new Canonicalizer(printerService, validatorService).canonicalize(term2);
         if(!(result1 instanceof CanonicalizerService.Success success1) || !(result2 instanceof CanonicalizerService.Success success2)) {
             return new NotCommensurable(Map.of());
         }
-        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm(), allowMolMassConversion);
+        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm());
 
     }
 
-    private CommensurableResult checkCommensurable(CanonicalTerm term1, CanonicalTerm term2, boolean allowMolMassConversion) {
+    private CommensurableResult checkCommensurable(CanonicalTerm term1, CanonicalTerm term2) {
         DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(term1, term2);
         return switch (comparisonResult) {
             case DimensionAnalyzer.Failure failure -> new NotCommensurable(failure.difference());

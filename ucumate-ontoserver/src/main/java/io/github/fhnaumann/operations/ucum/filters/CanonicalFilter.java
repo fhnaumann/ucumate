@@ -1,9 +1,11 @@
 package io.github.fhnaumann.operations.ucum.filters;
 
 import io.github.fhnaumann.PluginUtil;
+import io.github.fhnaumann.UCUMOntoOperationPlugin;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMExpression;
-import io.github.fhnaumann.operations.ucum.InvalidInputException;
+import io.github.fhnaumann.operations.ucum.Unchecked;
+import io.github.fhnaumann.operations.ucum.issues.InvalidInputException;
 import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
 import io.github.fhnaumann.util.LogUtil;
 import org.hl7.fhir.r4.model.ValueSet;
@@ -19,10 +21,16 @@ import java.util.Map;
  */
 public class CanonicalFilter implements ApplyFilter {
 
+    private static final String FILTER_NAME = "canonical";
+
+
     private static final Logger log = LoggerFactory.getLogger(CanonicalFilter.class);
+
+    private final UCUMOntoOperationPlugin plugin;
     private final UCUMService service;
 
-    public CanonicalFilter(UCUMService service) {
+    public CanonicalFilter(UCUMOntoOperationPlugin plugin, UCUMService service) {
+        this.plugin = plugin;
         this.service = service;
     }
 
@@ -39,7 +47,7 @@ public class CanonicalFilter implements ApplyFilter {
         return switch (operator) {
             case EQUAL -> applyWithEqualFilter(term);
             case IN -> applyWithInFilter(term);
-            default -> LogUtil.logAndThrow(log, UCUMExpandOperation.ExpandCodeOperationException.class, "The operator '{}' is not supported for UCUM valuesets. Only '{}' are supported.", operator, List.of(ValueSet.FilterOperator.EQUAL, ValueSet.FilterOperator.IN));
+            default -> throw new Unchecked.UncheckedUnprocessableEntityException("Unknown operator '%s'".formatted(operator.getDisplay()), plugin);
         };
     }
 
@@ -55,6 +63,4 @@ public class CanonicalFilter implements ApplyFilter {
                 .map(Map.Entry::getKey)
                 .toList();
     }
-
-    ;
 }

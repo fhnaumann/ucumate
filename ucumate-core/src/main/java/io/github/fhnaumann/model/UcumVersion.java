@@ -4,6 +4,8 @@ import io.github.fhnaumann.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 /**
  * @author Felix Naumann
  */
@@ -28,5 +30,17 @@ public enum UcumVersion {
             case "2.1"-> V2_1;
             default -> LogUtil.logAndThrow(log, "Unknown UCUM version {}.", version);
         };
+    }
+
+    public static Optional<UcumVersion> fromVersionStringAsOpt(String version) {
+        try {
+            return Optional.of(fromVersionString(version));
+        } catch (RuntimeException e) {
+            return Optional.empty();
+        }
+    }
+
+    public static UcumVersion getLatest() {
+        return V2_2;
     }
 }

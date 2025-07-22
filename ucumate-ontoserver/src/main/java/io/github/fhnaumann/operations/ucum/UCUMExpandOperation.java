@@ -1,25 +1,29 @@
 package io.github.fhnaumann.operations.ucum;
-
+import au.csiro.ontoserver.exceptions.PluginBaseException;
+import au.csiro.ontoserver.operations.Processor;
+import au.csiro.ontoserver.operations.expand.CodeSystemVersionPair;
+import au.csiro.ontoserver.operations.expand.ExpandOperation;
+import au.csiro.ontoserver.operations.expand.ExpansionProcessor;
+import au.csiro.ontoserver.operations.expand.ExpansionProfile;
 import io.github.fhnaumann.PluginUtil;
+import io.github.fhnaumann.UCUMOntoOperationPlugin;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.ValidatorService;
+import io.github.fhnaumann.funcs.printer.CustomUnitMappingPrinter;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
-import io.github.fhnaumann.operations.ExpandOperation;
 import io.github.fhnaumann.operations.ucum.filters.ApplyFilter;
 import io.github.fhnaumann.operations.ucum.filters.BasePropertyFilter;
 import io.github.fhnaumann.operations.ucum.filters.CanonicalFilter;
-import io.github.fhnaumann.util.LogUtil;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.OperationOutcome;
-import org.hl7.fhir.r4.model.ValueSet;
+import io.github.fhnaumann.operations.ucum.issues.InvalidInputException;
+import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.annotation.Inherited;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Implementation of the $expand operation for UCUM ValueSets.
@@ -30,62 +34,68 @@ public class UCUMExpandOperation implements ExpandOperation {
     private static final Logger log = LoggerFactory.getLogger(UCUMExpandOperation.class);
     private final Map<String, ApplyFilter> filterProperties;
 
+    private final UCUMOntoOperationPlugin plugin;
     private final UCUMService service;
 
-    public UCUMExpandOperation(UCUMService service) {
+    public UCUMExpandOperation(UCUMOntoOperationPlugin plugin, UCUMService service) {
+        this.plugin = plugin;
         this.service = service;
         // may be used in valueset.compose
         this.filterProperties = Map.of(
-                "canonical", new CanonicalFilter(service),
-                "property", new BasePropertyFilter(service)
+                "canonical", new CanonicalFilter(plugin, service),
+                "property", new BasePropertyFilter(plugin, service)
         );
     }
 
-    /**
-     * {@inheritDoc}
-     * <br>
-     * Since there are infinitely many UCUM terms, the expand operation is limited to the union of the units defined by
-     * UCUM itself (~3000 <i>simple units</i>) and any encountered UCUM expression in the past of this app instance.
-     * <br>
-     * If no include filters or concepts are defined, then all known codes are used.
-     * @param valueSet The ValueSet to be expanded. Expected to be normalized and only to contain codes from one system.
-     * @param textFilter Additional text filter that can be applied to filter the expanded codes.
-     * @return
-     */
     @Override
-    public ExpandResult expand(ValueSet valueSet, String textFilter) {
-        /*
-        The value set may...
-        * have codes explicitly listed in compose.include
-        * have codes explicitly listed in compose.exclude
-        * have filters listed in compose.include
-        * have filters listed in compose.exclude
-        * have a textFilter to limit returned codes to match it
-
-        The textFilter only searches in "code" and "names".
-
-        same include: intersect
-        different include: union
-         */
+    public void expand(ValueSet valueSet, ExpansionProfile expansionProfile, ExpansionProcessor expansionProcessor) throws PluginBaseException {
         try {
-            Set<UCUMExpression.Term> extractedIncludeTerms = extractExplicitCodesOrFilteredCodes(valueSet.getCompose().getInclude());
-            if(extractedIncludeTerms.isEmpty()) {
-                // no explicit codes and no include filters have been specified - return every known code instead of nothing.
-                // The excludes or text filters may limit the actual returned codes
-                extractedIncludeTerms = PluginUtil.getAllKnownValidTerms(service);
+            // Process all includes - should be UNION of all include blocks
+            Set<UCUMExpression.Term> extractedIncludeTerms = new HashSet<>();
+            for (ValueSet.ConceptSetComponent include : valueSet.getCompose().getInclude()) {
+                Set<UCUMExpression.Term> blockTerms = extractExplicitCodesOrFilteredCodes(include, expansionProcessor);
+                extractedIncludeTerms.addAll(blockTerms); // UNION operation
             }
-            Set<UCUMExpression.Term> extractedExcludeTerms = extractExplicitCodesOrFilteredCodes(valueSet.getCompose().getExclude());
+
+            // Process all excludes - should be UNION of all exclude blocks
+            Set<UCUMExpression.Term> extractedExcludeTerms = new HashSet<>();
+            for (ValueSet.ConceptSetComponent exclude : valueSet.getCompose().getExclude()) {
+                Set<UCUMExpression.Term> blockTerms = extractExplicitCodesOrFilteredCodes(exclude, expansionProcessor);
+                extractedExcludeTerms.addAll(blockTerms); // UNION operation
+            }
+
+            // Remove excludes from includes
             extractedIncludeTerms.removeAll(extractedExcludeTerms);
 
-            extractedIncludeTerms = applyTextFiltering(textFilter, extractedIncludeTerms);
-            return new PerfectSuccess(addToVsExpansion(valueSet, extractedIncludeTerms));
-        } catch (ExpandCodeOperationException e) {
-            return new Failure(constructOutcomeFrom(e));
+            extractedIncludeTerms = applyTextFiltering(expansionProfile.filter(), extractedIncludeTerms);
+
+            List<ValueSet.ValueSetExpansionContainsComponent> results = extractedIncludeTerms.stream().map(this::terms2ExpansionComp).toList();
+
+            Stream<CodeSystemVersionPair> codeSystemVersionPairStream = getPairsFromResults(results);
+            expansionProcessor.codeSystemVersionPairs(codeSystemVersionPairStream);
+
+            expansionProcessor.results(results.stream());
+        } catch (WrappingCheckedException e) {
+            throw e.getUnderlyingException();
         }
     }
 
-    public boolean includesAllUCUMCodes(ValueSet valueSet) {
-        Set<UCUMExpression.Term> extractedIncludeTerms = extractExplicitCodesOrFilteredCodes(valueSet.getCompose().getInclude());
+    private Stream<CodeSystemVersionPair> getPairsFromResults(List<ValueSet.ValueSetExpansionContainsComponent> results) {
+        // This plugin only handles the UCUM CodeSystem but manages multiple versions (if different versions are used throughout the VS)
+        return results.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                                ValueSet.ValueSetExpansionContainsComponent::getVersion,
+                                // UCUM CodeSystem is case sensitive
+                                comp -> new CodeSystemVersionPair(comp.getSystem(), comp.getVersion(), true), // comp.getSystem() should always be the UCUM system
+                                (existing, replacement) -> existing
+                        ),
+                        map -> map.values().stream()
+                ));
+    }
+
+    public boolean includesAllUCUMCodes(ValueSet valueSet, Processor processor) {
+        Set<UCUMExpression.Term> extractedIncludeTerms = extractExplicitCodesOrFilteredCodes(valueSet.getCompose().getInclude(), processor);
         return extractedIncludeTerms.isEmpty();
     }
 
@@ -98,9 +108,9 @@ public class UCUMExpandOperation implements ExpandOperation {
         return operationOutcome;
     }
 
-    private Set<UCUMExpression.Term> extractExplicitCodesOrFilteredCodes(List<ValueSet.ConceptSetComponent> conceptSetComponents) {
+    private Set<UCUMExpression.Term> extractExplicitCodesOrFilteredCodes(List<ValueSet.ConceptSetComponent> conceptSetComponents, Processor processor) {
         return conceptSetComponents.stream()
-                .map(this::extractExplicitCodesOrFilteredCodes)
+                .map(conceptSetComponent -> extractExplicitCodesOrFilteredCodes(conceptSetComponent, processor))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
     }
@@ -115,41 +125,58 @@ public class UCUMExpandOperation implements ExpandOperation {
         return valueSet;
     }
 
+    private ValueSet.ValueSetExpansionContainsComponent terms2ExpansionComp(UCUMExpression.Term term) {
+        ValueSet.ValueSetExpansionContainsComponent expansionComp = new ValueSet.ValueSetExpansionContainsComponent();
+        String code = service.print(term, Printer.PrintType.UCUM_SYNTAX);
+        expansionComp.setCode(code);
+        expansionComp.setDisplay(code);
+        expansionComp.setVersion(service.getUCUMVersion().getVersion());
+        expansionComp.setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
+        return expansionComp;
+    }
+
     private Set<UCUMExpression.Term> applyTextFiltering(String textFilter, Set<UCUMExpression.Term> mergedIncludeTerms) {
         if(textFilter != null) {
+            CustomUnitMappingPrinter customUnitMappingPrinter = new CustomUnitMappingPrinter(concept -> String.join(",", concept.names()));
             mergedIncludeTerms = mergedIncludeTerms.stream()
-                    .filter(term -> service.print(term, Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX).contains(textFilter))
+                    .filter(term -> service.print(term, customUnitMappingPrinter).contains(textFilter))
                     .collect(Collectors.toSet());
         }
         return mergedIncludeTerms;
     }
 
 
-    private Set<UCUMExpression.Term> createBasedOnFilter(String filterType, ValueSet.FilterOperator operator, String expression) throws ExpandCodeOperationException {
+    private Set<UCUMExpression.Term> createBasedOnFilter(String filterType, ValueSet.FilterOperator operator, String expression) {
         ApplyFilter applyFilter = filterProperties.get(filterType);
         if(applyFilter == null) {
-            return LogUtil.logAndThrow(log, ExpandCodeOperationException.class, "Unknown filter type '{}'. Only {} are known filter types.", filterType, filterProperties.keySet());
+            throw new Unchecked.UncheckedUnprocessableEntityException("Unknown filter '%s'".formatted(filterType), plugin);
+            //return LogUtil.logAndThrow(log, ExpandCodeOperationException.class, "Unknown filter type '{}'. Only {} are known filter types.", filterType, filterProperties.keySet());
         }
         try {
             return new HashSet<>(applyFilter.apply(expression, operator));
         } catch (InvalidInputException e) {
-            throw new ExpandCodeOperationException("The input '%s' is invalid and therefore could not be expanded.".formatted(expression), true);
+            throw new Unchecked.UncheckedUnprocessableEntityException("The input '%s' is invalid and therefore could not be expanded.".formatted(expression), plugin);
         }
     }
 
-    private Set<UCUMExpression.Term> extractExplicitCodesOrFilteredCodes(ValueSet.ConceptSetComponent conceptSetComponent) {
+    private Set<UCUMExpression.Term> extractExplicitCodesOrFilteredCodes(ValueSet.ConceptSetComponent conceptSetComponent, Processor processor) {
+        if(!UCUMOntoOperationPlugin.UCUM_SYSTEM.equals(conceptSetComponent.getSystem())) {
+            return Set.of();
+        }
         if(conceptSetComponent.hasConcept()) {
             return extractExplicitCodes(conceptSetComponent);
         }
         else if(conceptSetComponent.hasFilter()) {
-            return extractAndApplyIntersectionFilters(conceptSetComponent);
+            return extractAndApplyIntersectionFilters(conceptSetComponent, processor);
         }
         else {
-            throw new RuntimeException();
+            // UCUM CodeSystem with no concept or filter means get all known codes
+            // The text filter in the query may further limit the actual returned codes
+            return PluginUtil.getAllKnownValidTerms(service);
         }
     }
 
-    private Set<UCUMExpression.Term> extractAndApplyIntersectionFilters(ValueSet.ConceptSetComponent conceptSetComponent) {
+    private Set<UCUMExpression.Term> extractAndApplyIntersectionFilters(ValueSet.ConceptSetComponent conceptSetComponent, Processor processor) {
         return conceptSetComponent.getFilter().stream()
                 .map(f -> createBasedOnFilter(f.getProperty(), f.getOp(), f.getValue()))
                 .reduce(intersectingReducer())
@@ -167,7 +194,7 @@ public class UCUMExpandOperation implements ExpandOperation {
     private UCUMExpression.Term extractSuccessOrThrow(ValidatorService.ValidationResult result) {
         return switch (result) {
             case ValidatorService.Success success -> success.term();
-            case ValidatorService.Failure failure -> throw new ExpandCodeOperationException(String.join(",", failure.errorMessages()), true);
+            case ValidatorService.Failure failure -> throw new Unchecked.UncheckedUnprocessableEntityException(String.join(",", failure.errorMessages()), plugin);
         };
     }
 

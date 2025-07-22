@@ -1,12 +1,12 @@
 package io.github.fhnaumann.operations.ucum.filters;
 
 import io.github.fhnaumann.PluginUtil;
+import io.github.fhnaumann.UCUMOntoOperationPlugin;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
-import io.github.fhnaumann.operations.ucum.InvalidInputException;
-import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
+import io.github.fhnaumann.operations.ucum.Unchecked;
 import io.github.fhnaumann.util.LogUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
 import org.hl7.fhir.r4.model.ValueSet;
@@ -24,27 +24,32 @@ import java.util.stream.Collectors;
  */
 public class BasePropertyFilter implements ApplyFilter {
 
+    private static final String FILTER_NAME = "property";
+
     private static final Set<String> KNOWN_PROPERTIES = UCUMRegistry.getInstance().getBaseUnits(ConfigurationRegistry.get().getUCUMVersionAsEnum()).stream()
             .map(UCUMDefinition.BaseUnit::property)
             .collect(Collectors.toSet());
     private static final Logger log = LoggerFactory.getLogger(BasePropertyFilter.class);
 
+    private final UCUMOntoOperationPlugin plugin;
     private final UCUMService service;
     private final Extractor extractor;
 
-    public BasePropertyFilter(UCUMService service) {
+    public BasePropertyFilter(UCUMOntoOperationPlugin plugin, UCUMService service) {
+        this.plugin = plugin;
         this.service = service;
         this.extractor = new Extractor(service);
     }
 
     @Override
-    public Collection<UCUMExpression.Term> apply(String propertyName, ValueSet.FilterOperator operator) throws InvalidInputException {
+    public Collection<UCUMExpression.Term> apply(String propertyName, ValueSet.FilterOperator operator) {
         if(!KNOWN_PROPERTIES.contains(propertyName)) {
-            return LogUtil.logAndThrow(log, UCUMExpandOperation.ExpandCodeOperationException.class, "Unknown property '{}'. Only {} are known properties.", propertyName, KNOWN_PROPERTIES);
+            throw new Unchecked.UncheckedUnprocessableEntityException("Unknown property '%s', only '%s' are known.".formatted(propertyName, KNOWN_PROPERTIES), plugin);
+            //return LogUtil.logAndThrow(log, UCUMExpandOperation.ExpandCodeOperationException.class, "Unknown property '{}'. Only {} are known properties.", propertyName, KNOWN_PROPERTIES);
         }
         return switch (operator) {
             case EQUAL -> handleEqual(propertyName);
-            default -> LogUtil.logAndThrow(log, UCUMExpandOperation.ExpandCodeOperationException.class, "Only '=' (equal) is supported on the property filter.");
+            default -> throw new Unchecked.UncheckedUnprocessableEntityException("Unknown filter operator '%s'.".formatted(operator.getDisplay()), plugin);
         };
     }
 

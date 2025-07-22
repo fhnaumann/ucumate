@@ -14,25 +14,23 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
      *
      * @param term1 The first term in the relation.
      * @param term2 The second term in the relation.
-     * @param allowMolMassConversion If true, allows mol->g, otherwise mol->1. If the property ucumate.enableMolMassConversion=false then this value is ignored.
      * @return A RelationResult containing information about the relation between the two terms.
      *
      */
-    public RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2, boolean allowMolMassConversion);
+    public RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2);
 
     /**
      * Checks the commensurability relation between two UCUMTerms.
      *
      * @param term1 The first term in the relation as a string. Will be validated first.
      * @param term2 The second term in the relation. Will be validated first.
-     * @param allowMolMassConversion If true, allows mol->g, otherwise mol->1. If the property ucumate.enableMolMassConversion=false then this value is ignored.
      * @return A CommensurableResult containing information about the relation between the two terms.
      *
      * @see RelationChecker.CommensurableResult
      */
-    public default RelationChecker.CommensurableResult checkCommensurable(String term1, String term2, boolean allowMolMassConversion) {
+    public default RelationChecker.CommensurableResult checkCommensurable(String term1, String term2) {
         try {
-            return checkCommensurable(parseOrError(term1), parseOrError(term2), allowMolMassConversion);
+            return checkCommensurable(parseOrError(term1), parseOrError(term2));
         } catch (Validator.ParserException e) {
             return new Validator.ParserError();
         }
@@ -43,12 +41,11 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
      *
      * @param term1 The first term in the relation.
      * @param term2 The second term in the relation.
-     * @param allowMolMassConversion If true, allows mol->g, otherwise mol->1. If the property ucumate.enableMolMassConversion=false then this value is ignored.
      * @return A CommensurableResult containing information about the relation between the two terms.
      *
      * @see RelationChecker.CommensurableResult
      */
-    public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2, boolean allowMolMassConversion);
+    public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2);
 
     /**
      * Contains information about the relation check.
@@ -63,9 +60,9 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
     /**
      * The relation check failed. The subclasses provide more details.
      */
-    sealed interface FailedRelationCheck extends RelationResult permits Validator.ParserError {}
+    sealed interface FailedRelationCheck extends RelationResult permits FailedCommensurableCheck, Failure, ValidatorService.ParserError {}
 
-    sealed interface FailedCommensurableCheck extends RelationChecker.CommensurableResult permits Validator.ParserError {}
+    sealed interface FailedCommensurableCheck extends RelationChecker.CommensurableResult, FailedRelationCheck permits Validator.ParserError {}
 
     /**
      * The two given terms are not equal. Information about the commensurability is found here and in the subclasses.
@@ -76,8 +73,10 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
      * The two given terms are (semantically) equal.
      * @param strictEqual True if the two terms are exactly identical (same brackets, etc.), false otherwise.
      * @param equalAfterProcessing True if the two terms are equal in their canonical form (normalized, only multiplication and exponents), false otherwise.
+     * @param termThatIsEqual The term which is equal. For strict equality this will be the same as the input. For equality after processing this will be
+     *                        the term that both inputs can be transformed to in order to create a match.
      */
-    record IsEqual(boolean strictEqual, boolean equalAfterProcessing) implements Success {}
+    record IsEqual(boolean strictEqual, boolean equalAfterProcessing, UCUMExpression.Term termThatIsEqual) implements Success {}
 
     /**
      * The two terms are commensurable. This is the case if they share the same base dimensions and exponents.
@@ -93,5 +92,5 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
     /**
      * The relation check failed. This can happen when the canonicalization failed.
      */
-    record Failure() implements RelationResult {}
+    record Failure() implements FailedRelationCheck {}
 }
