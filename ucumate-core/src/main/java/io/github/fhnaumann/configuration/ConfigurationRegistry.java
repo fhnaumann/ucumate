@@ -86,7 +86,7 @@ public class ConfigurationRegistry {
         return Configuration.fromProps(merged);
     }
 
-    private static Properties loadDevConfig() {
+    public static Properties loadDevConfig() {
         Properties props = new Properties();
         try (var stream = ConfigurationRegistry.class.getClassLoader().getResourceAsStream(DEV_CONFIG_FILE)) {
             if (stream != null) {

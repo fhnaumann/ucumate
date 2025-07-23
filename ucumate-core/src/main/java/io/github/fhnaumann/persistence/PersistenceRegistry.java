@@ -1,9 +1,6 @@
 package io.github.fhnaumann.persistence;
 
-import io.github.fhnaumann.configuration.CanonKey;
-import io.github.fhnaumann.configuration.Configuration;
-import io.github.fhnaumann.configuration.ConfigurationRegistry;
-import io.github.fhnaumann.configuration.ValKey;
+import io.github.fhnaumann.configuration.*;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.Validator;
 
@@ -49,27 +46,26 @@ public class PersistenceRegistry implements PersistenceProvider {
      * See more <a href="https://fhnaumann.github.io/ucumate/cache/">in the online documentation</a>.
      */
     public static void initCache() {
-        Properties props = findCacheSettingsFromPropertyFileOnClasspath();
+        Properties props = ConfigurationRegistry.loadDevConfig();
         Properties mergeWithSystemProps = Configuration.mergeWithSystemProps(props);
         Properties interpolatedProps = Configuration.interpolateProps(mergeWithSystemProps);
-        initCache(interpolatedProps);
+        initCache(CacheConfiguration.fromProps(interpolatedProps));
     }
 
     /**
      * Initialize the cache with given properties.
      * See more <a href="https://fhnaumann.github.io/ucumate/cache/">in the online documentation</a>.
-     * @param properties The properties for the cache settings.
      */
-    public static void initCache(Properties properties) {
+    public static void initCache(CacheConfiguration cacheConfiguration) {
         try {
-            boolean enableCache = Boolean.parseBoolean(properties.getProperty("ucumate.cache.enable", "true"));
-            int maxCanonSize = Integer.parseInt(properties.getProperty("ucumate.cache.maxCanonSize", "10000"));
-            int maxValSize = Integer.parseInt(properties.getProperty("ucumate.cache.maxValSize", "10000"));
-            boolean recordStats = Boolean.parseBoolean(properties.getProperty("ucumate.cache.recordStats", "false"));
-            boolean preHeat = Boolean.parseBoolean(properties.getProperty("ucumate.cache.preheat", "true"));
-            boolean overrideInsteadOfAdd = Boolean.parseBoolean(properties.getProperty("ucumate.cache.preheat.override", "false"));
+            boolean enableCache = cacheConfiguration.enable();
+            int maxCanonSize = cacheConfiguration.maxCanonSize();
+            int maxValSize = cacheConfiguration.maxValSize();
+            boolean recordStats = cacheConfiguration.recordStats();
+            boolean preHeat = cacheConfiguration.preheat();
+            boolean overrideInsteadOfAdd = cacheConfiguration.preheatOverride();
             List<String> defaultPreHeatCodes = PropertiesUtil.readCodeFile(PersistenceRegistry.class.getClassLoader().getResourceAsStream("pre_heat_codes.json"));
-            String preHeatCodesFilename = properties.getProperty("ucumate.cache.preheat.codes", "");
+            String preHeatCodesFilename = cacheConfiguration.preheatCodeFilename();
             List<String> preHeatCodes = !preHeatCodesFilename.isBlank() ? PropertiesUtil.readCodeFile(preHeatCodesFilename) : List.of();
             if(cache != null) {
                 logger.warn("Overriding existing cache.");
@@ -117,16 +113,19 @@ public class PersistenceRegistry implements PersistenceProvider {
      */
     public static void register(String name, PersistenceProvider provider) {
         if(!"sqlite".equals(name)) {
+            logger.debug("Removed SQLite persistence provider because {} is being registered", provider.getClass().getSimpleName());
             additionalProviders.remove("sqlite");
         }
         PersistenceProvider old = additionalProviders.get(name);
         if(old != null) {
             old.close();
         }
+        logger.debug("Registering {}", provider.getClass().getSimpleName());
         additionalProviders.put(name, provider);
 
         // try and load saved data into cache if enabled
         if(cache != null && cache.isEnabled()) {
+            logger.debug("Populating cache with values from {}", provider.getClass().getSimpleName());
             provider.getAllValidated().forEach(cache::saveValidated);
             provider.getAllCanonical().forEach(cache::saveCanonical);
         }
@@ -232,11 +231,6 @@ public class PersistenceRegistry implements PersistenceProvider {
             return Map.of();
         }
         return additionalProviders.entrySet().stream().findFirst().get().getValue().getAllValidated();
-    }
-
-    @Override
-    public UcumVersion getVersion() {
-        return ConfigurationRegistry.get().getUCUMVersionAsEnum();
     }
 
     @Override

@@ -112,11 +112,6 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
     }
 
     @Override
-    public UcumVersion getVersion() {
-        return ucumVersion;
-    }
-
-    @Override
     public void close() {
         // No-op
     }

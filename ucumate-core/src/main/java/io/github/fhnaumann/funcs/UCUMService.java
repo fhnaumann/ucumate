@@ -82,8 +82,8 @@ public class UCUMService implements IUCUMService {
 
 
     @Override
-    public CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term) {
-        return canonicalizerService.canonicalize(factor, term);
+    public CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term, PreciseDecimal substanceMolarMassCoeff) {
+        return canonicalizerService.canonicalize(factor, term, substanceMolarMassCoeff);
     }
 
     @Override

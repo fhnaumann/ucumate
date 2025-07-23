@@ -23,8 +23,12 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
      * @see UCUMService#canonicalize(UCUMExpression.Term)
      */
     public default CanonicalizationResult canonicalize(String term) {
+        return canonicalize(term, (PreciseDecimal) null);
+    }
+
+    public default CanonicalizationResult canonicalize(String term, PreciseDecimal substanceMolarMassCoeff) {
         try {
-            return canonicalize(parseOrError(term));
+            return canonicalize(parseOrError(term), substanceMolarMassCoeff);
         } catch (Validator.ParserException e) {
             return new Validator.ParserError();
         }
@@ -47,6 +51,10 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
         return canonicalize(PreciseDecimal.ONE, term);
     }
 
+    public default CanonicalizationResult canonicalize(UCUMExpression.Term term, PreciseDecimal substanceMolarMassCoeff) {
+        return canonicalize(PreciseDecimal.ONE, term, substanceMolarMassCoeff);
+    }
+
     public default CanonicalizationResult canonicalize(PreciseDecimal factor, String term) {
         try {
             return canonicalize(factor, parseOrError(term));
@@ -63,7 +71,11 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
         return canonicalize(new PreciseDecimal(factor), term);
     }
 
-    public CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term);
+    public default CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term) {
+        return canonicalize(factor, term, null);
+    }
+
+    public CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term, PreciseDecimal substanceMolarMassCoeff);
 
     /**
      * Test if a given string term is canonical.

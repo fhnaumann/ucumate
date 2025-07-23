@@ -4,7 +4,6 @@ import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.*;
-import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -49,8 +48,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
     public abstract String getCanonicalUpsertQuery();
     public abstract String getValidateUpsertQuery();
 
-    @Override
-    public UcumVersion getVersion() {
+    private UcumVersion getVersion() {
         return ucumVersion;
     }
 

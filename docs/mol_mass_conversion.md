@@ -16,7 +16,7 @@ It is allowed by default.
 
 !!!warning Warning
 Enabling this property just allows the `mole <-> mass` conversion in general. **It does not automatically convert every
-encountered `mol` unit to `g`**. You have to explicitly enable this on a per-conversion basis. On the other hand, disabling
+encountered `mol` unit to `g`**. You have to explicitly enable this on a per-conversion basis by providing the substance's molar mass coefficient. On the other hand, disabling
 the property completely prohibits the conversion, and it's not possible to enable it on a per-conversion basis. See below
 on how to do that.
 !!!

@@ -5,7 +5,6 @@ import io.github.fhnaumann.UCUMOntoOperationPlugin;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.operations.ucum.Unchecked;
-import io.github.fhnaumann.operations.ucum.issues.InvalidInputException;
 import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
 import io.github.fhnaumann.util.LogUtil;
 import org.hl7.fhir.r4.model.ValueSet;
@@ -35,15 +34,15 @@ public class CanonicalFilter implements ApplyFilter {
     }
 
     @Override
-    public Collection<UCUMExpression.Term> apply(String expression, ValueSet.FilterOperator operator) throws InvalidInputException {
+    public Collection<UCUMExpression.Term> apply(String expression, ValueSet.FilterOperator operator) {
         ValidatorService.ValidationResult validationResult = service.validate(expression);
         return switch (validationResult) {
-            case ValidatorService.Failure failure -> throw new InvalidInputException(String.join(",", failure.errorMessages()));
+            case ValidatorService.Failure failure -> throw new Unchecked.UncheckedUnprocessableEntityException(String.join(",", failure.errorMessages()), plugin);
             case ValidatorService.Success success -> handleSuccess(success.term(), operator);
         };
     }
 
-    private List<UCUMExpression.Term> handleSuccess(UCUMExpression.Term term, ValueSet.FilterOperator operator) throws InvalidInputException {
+    private List<UCUMExpression.Term> handleSuccess(UCUMExpression.Term term, ValueSet.FilterOperator operator) {
         return switch (operator) {
             case EQUAL -> applyWithEqualFilter(term);
             case IN -> applyWithInFilter(term);

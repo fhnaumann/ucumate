@@ -15,7 +15,6 @@ import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.operations.ucum.filters.ApplyFilter;
 import io.github.fhnaumann.operations.ucum.filters.BasePropertyFilter;
 import io.github.fhnaumann.operations.ucum.filters.CanonicalFilter;
-import io.github.fhnaumann.operations.ucum.issues.InvalidInputException;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,11 +159,7 @@ public class UCUMExpandOperation implements ExpandOperation {
             throw new Unchecked.UncheckedUnprocessableEntityException("Unknown filter '%s'".formatted(filterType), plugin);
             //return LogUtil.logAndThrow(log, ExpandCodeOperationException.class, "Unknown filter type '{}'. Only {} are known filter types.", filterType, filterProperties.keySet());
         }
-        try {
-            return new HashSet<>(applyFilter.apply(expression, operator));
-        } catch (InvalidInputException e) {
-            throw new Unchecked.UncheckedUnprocessableEntityException("The input '%s' is invalid and therefore could not be expanded.".formatted(expression), plugin);
-        }
+        return new HashSet<>(applyFilter.apply(expression, operator));
     }
 
     private Set<UCUMExpression.Term> extractExplicitCodesOrFilteredCodes(ValueSet.ConceptSetComponent conceptSetComponent, Processor processor) {

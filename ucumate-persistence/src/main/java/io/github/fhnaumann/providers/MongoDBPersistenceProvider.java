@@ -8,7 +8,6 @@ import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
 import io.github.fhnaumann.funcs.*;
-import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -84,11 +83,6 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
         }
 
         return new Canonicalizer.CanonicalStepResult(term, magnitude, cfPrefix, special, func);
-    }
-
-    @Override
-    public UcumVersion getVersion() {
-        return ucumVersion;
     }
 
     @Override

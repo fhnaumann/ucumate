@@ -1,10 +1,12 @@
 package io.github.fhnaumann.converter;
 
 import io.github.fhnaumann.builders.SoloTermBuilder;
+import io.github.fhnaumann.configuration.CacheConfiguration;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.Converter;
 import io.github.fhnaumann.funcs.ConverterService;
+import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -16,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Properties;
 import java.util.stream.Stream;
 
 import static io.github.fhnaumann.TestUtil.*;
@@ -27,8 +30,11 @@ public class ConverterTest {
 
     @BeforeAll
     public static void init() {
-        ConfigurationRegistry.initialize(Configuration.builder().enableMolMassConversion(true).build());
-        PersistenceRegistry.disableInMemoryCache(true); // todo mole mass stuff messes up the caching, inspect
+        Properties prop = new Properties();
+        //prop.setProperty("ucumate.caching.enable", "false");
+        prop.setProperty("ucumate.caching.enable", "true");
+        ConfigurationRegistry.initialize(Configuration.builder().enableMolMassConversion(true).cacheConfig(CacheConfiguration.fromProps(prop)).build());
+        //PersistenceRegistry.disableInMemoryCache(true);
     }
 
     @BeforeAll

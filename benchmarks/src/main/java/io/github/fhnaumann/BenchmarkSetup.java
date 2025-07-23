@@ -1,5 +1,6 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.configuration.CacheConfiguration;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.fhir.ucum.UcumEssenceService;
@@ -40,7 +41,7 @@ public class BenchmarkSetup {
             Properties properties = new Properties();
             properties.put("ucumate.cache.enable", true);
             properties.put("ucumate.cache.preheat", ucumateCaching.equals("enableWithPreHeat"));
-            PersistenceRegistry.initCache(properties);
+            PersistenceRegistry.initCache(CacheConfiguration.fromProps(properties));
         }
         return new Data(validateCases, commensurableCases, convertCases, service, ucumateService);
     }
