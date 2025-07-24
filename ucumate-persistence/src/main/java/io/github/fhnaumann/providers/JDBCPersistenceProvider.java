@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Felix Naumann
@@ -245,6 +246,11 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
         }
 
         return resultMap;
+    }
+
+    @Override
+    public Stream<Map.Entry<ValKey, ValidatorService.ValidationResult>> getAllValidatedLazy() {
+        throw new UnsupportedOperationException("Lazy loading from JDBC not yet supported.");
     }
 
     @Override

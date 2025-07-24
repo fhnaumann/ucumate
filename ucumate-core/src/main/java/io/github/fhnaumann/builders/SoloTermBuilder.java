@@ -75,10 +75,26 @@ public class SoloTermBuilder {
         public AnnotationStep withExponent(int exponent) {
             UCUMExpression.Exponent exponentObj = new UCUMExpression.Exponent(exponent);
             if(unit instanceof UCUMExpression.CanonicalUnit canonicalUnit) {
-                this.component = new UCUMExpression.CanonicalComponentExponent(canonicalUnit, exponentObj);
+                if(exponent == 0) {
+                    this.component = new UCUMExpression.CanonicalComponentNoExponent(new UCUMExpression.IntegerUnit(1));
+                }
+                else if(exponent == 1) {
+                    this.component = new UCUMExpression.CanonicalComponentNoExponent(canonicalUnit);
+                }
+                else {
+                    this.component = new UCUMExpression.CanonicalComponentExponent(canonicalUnit, exponentObj);
+                }
             }
             else {
-                this.component = new UCUMExpression.MixedComponentExponent(unit, exponentObj);
+                if(exponent == 0) {
+                    this.component = new UCUMExpression.MixedComponentNoExponent(new UCUMExpression.IntegerUnit(1));
+                }
+                else if(exponent == 1) {
+                    this.component = new UCUMExpression.MixedComponentNoExponent(unit);
+                }
+                else {
+                    this.component = new UCUMExpression.MixedComponentExponent(unit, exponentObj);
+                }
             }
             return this;
         }

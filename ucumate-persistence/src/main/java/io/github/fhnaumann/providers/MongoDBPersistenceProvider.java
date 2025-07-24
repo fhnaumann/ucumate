@@ -18,6 +18,7 @@ import org.bson.Document;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -162,6 +163,11 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
         }
 
         return resultMap;
+    }
+
+    @Override
+    public Stream<Map.Entry<ValKey, ValidatorService.ValidationResult>> getAllValidatedLazy() {
+        throw new UnsupportedOperationException("Lazy loading from MongoDB not yet supported.");
     }
 
     @Override

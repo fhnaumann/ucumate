@@ -54,7 +54,7 @@ public class BasePropertyFilter implements ApplyFilter {
     }
 
     private Collection<UCUMExpression.Term> handleEqual(String propertyName) {
-        return PluginUtil.getAllKnownValidTerms(service).stream()
+        return PluginUtil.getAllKnownValidTerms(service)
                 .filter(this::isComparableToAnyBaseUnit)
                 .filter(term -> matchesExtraction(term, propertyName))
                 .toList();
@@ -78,8 +78,8 @@ public class BasePropertyFilter implements ApplyFilter {
                 if(!(success.canonicalTerm() instanceof UCUMExpression.ComponentTerm componentTerm)) {
                     yield false;
                 }
-                Map<Dimension, Integer> dimAnalysis = DimensionAnalyzer.analyze(success.canonicalTerm());
-                yield !dimAnalysis.containsKey(Dimension.NO_DIMENSION) && dimAnalysis.values().stream().noneMatch(integer -> integer < 0);
+                Map<DimensionType, Integer> dimAnalysis = DimensionAnalyzer.analyze(success.canonicalTerm());
+                yield !dimAnalysis.containsKey(DimensionType.NO_DIMENSION) && dimAnalysis.values().stream().noneMatch(integer -> integer < 0);
             }
         };
     }

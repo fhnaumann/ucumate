@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Felix Naumann
@@ -137,6 +138,11 @@ public class InfinispanPersistenceProvider implements PersistenceProvider, InMem
     @Override
     public Map<ValKey, Validator.ValidationResult> getAllValidated() {
         return Map.copyOf(valCache);
+    }
+
+    @Override
+    public Stream<Map.Entry<ValKey, ValidatorService.ValidationResult>> getAllValidatedLazy() {
+        return valCache.entrySet().stream();
     }
 
     @Override

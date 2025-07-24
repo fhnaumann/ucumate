@@ -87,7 +87,7 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
      * The two terms are not commensurable. This is the case if they don't share the same base dimensions and exponents.
      * @param diff A map containing the difference between the two terms dimensions and exponents.
      */
-    record NotCommensurable(Map<Dimension, Integer> diff) implements CommensurableResult {}
+    record NotCommensurable(Map<DimensionType, Integer> diff) implements CommensurableResult {}
 
     /**
      * The relation check failed. This can happen when the canonicalization failed.

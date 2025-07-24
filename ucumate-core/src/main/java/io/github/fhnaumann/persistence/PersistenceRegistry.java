@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Stream;
 
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PropertiesUtil;
 import org.slf4j.Logger;
@@ -231,6 +232,20 @@ public class PersistenceRegistry implements PersistenceProvider {
             return Map.of();
         }
         return additionalProviders.entrySet().stream().findFirst().get().getValue().getAllValidated();
+    }
+
+    @Override
+    public Stream<Map.Entry<ValKey, ValidatorService.ValidationResult>> getAllValidatedLazy() {
+        if(cache != null && cache.isEnabled()) {
+            return cache.getAllValidatedLazy();
+        }
+        if(additionalProviders.isEmpty()) {
+            return Stream.empty();
+        }
+        return additionalProviders.entrySet().stream()
+                .findFirst()
+                .map(entry -> entry.getValue().getAllValidatedLazy())
+                .orElse(Stream.empty());
     }
 
     @Override

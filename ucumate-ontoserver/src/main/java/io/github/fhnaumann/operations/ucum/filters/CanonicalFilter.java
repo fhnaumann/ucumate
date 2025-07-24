@@ -55,8 +55,9 @@ public class CanonicalFilter implements ApplyFilter {
     }
 
     private List<UCUMExpression.Term> applyWithEqualFilter(UCUMExpression.Term term) {
-        Map<Dimension, Integer> sourceDims = PluginUtil.analyze(service, term);
-        Map<UCUMExpression.Term, Map<Dimension, Integer>> allOtherExpressions = PluginUtil.analyzeAllKnownValidTerms(service);
+        Map<DimensionType, Integer> sourceDims = PluginUtil.analyze(service, term);
+        //Map<UCUMExpression.Term, Map<DimensionType, Integer>> allOtherExpressions = PluginUtil.analyzeAllKnownValidTerms(service);
+        Map<UCUMExpression.Term, Map<DimensionType, Integer>> allOtherExpressions = null; // todo fix
         return allOtherExpressions.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(sourceDims))
                 .map(Map.Entry::getKey)

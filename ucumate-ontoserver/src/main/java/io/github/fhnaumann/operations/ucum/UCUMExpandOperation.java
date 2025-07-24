@@ -175,7 +175,7 @@ public class UCUMExpandOperation implements ExpandOperation {
         else {
             // UCUM CodeSystem with no concept or filter means get all known codes
             // The text filter in the query may further limit the actual returned codes
-            return PluginUtil.getAllKnownValidTerms(service);
+            return PluginUtil.getAllKnownValidTerms(service).collect(Collectors.toSet()); // todo keep laziness
         }
     }
 

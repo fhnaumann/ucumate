@@ -6,6 +6,7 @@ import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.ValidatorService;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Felix Naumann
@@ -18,6 +19,8 @@ public interface PersistenceProvider {
      void saveValidated(ValKey key, ValidatorService.ValidationResult value);
      ValidatorService.ValidationResult getValidated(ValKey key);
      Map<ValKey, ValidatorService.ValidationResult> getAllValidated();
+
+     Stream<Map.Entry<ValKey, ValidatorService.ValidationResult>> getAllValidatedLazy();
 
      void close();
 }

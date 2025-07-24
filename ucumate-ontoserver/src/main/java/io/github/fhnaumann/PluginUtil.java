@@ -15,11 +15,7 @@ import org.hl7.fhir.r4.model.Coding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -46,29 +42,29 @@ public class PluginUtil {
         return SoloTermBuilder.builder().withoutPrefix(unit).noExpNoAnnot().asTerm().build();
     }
 
-    public static Set<UCUMExpression.Term> getAllKnownValidTerms(UCUMService service) {
-        Set<UCUMExpression.Term> fromRegistry = service.getUCUMRegistry().getAll().stream()
+    public static Stream<UCUMExpression.Term> getAllKnownValidTerms(UCUMService service) {
+        /*
+        Getting the terms from the UCUMRegistry does not have to be lazy because they are hard-limited to roughly ~3000 codes
+        However, retrieving the values from the persistence layer may be very large, a lazy stream is necessary here
+         */
+        Stream<UCUMExpression.Term> fromRegistry = service.getUCUMRegistry().getAll().stream()
                 .filter(UCUMDefinition.UCUMUnit.class::isInstance)
                 .map(UCUMDefinition.UCUMUnit.class::cast)
-                .map(PluginUtil::fromUCUMUnit)
-                .collect(Collectors.toSet());
-        Set<UCUMExpression.Term> fromStorage = PersistenceRegistry.getInstance().getAllValidated().values().stream()
+                .map(PluginUtil::fromUCUMUnit);
+        Stream<UCUMExpression.Term> fromStorage = PersistenceRegistry.getInstance().getAllValidatedLazy()
+                .map(Map.Entry::getValue)
                 .filter(ValidatorService.Success.class::isInstance)
                 .map(ValidatorService.Success.class::cast)
-                .map(ValidatorService.Success::term)
-                .collect(Collectors.toSet());
-        return Stream.concat(fromRegistry.stream(), fromStorage.stream()).collect(Collectors.toSet());
+                .map(ValidatorService.Success::term);
+        return Stream.concat(fromRegistry, fromStorage);
     }
 
-    public static Map<UCUMExpression.Term, Map<Dimension, Integer>> analyzeAllKnownValidTerms(UCUMService service) {
-        return getAllKnownValidTerms(service).stream()
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        term -> analyze(service, term)
-                ));
+    public static Stream<Map.Entry<UCUMExpression.Term, Map<DimensionType, Integer>>> analyzeAllKnownValidTerms(UCUMService service) {
+        return getAllKnownValidTerms(service)
+                .map(term -> Map.entry(term, analyze(service, term)));
     }
 
-    public static Map<Dimension, Integer> analyze(UCUMService service, UCUMExpression.Term term) {
+    public static Map<DimensionType, Integer> analyze(UCUMService service, UCUMExpression.Term term) {
         CanonicalizerService.CanonicalizationResult canonicalizationResult = service.canonicalize(term);
         return switch (canonicalizationResult) {
             case CanonicalizerService.Success success -> DimensionAnalyzer.analyze(success.canonicalTerm());

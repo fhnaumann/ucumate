@@ -10,13 +10,13 @@ public class DimensionAnalyzer {
 
     public sealed interface ComparisonResult {}
     public record DimensionsMatch() implements ComparisonResult {}
-    public record Failure(Map<Dimension, Integer> difference) implements ComparisonResult {}
+    public record Failure(Map<DimensionType, Integer> difference) implements ComparisonResult {}
 
 
     public static ComparisonResult compare(UCUMExpression.CanonicalTerm term, UCUMExpression.CanonicalTerm otherTerm) {
-        Map<Dimension, Integer> termDims = analyze(term, 1);
-        Map<Dimension, Integer> otherTermDims = analyze(otherTerm, 1);
-        Map<Dimension, Integer> result = MapUtil.calculateDiff(termDims, otherTermDims, true);
+        Map<DimensionType, Integer> termDims = analyze(term, 1);
+        Map<DimensionType, Integer> otherTermDims = analyze(otherTerm, 1);
+        Map<DimensionType, Integer> result = MapUtil.calculateDiff(termDims, otherTermDims, true);
         if(result.isEmpty()) {
             return new DimensionsMatch();
         }
@@ -25,13 +25,13 @@ public class DimensionAnalyzer {
         }
     }
 
-    public static Map<Dimension, Integer> analyze(UCUMExpression.CanonicalTerm term) {
-        Map<Dimension, Integer> map = analyze(term, 1);
+    public static Map<DimensionType, Integer> analyze(UCUMExpression.CanonicalTerm term) {
+        Map<DimensionType, Integer> map = analyze(term, 1);
         //return filterEmpty(map);
         return map;
     }
 
-    private static Map<Dimension, Integer> analyze(UCUMExpression.CanonicalTerm term, int sign) {
+    private static Map<DimensionType, Integer> analyze(UCUMExpression.CanonicalTerm term, int sign) {
         return switch(term) {
             case UCUMExpression.CanonicalComponentTerm componentTerm -> analyzeComponent(componentTerm.component(), sign);
             case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> Collections.EMPTY_MAP;
@@ -42,27 +42,27 @@ public class DimensionAnalyzer {
         };
     }
 
-    private static Map<Dimension, Integer> analyzeBinaryTerm(UCUMExpression.CanonicalBinaryTerm binaryTerm, int sign) {
-        Map<Dimension, Integer> leftDims = analyze(binaryTerm.left(), sign);
+    private static Map<DimensionType, Integer> analyzeBinaryTerm(UCUMExpression.CanonicalBinaryTerm binaryTerm, int sign) {
+        Map<DimensionType, Integer> leftDims = analyze(binaryTerm.left(), sign);
         int rightSign = switch(binaryTerm.operator()) {
             case MUL -> sign;
             case DIV -> -sign;
         };
-        Map<Dimension, Integer> rightDims = analyze(binaryTerm.right(), rightSign);
-        return Dimension.mergeDimensions(leftDims, rightDims);
+        Map<DimensionType, Integer> rightDims = analyze(binaryTerm.right(), rightSign);
+        return DimensionType.mergeDimensions(leftDims, rightDims);
     }
 
-    private static Map<Dimension, Integer> analyzeComponent(UCUMExpression.CanonicalComponent component, int sign) {
+    private static Map<DimensionType, Integer> analyzeComponent(UCUMExpression.CanonicalComponent component, int sign) {
         return switch(component) {
-            case UCUMExpression.CanonicalComponentExponent(UCUMExpression.CanonicalUnit unit, UCUMExpression.Exponent(int exponent)) -> Dimension.scaleDimensions(analyzeUnit(unit, sign), sign*exponent);
+            case UCUMExpression.CanonicalComponentExponent(UCUMExpression.CanonicalUnit unit, UCUMExpression.Exponent(int exponent)) -> DimensionType.scaleDimensions(analyzeUnit(unit, sign), sign*exponent);
             case UCUMExpression.CanonicalComponentNoExponent(UCUMExpression.CanonicalUnit unit) -> analyzeUnit(unit, sign);
         };
     }
 
-    private static Map<Dimension, Integer> analyzeUnit(UCUMExpression.CanonicalUnit unit, int sign) {
+    private static Map<DimensionType, Integer> analyzeUnit(UCUMExpression.CanonicalUnit unit, int sign) {
         return switch(unit) {
-            case UCUMExpression.CanonicalSimpleUnit canonicalSimpleUnit -> Map.of(Dimension.fromUCUMEssenceString(canonicalSimpleUnit.ucumUnit().dim()), Math.abs(sign)); // was: just 'sign'
-            case UCUMExpression.IntegerUnit integerUnit -> Map.of(Dimension.NO_DIMENSION, 1); //Map.of(Dimension.NO_DIMENSION, 1); // sign does not matter here (I think?)
+            case UCUMExpression.CanonicalSimpleUnit canonicalSimpleUnit -> Map.of(DimensionType.fromUCUMEssenceString(canonicalSimpleUnit.ucumUnit().dim()), Math.abs(sign)); // was: just 'sign'
+            case UCUMExpression.IntegerUnit integerUnit -> Map.of(DimensionType.NO_DIMENSION, 1); //Map.of(Dimension.NO_DIMENSION, 1); // sign does not matter here (I think?)
         };
     }
 
