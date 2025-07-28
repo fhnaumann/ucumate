@@ -21,21 +21,12 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 0)
 @Measurement(iterations = 1)
-@Fork(1)
+@Fork(0)
 @State(Scope.Thread)
 public class BenchmarkValidationJSON {
 
-    public static void main(String[] args) throws UcumException, IOException, ParserConfigurationException, SAXException {
-        BenchmarkValidationJSON obj = new BenchmarkValidationJSON();
-        obj.ucumateCaching = "disable";
-        obj.loadData();
-        //obj.benchmarkUcumateValidation();
-        obj.benchmarkUcumJavaValidation();
-    }
-
     private static final Logger logger = LoggerFactory.getLogger(BenchmarkValidationJSON.class);
 
-    private UCUMService ucumateService;
     private BenchmarkSetup.Data data;
 
     @Param({"disable", "enable", "enableWithPreHeat"})
@@ -43,7 +34,6 @@ public class BenchmarkValidationJSON {
 
     @Setup(Level.Iteration)
     public void loadData() throws IOException, ParserConfigurationException, SAXException, UcumException {
-        ucumateService = new UCUMService();
         data = BenchmarkSetup.loadSetup(ucumateCaching);
         //logger.warn("Cache size after loading data: " + PersistenceRegistry.getInstance().getAllValidated().size());
     }
@@ -60,7 +50,7 @@ public class BenchmarkValidationJSON {
     public void benchmarkUcumateValidation() {
         //logger.warn("Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
         for (TestCase.ValidateTestCase testCase : data.validateCases()) {
-            ucumateService.validateToBool(testCase.inputExpression());
+            data.ucumateService().validateToBool(testCase.inputExpression());
             //logger.warn("After Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
         }
     }

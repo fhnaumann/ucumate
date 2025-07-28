@@ -3,11 +3,7 @@ package io.github.fhnaumann.providers;
 import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.funcs.Canonicalizer;
-import io.github.fhnaumann.funcs.PrinterService;
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.Validator;
-import io.github.fhnaumann.funcs.printer.Printer;
+import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -23,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Felix Naumann
@@ -51,11 +48,6 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
     public abstract void createValidateTable();
     public abstract String getCanonicalUpsertQuery();
     public abstract String getValidateUpsertQuery();
-
-    @Override
-    public UcumVersion getVersion() {
-        return ucumVersion;
-    }
 
     protected void executeSQLFile(String path) {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(path)) {
@@ -152,7 +144,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
                 boolean valid = rs.getBoolean("valid");
                 if(valid) {
                     UCUMExpression.Term parsedKey = Validator.parseByPassChecks(key.expression(), ucumVersion);
-                    return new Validator.Success(parsedKey);
+                    return new ValidatorService.ComplexSuccess(parsedKey);
                 }
                 else {
                     return new Validator.Failure();
@@ -176,16 +168,12 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             while (rs.next()) {
                 String key = rs.getString("unit_key");
                 ValKey valKey = ValKey.fromStorageKey(key);
-                if(valKey.version() != getVersion()) {
-                    // Don't return if the provider version does not match the stored unit version
-                    continue;
-                }
                 boolean valid = rs.getBoolean("valid");
 
                 Validator.ValidationResult result;
                 if (valid) {
                     UCUMExpression.Term parsed = Validator.parseByPassChecks(valKey.expression(), ucumVersion);
-                    result = new Validator.Success(parsed);
+                    result = new ValidatorService.ComplexSuccess(parsed);
                 } else {
                     result = new Validator.Failure();
                 }
@@ -213,9 +201,6 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             while (rs.next()) {
                 String unitKey = rs.getString("unit_key");
                 CanonKey canonKey = CanonKey.fromStorageKey(unitKey, ucumVersion);
-                if(canonKey.version() != getVersion()) {
-                    continue;
-                }
                 String magnitudeStr = rs.getString("magnitude");
                 String cfPrefixStr = rs.getString("cfPrefix");
                 String termStr = rs.getString("term");
@@ -250,6 +235,11 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
         }
 
         return resultMap;
+    }
+
+    @Override
+    public Stream<Map.Entry<ValKey, ValidatorService.ValidationResult>> getAllValidatedLazy() {
+        throw new UnsupportedOperationException("Lazy loading from JDBC not yet supported.");
     }
 
     @Override

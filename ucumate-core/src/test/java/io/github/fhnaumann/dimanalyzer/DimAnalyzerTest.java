@@ -17,8 +17,8 @@ public class DimAnalyzerTest {
     public void test() {
         //Expression.Term term = CombineTermBuilder.builder().left(meter_term()).divideBy().right(CombineTermBuilder.builder().left(meter_term()).multiplyWith().right(second_term()).build()).build();
         //Expression.Term term = CombineTermBuilder.builder().left(CombineTermBuilder.builder().left(meter_term()).divideBy().right(second_term()).build()).divideBy().right(gram_term()).build();
-        Map<Dimension, Integer> result = DimensionAnalyzer.analyze(parse_canonical("s/4/m"));
-        Map<Dimension, Integer> result2 = DimensionAnalyzer.analyze(parse_canonical("s/m"));
+        Map<DimensionType, Integer> result = DimensionAnalyzer.analyze(parse_canonical("s/4/m"));
+        Map<DimensionType, Integer> result2 = DimensionAnalyzer.analyze(parse_canonical("s/m"));
     }
 
     @Test
@@ -32,10 +32,10 @@ public class DimAnalyzerTest {
         var map1 = DimensionAnalyzer.analyze(canonicalFrom);
         //var map2 = DimensionAnalyzer.analyze(canonicalTo);
         assertThat(map1)
-                .contains(Map.entry(Dimension.ELECTRIC_CHARGE, 2))
-                .contains(Map.entry(Dimension.MASS, -1))
-                .contains(Map.entry(Dimension.LENGTH, -2))
-                .contains(Map.entry(Dimension.TIME, 1));
+                .contains(Map.entry(DimensionType.ELECTRIC_CHARGE, 2))
+                .contains(Map.entry(DimensionType.MASS, -1))
+                .contains(Map.entry(DimensionType.LENGTH, -2))
+                .contains(Map.entry(DimensionType.TIME, 1));
         System.out.println(map1);
         //System.out.println(map2);
         //System.out.println(Flattener.flatten(canonicalTo));

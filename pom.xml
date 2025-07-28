@@ -7,23 +7,9 @@
 
     <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-parent</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4</version>
     <packaging>pom</packaging>
     <name>ucumate Parent</name>
-
-    <repositories>
-        <repository>
-            <name>Central Portal Snapshots</name>
-            <id>central-portal-snapshots</id>
-            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <description>A library for working with UCUM.</description>
     <url>https://github.com/fhnaumann/ucumate</url>
@@ -57,9 +43,8 @@
         <module>ucumate-mol-support</module>
         <module>ucumate-spi-tests</module>
         <module>ucumate-ucumjava-bridge</module>
-        <module>ucumate-ontoserver</module>
         <module>ucumate-error-feedback</module>
-        <!--module>ucumate-demo</module-->
+        <!--module>ucumate-ontoserver</module-->
     </modules>
 
     <dependencyManagement>
@@ -112,8 +97,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
-                    <autoPublish>false</autoPublish>
-                    <centralSnapshotsUrl>https://central.sonatype.com/repository/maven-snapshots/</centralSnapshotsUrl>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>uploaded</waitUntil>
                 </configuration>
             </plugin>
             <!--plugin>
@@ -220,12 +205,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>central</id>
-            <name>central</name>
-            <url>https://central.sonatype.com/repository/maven-snapshots/ </url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>

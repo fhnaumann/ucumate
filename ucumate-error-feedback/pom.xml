@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.fhnaumann</groupId>
         <artifactId>ucumate-parent</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.4</version>
     </parent>
 
     <artifactId>ucumate-error-feedback</artifactId>
@@ -17,11 +17,36 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <name>ucumate-error-feedback</name>
+    <description>Provide better error messages for invalid UCUM expression.</description>
+    <url>https://github.com/fhnaumann/ucumate</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Felix Naumann</name>
+            <email>fhnaumann@t-online.de</email>
+            <organization>Personal</organization>
+            <organizationUrl>https://github.com/fhnaumann</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <url>https://github.com/fhnaumann/ucumate/tree/main</url>
+        <connection>scm:git:git://github.com/fhnaumann/ucumate.git</connection>
+        <developerConnection>scm:git:ssh://github.com:fhnaumann/ucumate.git</developerConnection>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
@@ -36,7 +61,7 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-test-utils</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

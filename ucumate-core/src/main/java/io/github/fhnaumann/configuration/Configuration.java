@@ -12,14 +12,24 @@ public class Configuration {
     private final Boolean allowAnnotAfterParens;
     private final Boolean enableSQLitePersistence;
     private final String sqliteDBPath;
+    private final CacheConfiguration cacheConfiguration;
 
-    private Configuration(String ucumVersion, Boolean enablePrefixOnNonMetricUnits, Boolean enableMolMassConversion, Boolean allowAnnotAfterParens, Boolean enableSQLitePersistence, String sqliteDBPath) {
+
+    private Configuration(
+            String ucumVersion,
+            Boolean enablePrefixOnNonMetricUnits,
+            Boolean enableMolMassConversion,
+            Boolean allowAnnotAfterParens,
+            Boolean enableSQLitePersistence,
+            String sqliteDBPath,
+            CacheConfiguration cacheConfiguration) {
         this.ucumVersion = ucumVersion;
         this.enablePrefixOnNonMetricUnits = enablePrefixOnNonMetricUnits;
         this.enableMolMassConversion = enableMolMassConversion;
         this.allowAnnotAfterParens = allowAnnotAfterParens;
         this.enableSQLitePersistence = enableSQLitePersistence;
         this.sqliteDBPath = sqliteDBPath;
+        this.cacheConfiguration = cacheConfiguration;
     }
 
     public FeatureFlags asFeatureFlags() {
@@ -57,12 +67,13 @@ public class Configuration {
     @Override
     public String toString() {
         return "Configuration{" +
-                ", ucumVersion='" + ucumVersion + '\'' +
+                "ucumVersion='" + ucumVersion + '\'' +
                 ", enablePrefixOnNonMetricUnits=" + enablePrefixOnNonMetricUnits +
                 ", enableMolMassConversion=" + enableMolMassConversion +
                 ", allowAnnotAfterParens=" + allowAnnotAfterParens +
                 ", enableSQLitePersistence=" + enableSQLitePersistence +
                 ", sqliteDBPath='" + sqliteDBPath + '\'' +
+                ", cacheConfiguration=" + cacheConfiguration +
                 '}';
     }
 
@@ -91,6 +102,10 @@ public class Configuration {
         if(sqliteDBPath != null) {
             props.put("ucumate.persistence.sqlite.dbpath", sqliteDBPath);
         }
+        if(cacheConfiguration != null) {
+            Properties cacheProps = cacheConfiguration.asProps();
+            props.putAll(cacheProps);
+        }
         return props;
     }
 
@@ -103,11 +118,12 @@ public class Configuration {
                 Boolean.parseBoolean(interpolatedProps.getProperty("ucumate.enableMolMassConversion")),
                 Boolean.parseBoolean(interpolatedProps.getProperty("ucumate.allowAnnotAfterParens")),
                 Boolean.parseBoolean(interpolatedProps.getProperty("ucumate.persistence.sqlite.enable")),
-                interpolatedProps.getProperty("ucumate.persistence.sqlite.dbpath")
+                interpolatedProps.getProperty("ucumate.persistence.sqlite.dbpath"),
+                CacheConfiguration.fromProps(properties)
                 );
     }
 
-    private static Properties mergeWithSystemProps(Properties properties) {
+    public static Properties mergeWithSystemProps(Properties properties) {
         Properties resolved = new Properties();
         for (String key : properties.stringPropertyNames()) {
             String sysProp = System.getProperty(key);
@@ -128,7 +144,7 @@ public class Configuration {
         return merged;
     }
 
-    private static Properties interpolateProps(Properties properties) {
+    public static Properties interpolateProps(Properties properties) {
         Properties interpolated = new Properties();
         properties.forEach((o, o2) -> {
             interpolated.put(o, o2.toString().replace("${user.dir}", System.getProperty("user.dir")));
@@ -143,6 +159,7 @@ public class Configuration {
         private Boolean allowAnnotAfterParens;
         private Boolean enableSQLitePersistence;
         private String sqliteDBPath;
+        private CacheConfiguration cacheConfiguration;
 
         public Builder withUCUMVersion(String ucumVersion) {
             this.ucumVersion = ucumVersion;
@@ -174,6 +191,11 @@ public class Configuration {
             return this;
         }
 
+        public Builder cacheConfig(CacheConfiguration cacheConfiguration) {
+            this.cacheConfiguration = cacheConfiguration;
+            return this;
+        }
+
         public Configuration build() {
             /*
             At the time that this method is called, there will always be another configuration already loaded.
@@ -182,7 +204,7 @@ public class Configuration {
             value already exists. Therefore, it's necessary to merge the props here.
              */
             Configuration oldConfiguration = ConfigurationRegistry.get();
-            Configuration newConfiguration = new Configuration(ucumVersion, enablePrefixOnNonMetricUnits, enableMolMassConversion, allowAnnotAfterParens, enableSQLitePersistence, sqliteDBPath);
+            Configuration newConfiguration = new Configuration(ucumVersion, enablePrefixOnNonMetricUnits, enableMolMassConversion, allowAnnotAfterParens, enableSQLitePersistence, sqliteDBPath, cacheConfiguration);
             Properties merged = merge(newConfiguration.asProps(), oldConfiguration.asProps());
             return Configuration.fromProps(merged);
         }

@@ -20,7 +20,7 @@ You can [change these cache settings](cache.md) if desired. You can also add [pe
 
 ## Lookup
 
-`UCUMService#lookup` can be used to look up a UCUM unit when it is not given by its code. For when you want to parse a
+`UCUMService#lookup` can be used to look up properties of a UCUM expression.
 UCUMExpression use the [validator result](core-lib.md#validation).
 
 ```java
@@ -70,7 +70,7 @@ System.out.println(ucumService.print("cm", Printer.PrintType.EXPRESSIVE_UCUM_SYN
 ValidationResult valResult = ucumService.validate("cm.s");
 String print = switch(valResult) {
     case Failure failure -> "Invalid input";
-    case Success sucess -> ucumService.print(success.term(), Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX);
+    case Success sucess -> ucumService.print(dimensionsMatch.term(), Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX);
 };
 System.out.println(print); // c (centi)m (meter).s (second)
 ```
@@ -91,7 +91,7 @@ the parsed `Term` and its canonicalization factor obtained during the canonicali
 CanonicalizationResult canonResult = ucumService.canonicalize("[in_i]");
 String print = switch (canonResult) {
     case FailedCanonicalization failedCanonicalization -> "Invalid input";
-    case Success success -> String.format("Canonicalization Factor: %s, Canonical Form: %s".formatted(success.magnitude(), ucumService.print(success.canonicalTerm())));
+    case Success dimensionsMatch -> String.format("Canonicalization Factor: %s, Canonical Form: %s".formatted(dimensionsMatch.magnitude(), ucumService.print(dimensionsMatch.canonicalTerm())));
 };
 System.out.println(print); // Canonicalization Factor: 0.0254, Canonical Form: m+1
 ```
@@ -105,7 +105,7 @@ the resulting conversion facor or a `FailedConversion`.
 ConversionResult convResult = ucumService.convert("[ft_i]", "[in_i]");
 String print = switch (convResult) {
     case FailedConversion failedConversion -> "Conversion failed";
-    case Success success -> "1 [ft_i] is %s [in_i]".formatted(success.conversionFactor());
+    case Success dimensionsMatch -> "1 [ft_i] is %s [in_i]".formatted(dimensionsMatch.conversionFactor());
 };
 System.out.println(print); // 1 [ft_i] is 12 [in_i]
 ```

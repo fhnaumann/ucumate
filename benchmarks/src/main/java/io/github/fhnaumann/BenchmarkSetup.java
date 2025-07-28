@@ -1,5 +1,7 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.configuration.CacheConfiguration;
+import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.fhir.ucum.UcumEssenceService;
 import org.fhir.ucum.UcumException;
@@ -13,7 +15,7 @@ import java.util.Properties;
  */
 public class BenchmarkSetup {
 
-    public record Data(List<TestCase.ValidateTestCase> validateCases, List<TestCase.CommensurableTestCase> commensurableCases, List<TestCase.ConvertTestCase> convertCases, UcumEssenceService service) {}
+    public record Data(List<TestCase.ValidateTestCase> validateCases, List<TestCase.CommensurableTestCase> commensurableCases, List<TestCase.ConvertTestCase> convertCases, UcumEssenceService service, UCUMService ucumateService) {}
 
     public static Data loadSetup(String ucumateCaching) throws IOException, UcumException {
         TestSuite suite = TestCaseLoader.load();
@@ -21,7 +23,8 @@ public class BenchmarkSetup {
         List<TestCase.CommensurableTestCase> commensurableCases = suite.commensurable;
         List<TestCase.ConvertTestCase> convertCases = suite.convert;
 
-        UcumEssenceService service = new UcumEssenceService(BenchmarkFunctionalXMLTests.class.getResourceAsStream("/ucum-essence.xml"));
+        UcumEssenceService service = new UcumEssenceService(BenchmarkSetup.class.getResourceAsStream("/ucum-essence.xml"));
+        UCUMService ucumateService = new UCUMService();
 
         // just to make sure any "accidental" caching in setup loading is removed
         PersistenceRegistry.disableInMemoryCache(true);
@@ -38,8 +41,8 @@ public class BenchmarkSetup {
             Properties properties = new Properties();
             properties.put("ucumate.cache.enable", true);
             properties.put("ucumate.cache.preheat", ucumateCaching.equals("enableWithPreHeat"));
-            PersistenceRegistry.initCache(properties);
+            PersistenceRegistry.initCache(CacheConfiguration.fromProps(properties));
         }
-        return new Data(validateCases, commensurableCases, convertCases, service);
+        return new Data(validateCases, commensurableCases, convertCases, service, ucumateService);
     }
 }

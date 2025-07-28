@@ -2,6 +2,8 @@ package io.github.fhnaumann.builders;
 
 import io.github.fhnaumann.model.UCUMExpression;
 
+import java.util.function.BinaryOperator;
+
 public class CombineTermBuilder {
     public interface FinishStep {
         UCUMExpression.Term build();
@@ -23,6 +25,8 @@ public class CombineTermBuilder {
     public static LeftStep builder() {
         return new Builder();
     }
+
+    public static final BinaryOperator<UCUMExpression.CanonicalTerm> APPEND_RIGHT_MUL = (canonicalTerm, canonicalTerm2) -> CombineTermBuilder.builder().left(canonicalTerm).multiplyWith().right(canonicalTerm2).buildCanonical();
 
     private static class Builder implements FinishStep, RightStep, OperatorStep, LeftStep {
 

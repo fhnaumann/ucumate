@@ -11,29 +11,13 @@ An [online demo](https://virtuous-respect-production.up.railway.app/) is also av
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-core</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4</version>
 </dependency>
-```
-
-```xml
-<repositories>
-  <repository>
-    <name>Central Portal Snapshots</name>
-    <id>central-portal-snapshots</id>
-    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-    <releases>
-      <enabled>false</enabled>
-    </releases>
-    <snapshots>
-      <enabled>true</enabled>
-    </snapshots>
-  </repository>
-</repositories>
 ```
 
 ```java
 UCUMService ucumService = new UCUMService(); // default version is 2.2, but you can also specify a different version
-LookupResult lookupResult = ucumService.lookup("meter");
+LookupResult lookupResult = ucumService.lookup("m");
 String print = ucumService.print("cm");
 ValidationResult valResult = ucumService.validate("cm");
 CanonicalizationResult canonResult = ucumService.canonicalize("[in_i]");

@@ -1,5 +1,6 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.sorter.AlphabeticalSorter;
 import io.github.fhnaumann.model.UCUMDefinition.*;
@@ -164,21 +165,8 @@ public class Canonicalizer implements CanonicalizerService {
         FROM, TO
     }
 
-    public CanonicalizerService.CanonicalizationResult canonicalize(Term term) {
-        return canonicalize(PreciseDecimal.ONE, term);
-    }
-
-    public CanonicalizerService.CanonicalizationResult canonicalize(Term term, boolean allowMolMassConversion) {
-        /*
-        A bit weird here with the molMassConversion flag:
-        If false, use null because it will canonicalize mol->1
-        If true, use any non-null value because it will canonicalize mol->g (+ coefficient, but that is irrelevant here, otherwise a different method would have been called)
-         */
-        return canonicalize(PreciseDecimal.ONE, term, true, true, UnitDirection.FROM, allowMolMassConversion ? PreciseDecimal.ONE : null);
-    }
-
-    public CanonicalizerService.CanonicalizationResult canonicalize(PreciseDecimal factor, Term term) {
-        return canonicalize(factor, term, true, true, UnitDirection.FROM, null);
+    public CanonicalizerService.CanonicalizationResult canonicalize(PreciseDecimal factor, Term term, PreciseDecimal substanceMolarMassCoeff) {
+        return canonicalize(factor, term, true, true, UnitDirection.FROM, substanceMolarMassCoeff);
     }
 
     public CanonicalizerService.CanonicalizationResult canonicalize(PreciseDecimal factor, Term term, boolean normalize, boolean flatten, UnitDirection unitDirection, PreciseDecimal substanceMolarMassCoeff) {
@@ -213,7 +201,7 @@ public class Canonicalizer implements CanonicalizerService {
             the term is being saved there, and it would require severe restructuring so it's easier to just skip caching in these instances.
              */
             if(!isMolInvolved) {
-                PersistenceRegistry.getInstance().saveCanonical(term, new CanonicalStepResult(
+                PersistenceRegistry.getInstance().saveCanonical(CanonKey.of(term, getUCUMVersion()), new CanonicalStepResult(
                         resultTerm,
                         canonicalStep.magnitude,
                         canonicalStep.cfPrefix,
@@ -299,7 +287,7 @@ public class Canonicalizer implements CanonicalizerService {
 
     private CanonicalStepResult canonicalizeImpl(Term term, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
-        CanonicalStepResult cached = PersistenceRegistry.getInstance().getCanonical(term);
+        CanonicalStepResult cached = PersistenceRegistry.getInstance().getCanonical(CanonKey.of(term, getUCUMVersion()));
         if(cached != null) {
             return cached;
         }

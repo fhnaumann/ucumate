@@ -3,8 +3,6 @@
 /ucumate-demo-impl
 *.db
 
-ucumate-ontoserver
-
 ucumate-core/target/
 ucumate-core/.idea
 ucumate-core/precise_decimal.md

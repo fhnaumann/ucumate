@@ -168,7 +168,7 @@ public class UcumateToUcumJavaService implements UcumService {
 
         DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(success.canonicalTerm(), success1.canonicalTerm());
         return switch (comparisonResult) {
-            case DimensionAnalyzer.Success comparisonSuccess -> null;
+            case DimensionAnalyzer.DimensionsMatch comparisonDimensionsMatch -> null;
             case DimensionAnalyzer.Failure failure -> "The provided unit '%s' and the desired canonical form '%s' do not match. This is their difference: %s".formatted(unit, canonical, failure.difference());
         };
     }
@@ -193,7 +193,7 @@ public class UcumateToUcumJavaService implements UcumService {
         }
         return switch (DimensionAnalyzer.compare(units1Success.canonicalTerm(), units2Success.canonicalTerm())) {
             case DimensionAnalyzer.Failure failure -> false;
-            case DimensionAnalyzer.Success success -> true;
+            case DimensionAnalyzer.DimensionsMatch dimensionsMatch -> true;
         };
     }
 
@@ -220,7 +220,7 @@ public class UcumateToUcumJavaService implements UcumService {
                 continue;
             }
             var comparison = DimensionAnalyzer.compare(success.canonicalTerm(), baseUnitAsTerm);
-            if (comparison instanceof DimensionAnalyzer.Success) {
+            if (comparison instanceof DimensionAnalyzer.DimensionsMatch) {
                 result.add(definedUnit);
             }
         }

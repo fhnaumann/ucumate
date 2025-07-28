@@ -3,13 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
+    <!--parent>
         <groupId>io.github.fhnaumann</groupId>
         <artifactId>ucumate-parent</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.4</version>
     </parent>
+    <artifactId>ucumate-ontoserver</artifactId-->
 
+    <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-ontoserver</artifactId>
+    <version>1.0.4</version>
+    <!-- command: mvn -pl ucumate-ontoserver clean install -am -DskipTests -->
+    <!-- ontoserver command:  java -Dloader.path=/Users/felixnaumann/Documents/ucumate/ucumate-ontoserver/target/ucumate-ontoserver-1.0.4.jar -jar ontoserver4-6.22.7.jar -->
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -19,26 +24,125 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.github.fhnaumann</groupId>
-            <artifactId>ucumate-core</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.fhnaumann</groupId>
-            <artifactId>ucumate-persistence</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.16</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-validation</artifactId>
+            <artifactId>hapi-fhir-base</artifactId>
             <version>8.2.0</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-structures-r4</artifactId>
+            <version>8.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>au.csiro.ontoserver</groupId>
+            <artifactId>ontoserver-plugin-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.fhnaumann</groupId>
+            <artifactId>ucumate-core</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.fhnaumann</groupId>
+            <artifactId>ucumate-error-feedback</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <!--dependency>
+            <groupId>io.github.fhnaumann</groupId>
+            <artifactId>ucumate-persistence</artifactId>
+            <version>1.0.4</version>
+        </dependency-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>6.2.8</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-core</artifactId>
             <version>16.0.0.Dev01</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.3</version>
+                <configuration>
+                    <argLine>${argLine}</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <!--configuration>
+                    <minimizeJar>true</minimizeJar>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration-->
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

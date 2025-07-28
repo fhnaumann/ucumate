@@ -52,7 +52,7 @@ public class PreciseUCUMTests {
     @ParameterizedTest(name="{0}")
     @MethodSource("commensurableTestCases")
     public void testCommensurability(TestCase.CommensurableTestCase testCase) {
-        RelationChecker.RelationResult result = service.checkCommensurable(TestUtil.parse(testCase.expr1()), TestUtil.parse(testCase.expr2()), false);
+        RelationChecker.RelationResult result = service.checkCommensurable(TestUtil.parse(testCase.expr1()), TestUtil.parse(testCase.expr2()));
         assertEquals(testCase.commensurable(), result instanceof RelationChecker.IsCommensurable, testCase.toString());
     }
 

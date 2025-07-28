@@ -1,18 +1,19 @@
 package io.github.fhnaumann.funcs;
-
-import com.google.common.base.Preconditions;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.printer.*;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
+import io.github.fhnaumann.util.LogUtil;
 import io.github.fhnaumann.util.PreciseDecimal;
-import io.github.fhnaumann.util.ReflectionUtil;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.ServiceLoader;
 
 /**
  * This class provides all the functionality of the ucumate library in a centralized place.
@@ -25,12 +26,12 @@ public class UCUMService implements IUCUMService {
 
     private static final UcumVersion SELECTED_UCUM_VERSION = ConfigurationRegistry.get().getUCUMVersionAsEnum();
 
-    private static final ValidatorService DEFAULT_VALIDATOR_SERVICE = ReflectionUtil.loadService(ValidatorService.class, new Validator(SELECTED_UCUM_VERSION));
-    private static final PrinterService DEFAULT_PRINTER_SERVICE = ReflectionUtil.loadService(PrinterService.class, new Printer());
-    private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = ReflectionUtil.loadService(RelationCheckerService.class, new RelationChecker(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final ConverterService DEFAULT_CONVERTER_SERVICE = ReflectionUtil.loadService(ConverterService.class, new Converter(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = ReflectionUtil.loadService(CanonicalizerService.class, new Canonicalizer(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final LookupService DEFAULT_LOOKUP_SERVICE = ReflectionUtil.loadService(LookupService.class, new Lookup(SELECTED_UCUM_VERSION));
+    private static final ValidatorService DEFAULT_VALIDATOR_SERVICE = loadService(ValidatorService.class, new Validator(SELECTED_UCUM_VERSION));
+    private static final PrinterService DEFAULT_PRINTER_SERVICE = loadService(PrinterService.class, new Printer());
+    private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = loadService(RelationCheckerService.class, new RelationChecker(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final ConverterService DEFAULT_CONVERTER_SERVICE = loadService(ConverterService.class, new Converter(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = loadService(CanonicalizerService.class, new Canonicalizer(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
+    private static final Logger log = LoggerFactory.getLogger(UCUMService.class);
 
     private UcumVersion ucumVersion;
     private CanonicalizerService canonicalizerService;
@@ -38,7 +39,6 @@ public class UCUMService implements IUCUMService {
     private ValidatorService validatorService;
     private RelationCheckerService relationCheckerService;
     private PrinterService printerService;
-    private LookupService lookupService;
 
     public UCUMService() {
         this(ConfigurationRegistry.get().getUCUMVersion());
@@ -55,19 +55,22 @@ public class UCUMService implements IUCUMService {
                 DEFAULT_CONVERTER_SERVICE,
                 DEFAULT_VALIDATOR_SERVICE,
                 DEFAULT_RELATION_CHECKER_SERVICE,
-                DEFAULT_PRINTER_SERVICE,
-                DEFAULT_LOOKUP_SERVICE
+                DEFAULT_PRINTER_SERVICE
         );
     }
 
-    public UCUMService(UcumVersion ucumVersion, CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService, LookupService lookupService) {
+    public UCUMService(UcumVersion ucumVersion, CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService) {
         this.canonicalizerService = canonicalizerService;
         this.converterService = converterService;
         this.validatorService = validatorService;
         this.relationCheckerService = relationCheckerService;
         this.printerService = printerService;
-        this.lookupService = lookupService;
         setUCUMVersion(ucumVersion);
+    }
+
+    private static <T> T loadService(Class<T> clazz, T fallback) {
+        ServiceLoader<T> loader = ServiceLoader.load(clazz);
+        return loader.findFirst().orElse(fallback);
     }
 
     @Override
@@ -77,8 +80,8 @@ public class UCUMService implements IUCUMService {
 
 
     @Override
-    public CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term) {
-        return canonicalizerService.canonicalize(factor, term);
+    public CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term, PreciseDecimal substanceMolarMassCoeff) {
+        return canonicalizerService.canonicalize(factor, term, substanceMolarMassCoeff);
     }
 
     @Override
@@ -92,18 +95,13 @@ public class UCUMService implements IUCUMService {
     }
 
     @Override
-    public RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2, boolean allowMolMassConversion) {
-        return relationCheckerService.checkRelation(term1, term2, allowMolMassConversion);
+    public RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2) {
+        return relationCheckerService.checkRelation(term1, term2);
     }
 
     @Override
-    public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2, boolean allowMolMassConversion) {
-        return relationCheckerService.checkCommensurable(term1, term2, allowMolMassConversion);
-    }
-
-    @Override
-    public LookupResult lookup(String input, Collection<MatchType> allowedMatchTypes, Comparator<MatchType> comparator) {
-        return lookupService.lookup(input, allowedMatchTypes, comparator);
+    public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2) {
+        return relationCheckerService.checkCommensurable(term1, term2);
     }
 
     @Override
@@ -124,7 +122,9 @@ public class UCUMService implements IUCUMService {
     }
 
     private void checkSameVersion(UcumVersioning versioning) {
-        Preconditions.checkArgument(getUCUMVersion() == versioning.getUCUMVersion(), "Cannot use service ({}) with a different version than the composite version ({}).", versioning.getUCUMVersion(), getUCUMVersion());
+        if(getUCUMVersion() != versioning.getUCUMVersion()) {
+            LogUtil.logAndThrow(log, "Cannot use service ({}) with a different version than the composite version ({}).", versioning.getUCUMVersion(), getUCUMVersion());
+        }
     }
 
     @Override
@@ -167,17 +167,6 @@ public class UCUMService implements IUCUMService {
     }
 
     @Override
-    public LookupService getLookupService() {
-        return lookupService;
-    }
-
-    @Override
-    public void setLookupService(LookupService lookupService) {
-        checkSameVersion(lookupService);
-        this.lookupService = lookupService;
-    }
-
-    @Override
     public UcumVersion getUCUMVersion() {
         return ucumVersion;
     }
@@ -188,7 +177,6 @@ public class UCUMService implements IUCUMService {
         relationCheckerService.setUCUMVersion(ucumVersion);
         canonicalizerService.setUCUMVersion(ucumVersion);
         converterService.setUCUMVersion(ucumVersion);
-        lookupService.setUCUMVersion(ucumVersion);
         this.ucumVersion = ucumVersion;
     }
 

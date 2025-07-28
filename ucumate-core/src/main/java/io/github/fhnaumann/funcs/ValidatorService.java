@@ -1,5 +1,6 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.ParseUtil;
 
@@ -37,7 +38,18 @@ public interface ValidatorService extends UcumVersioning {
 
     public sealed interface ValidationResult {}
 
-    public record Success(UCUMExpression.Term term) implements ValidationResult {}
+    public sealed interface Success extends ValidationResult {
+        UCUMExpression.Term term();
+    }
+
+    public record ComplexSuccess(UCUMExpression.Term term) implements Success {}
+
+    public record SimpleSuccess(UCUMExpression.SingleUnitTerm singleUnitTerm) implements Success {
+        @Override
+        public UCUMExpression.Term term() {
+            return singleUnitTerm;
+        }
+    }
 
     public record Failure(List<String> errorMessages) implements ValidationResult {
         public Failure() {

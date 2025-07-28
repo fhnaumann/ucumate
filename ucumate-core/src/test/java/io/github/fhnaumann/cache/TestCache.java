@@ -1,5 +1,6 @@
 package io.github.fhnaumann.cache;
 
+import io.github.fhnaumann.configuration.CacheConfiguration;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.configuration.ValKey;
@@ -46,7 +47,7 @@ public class TestCache {
         converterService = new Converter(new Printer(), validatorService);
         Properties props = new Properties();
         props.setProperty("ucumate.cache.enable", "true");
-        PersistenceRegistry.initCache(props);
+        PersistenceRegistry.initCache(CacheConfiguration.fromProps(props));
     }
 
     @Test

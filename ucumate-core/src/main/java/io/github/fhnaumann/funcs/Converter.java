@@ -73,7 +73,7 @@ public class Converter implements ConverterService {
                         DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(fromSuccess.canonicalTerm(), toSuccess.canonicalTerm());
                         yield switch (comparisonResult) {
                             case Failure failure -> new BaseDimensionMismatch(failure);
-                            case DimensionAnalyzer.Success dimSuccess -> new Success(toSuccess.magnitude());
+                            case DimensionAnalyzer.DimensionsMatch dimDimensionsMatch -> new Success(toSuccess.magnitude());
                         };
                     }
                 };
