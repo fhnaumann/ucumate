@@ -2,6 +2,7 @@ package io.github.fhnaumann.functionaltests;
 
 import io.github.fhnaumann.*;
 import io.github.fhnaumann.builders.CacheConfig;
+import io.github.fhnaumann.configuration.CacheConfiguration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -29,7 +30,7 @@ public class UCUMTests {
     @BeforeAll
     public void initalSetup() throws IOException {
         ConfigurationRegistry.initialize(null);
-        PersistenceRegistry.initCache(CacheConfig.builder().disable().build());
+        PersistenceRegistry.initCache(CacheConfiguration.fromProps(CacheConfig.builder().disable().build()));
         testSuite = TestCaseLoader.load();
         service = new UCUMService();
     }
