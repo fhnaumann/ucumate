@@ -6,7 +6,7 @@ import io.github.fhnaumann.model.UcumVersion;
 /**
  * @author Felix Naumann
  */
-public interface IUCUMService extends ValidatorService, CanonicalizerService, ConverterService, RelationCheckerService, PrinterService, LookupService {
+public interface IUCUMService extends ValidatorService, CanonicalizerService, ConverterService, RelationCheckerService, PrinterService {
 
     public CanonicalizerService getCanonicalizerService();
     public void setCanonicalizerService(CanonicalizerService canonicalizerService);
@@ -16,6 +16,4 @@ public interface IUCUMService extends ValidatorService, CanonicalizerService, Co
     public void setValidatorService(ValidatorService validatorService);
     public RelationCheckerService getRelationCheckerService();
     public void setRelationCheckerService(RelationCheckerService relationCheckerService);
-    public LookupService getLookupService();
-    public void setLookupService(LookupService lookupService);
 }

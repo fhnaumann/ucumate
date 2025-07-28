@@ -31,7 +31,6 @@ public class UCUMService implements IUCUMService {
     private static final RelationCheckerService DEFAULT_RELATION_CHECKER_SERVICE = loadService(RelationCheckerService.class, new RelationChecker(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
     private static final ConverterService DEFAULT_CONVERTER_SERVICE = loadService(ConverterService.class, new Converter(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
     private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = loadService(CanonicalizerService.class, new Canonicalizer(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
-    private static final LookupService DEFAULT_LOOKUP_SERVICE = loadService(LookupService.class, new Lookup(SELECTED_UCUM_VERSION));
     private static final Logger log = LoggerFactory.getLogger(UCUMService.class);
 
     private UcumVersion ucumVersion;
@@ -40,7 +39,6 @@ public class UCUMService implements IUCUMService {
     private ValidatorService validatorService;
     private RelationCheckerService relationCheckerService;
     private PrinterService printerService;
-    private LookupService lookupService;
 
     public UCUMService() {
         this(ConfigurationRegistry.get().getUCUMVersion());
@@ -57,18 +55,16 @@ public class UCUMService implements IUCUMService {
                 DEFAULT_CONVERTER_SERVICE,
                 DEFAULT_VALIDATOR_SERVICE,
                 DEFAULT_RELATION_CHECKER_SERVICE,
-                DEFAULT_PRINTER_SERVICE,
-                DEFAULT_LOOKUP_SERVICE
+                DEFAULT_PRINTER_SERVICE
         );
     }
 
-    public UCUMService(UcumVersion ucumVersion, CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService, LookupService lookupService) {
+    public UCUMService(UcumVersion ucumVersion, CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService) {
         this.canonicalizerService = canonicalizerService;
         this.converterService = converterService;
         this.validatorService = validatorService;
         this.relationCheckerService = relationCheckerService;
         this.printerService = printerService;
-        this.lookupService = lookupService;
         setUCUMVersion(ucumVersion);
     }
 
@@ -106,11 +102,6 @@ public class UCUMService implements IUCUMService {
     @Override
     public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2) {
         return relationCheckerService.checkCommensurable(term1, term2);
-    }
-
-    @Override
-    public LookupResult lookup(String input, Collection<MatchType> allowedMatchTypes, Comparator<MatchType> comparator) {
-        return lookupService.lookup(input, allowedMatchTypes, comparator);
     }
 
     @Override
@@ -176,17 +167,6 @@ public class UCUMService implements IUCUMService {
     }
 
     @Override
-    public LookupService getLookupService() {
-        return lookupService;
-    }
-
-    @Override
-    public void setLookupService(LookupService lookupService) {
-        checkSameVersion(lookupService);
-        this.lookupService = lookupService;
-    }
-
-    @Override
     public UcumVersion getUCUMVersion() {
         return ucumVersion;
     }
@@ -197,7 +177,6 @@ public class UCUMService implements IUCUMService {
         relationCheckerService.setUCUMVersion(ucumVersion);
         canonicalizerService.setUCUMVersion(ucumVersion);
         converterService.setUCUMVersion(ucumVersion);
-        lookupService.setUCUMVersion(ucumVersion);
         this.ucumVersion = ucumVersion;
     }
 
