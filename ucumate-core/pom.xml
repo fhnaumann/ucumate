@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ucumate-core</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4</version>
 
     <parent>
         <groupId>io.github.fhnaumann</groupId>
         <artifactId>ucumate-parent</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.4</version>
     </parent>
     <packaging>jar</packaging>
 
@@ -66,7 +66,7 @@
             <version>2.0.16</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+        <dependency> <!-- TODO is lookup on print symbol even necessary? If not, then this dependency could be removed. -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
             <version>1.11.0</version>
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-test-utils</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jol</groupId>
@@ -114,13 +114,8 @@
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
-            <artifactId>antlr4</artifactId>
+            <artifactId>antlr4-runtime</artifactId>
             <version>4.13.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.4.8-jre</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>

@@ -1,14 +1,15 @@
 package io.github.fhnaumann.funcs;
-
-import com.google.common.base.Preconditions;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.printer.*;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
+import io.github.fhnaumann.util.LogUtil;
 import io.github.fhnaumann.util.PreciseDecimal;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -31,6 +32,7 @@ public class UCUMService implements IUCUMService {
     private static final ConverterService DEFAULT_CONVERTER_SERVICE = loadService(ConverterService.class, new Converter(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
     private static final CanonicalizerService DEFAULT_CANONICALIZER_SERVICE = loadService(CanonicalizerService.class, new Canonicalizer(SELECTED_UCUM_VERSION, DEFAULT_PRINTER_SERVICE, DEFAULT_VALIDATOR_SERVICE));
     private static final LookupService DEFAULT_LOOKUP_SERVICE = loadService(LookupService.class, new Lookup(SELECTED_UCUM_VERSION));
+    private static final Logger log = LoggerFactory.getLogger(UCUMService.class);
 
     private UcumVersion ucumVersion;
     private CanonicalizerService canonicalizerService;
@@ -129,7 +131,9 @@ public class UCUMService implements IUCUMService {
     }
 
     private void checkSameVersion(UcumVersioning versioning) {
-        Preconditions.checkArgument(getUCUMVersion() == versioning.getUCUMVersion(), "Cannot use service ({}) with a different version than the composite version ({}).", versioning.getUCUMVersion(), getUCUMVersion());
+        if(getUCUMVersion() != versioning.getUCUMVersion()) {
+            LogUtil.logAndThrow(log, "Cannot use service ({}) with a different version than the composite version ({}).", versioning.getUCUMVersion(), getUCUMVersion());
+        }
     }
 
     @Override

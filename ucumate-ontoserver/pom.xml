@@ -3,15 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
+    <!--parent>
         <groupId>io.github.fhnaumann</groupId>
         <artifactId>ucumate-parent</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.4</version>
     </parent>
+    <artifactId>ucumate-ontoserver</artifactId-->
 
+    <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-ontoserver</artifactId>
+    <version>1.0.4</version>
     <!-- command: mvn -pl ucumate-ontoserver clean install -am -DskipTests -->
-    <!-- ontoserver command:  java -Dloader.path=/Users/felixnaumann/Documents/ucumate/ucumate-ontoserver/target/ucumate-ontoserver-1.0.3-SNAPSHOT.jar -jar ontoserver4-6.22.7.jar -->
+    <!-- ontoserver command:  java -Dloader.path=/Users/felixnaumann/Documents/ucumate/ucumate-ontoserver/target/ucumate-ontoserver-1.0.4.jar -jar ontoserver4-6.22.7.jar -->
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -53,17 +56,17 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-error-feedback</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
         <!--dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-persistence</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency-->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -71,11 +74,6 @@
             <version>6.2.8</version>
             <scope>provided</scope>
         </dependency>
-        <!--dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-validation</artifactId>
-            <version>8.2.0</version>
-        </dependency-->
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-core</artifactId>

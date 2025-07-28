@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ucumate-parent</artifactId>
     <groupId>io.github.fhnaumann</groupId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ucumate-ontoserver</artifactId>
@@ -53,6 +53,12 @@
     </plugins>
   </build>
   <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>2.0.16</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>ca.uhn.hapi.fhir</groupId>
       <artifactId>hapi-fhir-base</artifactId>

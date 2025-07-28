@@ -6,7 +6,7 @@ Add the dependency:
 <dependency>
     <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-error-feedback</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4</version>
 </dependency>
 ```
 

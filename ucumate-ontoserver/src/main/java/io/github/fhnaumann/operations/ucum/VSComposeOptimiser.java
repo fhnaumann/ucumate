@@ -3,11 +3,9 @@ package io.github.fhnaumann.operations.ucum;
 import io.github.fhnaumann.UCUMOntoOperationPlugin;
 import io.github.fhnaumann.builders.CombineTermBuilder;
 import io.github.fhnaumann.builders.SoloTermBuilder;
-import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
-import io.github.fhnaumann.util.UCUMRegistry;
 import org.hl7.fhir.r4.model.ValueSet;
 
 import java.util.*;
@@ -36,15 +34,17 @@ public class VSComposeOptimiser {
             return switch (fhirOperator) {
                 case IN -> IN;
                 case EQUAL -> EQ;
-                default -> throw new RuntimeException();
+                default -> null;
             };
         }
 
     }
 
     public sealed interface OptimisationResult {}
-    public record NotOptimised() implements OptimisationResult {}
-    public record OptimisedIncludeConcepts(Set<UCUMExpression.Term> explicitIncludeConcepts) implements OptimisationResult {}
+    public record Empty() implements OptimisationResult {}
+    public record IncludeAllOfUCUM() implements OptimisationResult {}
+    public record ExcludeAllOfUCUM() implements OptimisationResult {}
+    public record OptimisedConcepts(boolean include, Set<UCUMExpression.Term> explicitConcepts) implements OptimisationResult {}
     public record OptimisedCanonicalFilter(boolean include, ValueSet.FilterOperator filterOperator, Set<UCUMExpression.CanonicalTerm> filterValue) implements OptimisationResult {}
     public record OptimisedCanonicalFilterAndIncludeConcepts(boolean include, ValueSet.FilterOperator filterOperator, Set<UCUMExpression.CanonicalTerm> filterValue, Set<UCUMExpression.Term> explicitIncludeConcepts) implements OptimisationResult {}
 
@@ -69,7 +69,7 @@ public class VSComposeOptimiser {
                 .filter(UCUMOntoOperationPlugin.IS_UCUM_SYSTEM)
                 .anyMatch(exclude -> !exclude.hasFilter() && !exclude.hasConcept());
         if(excludeAllOfUCUM) {
-            return new NotOptimised();
+            return new ExcludeAllOfUCUM();
         }
 
         Set<UCUMExpression.Term> includeConcepts = new HashSet<>();
@@ -130,25 +130,25 @@ public class VSComposeOptimiser {
             includeConcepts.removeIf(term -> conceptIsCapturedByFilter(term, optimisedExcludeFilter));
         }
 
-        return createResult(optimisedSubtractedFilter, includeAllOfUCUM, includeConcepts);
+        return createResult(optimisedSubtractedFilter, includeAllOfUCUM, !includeConcepts.isEmpty(), !includeConcepts.isEmpty() ? includeConcepts : excludeConcepts);
     }
 
-    private OptimisationResult createResult(Filter optimisedSubtractedFilter, boolean includeAllOfUCUM, Set<UCUMExpression.Term> includeConcepts) {
+    private OptimisationResult createResult(Filter optimisedSubtractedFilter, boolean includeAllOfUCUM, boolean includeConcepts, Set<UCUMExpression.Term> concepts) {
         if(optimisedSubtractedFilter == null) {
-            if(!includeConcepts.isEmpty()) {
-                return new OptimisedIncludeConcepts(includeConcepts);
+            if(!concepts.isEmpty()) {
+                return new OptimisedConcepts(includeConcepts, concepts);
             }
             else {
-                return new NotOptimised();
+                return includeAllOfUCUM ? new IncludeAllOfUCUM() : new Empty();
             }
         }
         else {
-            if(!includeConcepts.isEmpty()) {
+            if(!concepts.isEmpty()) {
                 return new OptimisedCanonicalFilterAndIncludeConcepts(
                         !includeAllOfUCUM,
                         optimisedSubtractedFilter.operator.fhirOperator,
                         constructFilterValueFrom(optimisedSubtractedFilter.signatures),
-                        includeConcepts
+                        concepts
                 );
             }
             else {
@@ -199,6 +199,9 @@ public class VSComposeOptimiser {
         return comp.getFilter().stream()
                 .map(filterComp -> {
                     Operator op = Operator.fromFHIR(filterComp.getOp());
+                    if(op == null) {
+                        throw new Unchecked.UncheckedUnprocessableEntityException("Unknown filter operator '%s' for '%s' filter.".formatted(filterComp.getOp().getDisplay(), filterComp.getProperty()), plugin);
+                    }
                     if(filterComp.getProperty().equals("property")) {
                         if(op != Operator.EQ) {
                             throw new Unchecked.UncheckedUnprocessableEntityException("'%s' operator is not supported for the property filter.".formatted(op), plugin);

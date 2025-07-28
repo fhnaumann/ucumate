@@ -14,11 +14,8 @@ public class BuilderUtil {
 
     static final List<UCUMDefinition.UCUMPrefix> PREFIXES = List.of(giga, dezi);
     static final List<UCUMDefinition.UCUMUnit> UNITS = List.of(meter, gram, newton, feet, celsius, hp_c);
-    static final List<Integer> EXPONENTS = List.of(-1, 0, 1, 2);
+    static final List<Integer> EXPONENTS = List.of(-3, -2, 2, 3);
     static final List<String> ANNOTATIONS = List.of("aspirin", "oral");
-
-
-
 
     public static AbstractObjectAssert<?, UCUMExpression.Component> assert_component_term_of(UCUMExpression.Term term) {
         return assertThat(term)

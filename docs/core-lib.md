@@ -20,7 +20,7 @@ You can [change these cache settings](cache.md) if desired. You can also add [pe
 
 ## Lookup
 
-`UCUMService#lookup` can be used to look up a UCUM unit when it is not given by its code. For when you want to parse a
+`UCUMService#lookup` can be used to look up properties of a UCUM expression.
 UCUMExpression use the [validator result](core-lib.md#validation).
 
 ```java

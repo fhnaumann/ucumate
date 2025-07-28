@@ -132,6 +132,14 @@ public class PersistenceRegistry implements PersistenceProvider {
         }
     }
 
+    public static void unregister(String name) {
+        PersistenceProvider removed = additionalProviders.remove(name);
+        if(removed != null) {
+            removed.close();
+            logger.debug("Unregistered {}: {} from the persistence registry.", name, removed.getClass().getSimpleName());
+        }
+    }
+
     public static boolean hasAny() {
         return !additionalProviders.isEmpty();
     }

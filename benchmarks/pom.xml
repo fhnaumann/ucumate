@@ -6,7 +6,7 @@
 
     <groupId>io.github.fhnaumann</groupId>
     <artifactId>benchmarks</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -26,20 +26,6 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-
-    <developers>
-        <developer>
-            <name>Felix Naumann</name>
-            <email>fhnaumann@t-online.de</email>
-            <organization>Personal</organization>
-            <organizationUrl>https://github.com/fhnaumann</organizationUrl>
-        </developer>
-    </developers>
-    <scm>
-        <url>https://github.com/fhnaumann/ucumate/tree/main</url>
-        <connection>scm:git:git://github.com/fhnaumann/ucumate.git</connection>
-        <developerConnection>scm:git:ssh://github.com:fhnaumann/ucumate.git</developerConnection>
-    </scm>
 
     <dependencies>
         <dependency>
@@ -63,12 +49,12 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-error-feedback</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.fhir</groupId>
@@ -107,18 +93,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <name>Central Portal Snapshots</name>
-            <id>central-portal-snapshots</id>
-            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 </project>

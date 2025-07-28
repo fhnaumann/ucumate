@@ -87,13 +87,26 @@ public class UCUMLookupOperation implements LookupOperation {
         requestedProps.stream()
                 .map(prop -> Map.entry(prop, PROPS_MAPPER.get(prop).apply(service, term)))
                 .forEach(entry -> parameters.addParameter(entry.getKey(), entry.getValue()));
-        // todo figure out if designation and "property" (inactive) is necessary
+        Parameters.ParametersParameterComponent nameDesignation = parameters.addParameter();
+        nameDesignation.setName("designation");
+        nameDesignation.addPart()
+                .setName("language")
+                .setValue(new StringType("en"));
+        nameDesignation.addPart()
+                .setName("use")
+                .setValue(new Coding()
+                    .setSystem("http://terminology.hl7.org/CodeSystem/designation-usage")
+                    .setCode("display")
+                    .setDisplay("Display"));
+        nameDesignation.addPart()
+                .setName("value")
+                .setValue(new StringType(service.print(term, Printer.PrintType.EXPRESSIVE_UCUM_SYNTAX)));
+                //.setValue(new StringType(new CustomUnitMappingPrinter(concept -> concept.names().stream().findFirst().orElseThrow()).print(term)));
 
         // todo add warning parameter for annotation usage?
     }
 
     private void checkForUnknownProps(Collection<String> requestedProps) {
-        // todo just silently remove them for now or throw InvalidRequestException or UnprocessableEntityException
         requestedProps.removeIf(Predicate.not(PROPS_MAPPER::containsKey));
     }
 

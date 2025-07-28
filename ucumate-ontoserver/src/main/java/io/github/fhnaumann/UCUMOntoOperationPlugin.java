@@ -20,6 +20,7 @@ import org.infinispan.manager.DefaultCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -41,6 +42,8 @@ public class UCUMOntoOperationPlugin implements OntoOperationPlugin {
     public static Predicate<ValueSet.ValueSetExpansionContainsComponent> IS_UCUM_SYSTEM_ = conceptSetComponent -> conceptSetComponent.hasSystem() && UCUM_SYSTEM.equals(conceptSetComponent.getSystem());
     public static final Set<String> KNOWN_FILTERS = Set.of("canonical", "property");
 
+    public static final String INFINISPAN_CACHE_NAME = "infinispan-cache";
+
     private static UCUMOntoOperationPlugin instance;
 
     private UCUMService service;
@@ -51,6 +54,9 @@ public class UCUMOntoOperationPlugin implements OntoOperationPlugin {
 
     private final DefaultCacheManager defaultCacheManager;
     private InfinispanPersistenceProvider infinispanPersistenceProvider;
+
+    @Value("${ontoserver.plugins.ucum.infinispan}")
+    private boolean enableInfinispan;
 
     @Autowired
     public UCUMOntoOperationPlugin(DefaultCacheManager cacheManager) {
@@ -69,14 +75,14 @@ public class UCUMOntoOperationPlugin implements OntoOperationPlugin {
         this.ucumVersionResolver = new UCUMVersionResolver();
 
         // register infinispan
-        if(infinispanPersistenceProvider == null) {
+        if(enableInfinispan && infinispanPersistenceProvider == null) {
             this.infinispanPersistenceProvider = new InfinispanPersistenceProvider(defaultCacheManager);
-            PersistenceRegistry.register("infinispan-cache", infinispanPersistenceProvider);
+            PersistenceRegistry.register(INFINISPAN_CACHE_NAME, infinispanPersistenceProvider);
             String preheatCodeFilename = "pre_heat_codes.json";
             try {
                 List<String> defaultPreHeatCodes = PropertiesUtil.readCodeFile(PersistenceRegistry.class.getClassLoader().getResourceAsStream(preheatCodeFilename));
                 log.debug("Preheating Infinispan Persistence Provider (de-facto cache) with codes from {}.", preheatCodeFilename);
-                //this.infinispanPersistenceProvider.preheat(defaultPreHeatCodes);
+                this.infinispanPersistenceProvider.preheat(defaultPreHeatCodes);
             } catch (IOException e) {
                 throw new RuntimeException("Failed preheat codes from '%s'".formatted(preheatCodeFilename), e);
             }

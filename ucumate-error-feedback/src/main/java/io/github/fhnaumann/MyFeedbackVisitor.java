@@ -7,12 +7,16 @@ import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.ParseUtil;
+import io.github.fhnaumann.util.SyntaxVisitorHelper;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import static io.github.fhnaumann.model.UCUMExpression.*;
+import static io.github.fhnaumann.util.SyntaxVisitorHelper.*;
 
 /**
  * @author Felix Naumann
@@ -36,7 +40,7 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
         String digitsAsText = ParseUtil.asText(ctx.DIGIT_SYMBOL());
         try {
             int number = Integer.parseInt(digitsAsText);
-            return new UCUMExpression.IntegerUnit(number);
+            return new IntegerUnit(number);
         } catch(NumberFormatException e) {
             throw new RuntimeException("ANTLR4 should not have matched a number if it can't be parsed.");
         }
@@ -46,7 +50,7 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
     public UCUMExpression visitMaybeAPrefixSymbolUnit(ErrorFeedbackUCUMParser.MaybeAPrefixSymbolUnitContext ctx) {
         ParseUtil.MatchResult matchResult = ParseUtil.separatePrefixFromUnit(ctx.getText(), registry);
         return switch(matchResult) {
-            case ParseUtil.SuccessNoPrefixUnit(UCUMDefinition.UCUMUnit unit) -> new UCUMExpression.MixedNoPrefixSimpleUnit(unit);
+            case ParseUtil.SuccessNoPrefixUnit(UCUMDefinition.UCUMUnit unit) -> fromUCUMUnit(unit);
             case ParseUtil.SuccessPrefixUnit(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.UCUMUnit unit) -> {
                 if(!ConfigurationRegistry.get().isEnablePrefixOnNonMetricUnits() && !ParseUtil.isMetric(unit)) {
                     String prefixString = printer.print(prefix);
@@ -54,7 +58,7 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
                     log.warn("Matched prefix={} and unit={} but {} is not metric and prefixes for non-metric units is disabled.\nYou can change the behaviour with the 'ucumate.enablePrefixOnNonMetricUnits' property.", prefixString, unitString, unitString);
                     throw new Validator.ParserException("Matched prefix=%s and unit=%s but %s is not metric and prefixes for non-metric units is disabled.".formatted(prefixString, unitString, unitString));
                 }
-                yield new UCUMExpression.MixedPrefixSimpleUnit(prefix, unit);
+                yield from(prefix, unit);
             }
             case ParseUtil.InvalidResults invalidResults -> throw new Validator.ParserException(invalidResults);
             case ParseUtil.FailureResult failureResult -> throw new Validator.ParserException(failureResult);
@@ -64,101 +68,101 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
     @Override
     public UCUMExpression visitStigmatizedSymbolUnit(ErrorFeedbackUCUMParser.StigmatizedSymbolUnitContext ctx) {
         UCUMDefinition.DefinedUnit definedUnit = registry.getDefinedUnit(ctx.getText()).orElseThrow(() -> new Validator.ParserException("'%s' could not be parsed to a stigmatized unit.".formatted(ctx.getText())));
-        return new UCUMExpression.MixedNoPrefixSimpleUnit(definedUnit);
+        return new MixedNoPrefixSimpleUnit(definedUnit);
     }
 
     @Override
     public UCUMExpression visitAnnotation(ErrorFeedbackUCUMParser.AnnotationContext ctx) {
         String annotationText = ParseUtil.asText(ctx.withinCbSymbol());
         ParseUtil.checkASCIIRangeForAnnotation(annotationText);
-        return new UCUMExpression.Annotation(annotationText);
+        return new Annotation(annotationText);
     }
 
     @Override
     public UCUMExpression visitExponentWithExplicitSign(ErrorFeedbackUCUMParser.ExponentWithExplicitSignContext ctx) {
         int exponent = Integer.parseInt(ctx.getText());
-        return new UCUMExpression.Exponent(exponent);
+        return new Exponent(exponent);
     }
 
     @Override
     public UCUMExpression visitExponentWithoutSign(ErrorFeedbackUCUMParser.ExponentWithoutSignContext ctx) {
         int exponent = Integer.parseInt(ctx.getText());
-        return new UCUMExpression.Exponent(exponent);
+        return new Exponent(exponent);
     }
 
     @Override
     public UCUMExpression visitNumberUnit(ErrorFeedbackUCUMParser.NumberUnitContext ctx) {
-        UCUMExpression.IntegerUnit integerUnit = (UCUMExpression.IntegerUnit) visit(ctx.digitSymbols());
+        IntegerUnit integerUnit = (IntegerUnit) visit(ctx.digitSymbols());
         return integerUnit;
     }
 
     @Override
     public UCUMExpression visitComponentOnly(ErrorFeedbackUCUMParser.ComponentOnlyContext ctx) {
-        UCUMExpression.Unit unit = (UCUMExpression.Unit) visit(ctx.simpleSymbolUnit());
-        return new UCUMExpression.MixedComponentNoExponent(unit);
+        Unit unit = (Unit) visit(ctx.simpleSymbolUnit());
+        return from(unit);
     }
 
     @Override
     public UCUMExpression visitComponentWithExponent(ErrorFeedbackUCUMParser.ComponentWithExponentContext ctx) {
         String exponentSymbol = ctx.getChild(1).getText();
         SyntaxMatchHelper.checkWrongButKnownExpSymbolUsed(exponentSymbol, errorMessages);
-        UCUMExpression.Unit unit = (UCUMExpression.Unit) visit(ctx.simpleSymbolUnit());
-        UCUMExpression.Exponent exponent = (UCUMExpression.Exponent) visit(ctx.exponent());
-        return new UCUMExpression.MixedComponentExponent(unit, exponent);
+        Unit unit = (Unit) visit(ctx.simpleSymbolUnit());
+        Exponent exponent = (Exponent) visit(ctx.exponent());
+        return from(unit, exponent);
     }
 
     @Override
     public UCUMExpression visitTermOnly(ErrorFeedbackUCUMParser.TermOnlyContext ctx) {
-        UCUMExpression.Component component = (UCUMExpression.Component) visit(ctx.component());
-        return new UCUMExpression.MixedComponentTerm(component);
+        Component component = (Component) visit(ctx.component());
+        return from(component);
     }
 
     @Override
     public UCUMExpression visitTermWithAnnotation(ErrorFeedbackUCUMParser.TermWithAnnotationContext ctx) {
-        UCUMExpression.Term term = (UCUMExpression.Term) visit(ctx.term());
+        Term term = (Term) visit(ctx.term());
         /*
         if(!(term instanceof UCUMExpression.ComponentTerm componentTerm)) {
             throw new RuntimeException("Term has annotation when its not allowed!");
         }
         */
-        UCUMExpression.Annotation annotation = (UCUMExpression.Annotation) visit(ctx.annotation());
-        return new UCUMExpression.MixedAnnotTerm(term, annotation);
+        Annotation annotation = (Annotation) visit(ctx.annotation());
+        return from(term, annotation);
     }
 
     @Override
     public UCUMExpression visitAnnotationOnly(ErrorFeedbackUCUMParser.AnnotationOnlyContext ctx) {
-        UCUMExpression.Annotation annotation = (UCUMExpression.Annotation) visit(ctx.annotation());
-        return new UCUMExpression.AnnotOnlyTerm(annotation);
+        Annotation annotation = (Annotation) visit(ctx.annotation());
+        return new AnnotOnlyTerm(annotation);
     }
 
     @Override
     public UCUMExpression visitUnaryDivTerm(ErrorFeedbackUCUMParser.UnaryDivTermContext ctx) {
-        UCUMExpression.Term term = (UCUMExpression.Term) visit(ctx.term());
-        return new UCUMExpression.MixedUnaryDivTerm(term);
+        Term term = (Term) visit(ctx.term());
+        return fromForUnaryDiv(term);
     }
 
     @Override
     public UCUMExpression visitBinaryDivTerm(ErrorFeedbackUCUMParser.BinaryDivTermContext ctx) {
         String divSymbol = ctx.getChild(1).getText();
         SyntaxMatchHelper.checkWrongButKnownDivSymbolUsed(divSymbol, errorMessages);
-        UCUMExpression.Term left = (UCUMExpression.Term) visit(ctx.term(0));
-        UCUMExpression.Term right = (UCUMExpression.Term) visit(ctx.term(1));
-        return new UCUMExpression.MixedBinaryTerm(left, UCUMExpression.Operator.DIV, right);
+        Term left = (Term) visit(ctx.term(0));
+        Term right = (Term) visit(ctx.term(1));
+        return from(left, Operator.DIV, right);
     }
 
     @Override
     public UCUMExpression visitBinaryMulTerm(ErrorFeedbackUCUMParser.BinaryMulTermContext ctx) {
         String mulSymbol = ctx.getChild(1).getText();
         SyntaxMatchHelper.checkWrongButKnownMulSymbolUsed(mulSymbol, errorMessages);
-        UCUMExpression.Term left = (UCUMExpression.Term) visit(ctx.term(0));
-        UCUMExpression.Term right = (UCUMExpression.Term) visit(ctx.term(1));
-        return new UCUMExpression.MixedBinaryTerm(left, UCUMExpression.Operator.MUL, right);
+        Term left = (Term) visit(ctx.term(0));
+        Term right = (Term) visit(ctx.term(1));
+        return from(left, Operator.MUL, right);
     }
 
     @Override
     public UCUMExpression visitParenthesisedTerm(ErrorFeedbackUCUMParser.ParenthesisedTermContext ctx) {
-        UCUMExpression.Term term = (UCUMExpression.Term) visit(ctx.term());
-        return new UCUMExpression.MixedParenTerm(term);
+        Term term = (Term) visit(ctx.term());
+        return fromForParen(term);
     }
 
     @Override

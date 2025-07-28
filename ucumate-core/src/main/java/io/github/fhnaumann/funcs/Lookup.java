@@ -26,9 +26,11 @@ public class Lookup implements LookupService {
     private final Map<String, UCUMDefinition.UCUMUnit> unitsNormallyWithSbWithoutSb;
 
     private UcumVersion ucumVersion;
+    private final Validator validator;
 
     public Lookup(UcumVersion ucumVersion) {
         this.ucumVersion = ucumVersion;
+        this.validator = new Validator(ucumVersion);
         this.registry = UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(ucumVersion);
         this.unitsNormallyWithSbWithoutSb = removeSbFromSbUnits();
     }
@@ -44,6 +46,9 @@ public class Lookup implements LookupService {
 
     @Override
     public LookupResult lookup(String input, Collection<MatchType> allowedMatchTypes, Comparator<MatchType> comparator) {
+
+
+
         if(WARN_ON_ENCOUNTER.stream().anyMatch(input::contains)) {
             log.warn("Detected a symbol that indicates the presence of multiple units in the provided input '{}'. " +
                     "Lookup only supports individual units (no prefix or exponent)." +

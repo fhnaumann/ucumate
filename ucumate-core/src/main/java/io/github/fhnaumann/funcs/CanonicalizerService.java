@@ -104,7 +104,28 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
     public default boolean isCanonical(UCUMExpression.Term term) {
         return switch (term) {
             case UCUMExpression.CanonicalTerm canonicalTerm -> true;
-            case UCUMExpression.MixedTerm mixedTerm -> false;
+            case UCUMExpression.MixedTerm mixedTerm -> switch (term) {
+                case UCUMExpression.ComponentTerm componentTerm -> isCanonical(componentTerm.component().unit());
+                case UCUMExpression.ParenTerm parenTerm -> isCanonical(parenTerm.term());
+                case UCUMExpression.AnnotTerm annotTerm -> isCanonical(annotTerm.term());
+                case UCUMExpression.UnaryDivTerm unaryDivTerm -> isCanonical(unaryDivTerm.term());
+                case UCUMExpression.BinaryTerm binaryTerm -> isCanonical(binaryTerm.left()) && isCanonical(binaryTerm.right());
+                case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> true;
+            };
+        };
+    }
+
+    public default boolean isCanonical(UCUMExpression.Unit unit) {
+        return switch (unit) {
+            case UCUMExpression.CanonicalUnit canonicalUnit -> true;
+            case UCUMExpression.MixedUnit mixedUnit -> false;
+        };
+    }
+
+    public default boolean isCanonical(UCUMDefinition.UCUMUnit ucumUnit) {
+        return switch (ucumUnit) {
+            case UCUMDefinition.BaseUnit baseUnit -> true;
+            case UCUMDefinition.DefinedUnit definedUnit -> false;
         };
     }
 
@@ -116,7 +137,7 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
     /**
      * Represents a failed canonicalization. The subclasses provide more details.
      */
-    sealed interface FailedCanonicalization extends CanonicalizationResult permits Canonicalizer.TermContainsPHAndCanonicalizingToMass, Canonicalizer.TermHasArbitraryUnit, Validator.ParserError {}
+    sealed interface FailedCanonicalization extends CanonicalizationResult permits TermContainsPHAndCanonicalizingToMass, TermHasArbitraryUnit, Validator.ParserError {}
 
     /**
      * The canonicalization was successful.

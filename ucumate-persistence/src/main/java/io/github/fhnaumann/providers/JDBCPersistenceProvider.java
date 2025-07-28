@@ -49,10 +49,6 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
     public abstract String getCanonicalUpsertQuery();
     public abstract String getValidateUpsertQuery();
 
-    private UcumVersion getVersion() {
-        return ucumVersion;
-    }
-
     protected void executeSQLFile(String path) {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(path)) {
             if (input == null) throw new RuntimeException("Missing SQL file: " + path);
@@ -172,10 +168,6 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             while (rs.next()) {
                 String key = rs.getString("unit_key");
                 ValKey valKey = ValKey.fromStorageKey(key);
-                if(valKey.version() != getVersion()) {
-                    // Don't return if the provider version does not match the stored unit version
-                    continue;
-                }
                 boolean valid = rs.getBoolean("valid");
 
                 Validator.ValidationResult result;
@@ -209,9 +201,6 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             while (rs.next()) {
                 String unitKey = rs.getString("unit_key");
                 CanonKey canonKey = CanonKey.fromStorageKey(unitKey, ucumVersion);
-                if(canonKey.version() != getVersion()) {
-                    continue;
-                }
                 String magnitudeStr = rs.getString("magnitude");
                 String cfPrefixStr = rs.getString("cfPrefix");
                 String termStr = rs.getString("term");

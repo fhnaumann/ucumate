@@ -1,5 +1,6 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.ValidatorService;
@@ -7,15 +8,19 @@ import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
+import io.github.fhnaumann.operations.ucum.UCUMExpandOperation;
 import io.github.fhnaumann.operations.ucum.VSComposeOptimiser;
+import io.github.fhnaumann.util.UCUMRegistry;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.presentation.StandardRepresentation;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,20 +47,6 @@ public class VSComposeOptimiserTest {
             if(object instanceof UCUMExpression.Term term) {
                 return printer.print(term);
             }
-            /*
-            if(object instanceof VSComposeOptimiser.OptimisedIncludeConcepts optimisedIncludeConcepts) {
-                return optimisedIncludeConcepts.toString();
-            }
-            if(object instanceof VSComposeOptimiser.OptimisedCanonicalFilter optimisedCanonicalFilter) {
-                return "include: %s\n operator: %s\n value: %s"
-                        .formatted(optimisedCanonicalFilter.include(), optimisedCanonicalFilter.filterOperator(), optimisedCanonicalFilter.filterValue().stream().map(printer::print).toList().toString());
-            }
-            if(object instanceof VSComposeOptimiser.OptimisedCanonicalFilterAndIncludeConcepts obj) {
-                return "concepts: %s\n include: %s\n operator: %s\n value: %s"
-                        .formatted(obj.explicitIncludeConcepts().toString(), obj.include(), obj.filterOperator(), obj.filterValue().stream().map(printer::print).toList().toString());
-            }
-
-             */
             return super.toStringOf(object);
         }
     }
@@ -76,10 +67,14 @@ public class VSComposeOptimiserTest {
     private static void assert_result(VSComposeOptimiser.OptimisationResult actual, VSComposeOptimiser.OptimisationResult expected) {
         assertThat(actual.getClass()).isEqualTo(expected.getClass());
         switch (actual) {
-            case VSComposeOptimiser.NotOptimised actualNotOptimised -> {}
-            case VSComposeOptimiser.OptimisedIncludeConcepts actualOptimisedIncludeConcepts -> {
-                VSComposeOptimiser.OptimisedIncludeConcepts expectedIncludeConcepts = (VSComposeOptimiser.OptimisedIncludeConcepts) expected;
-                assertThat(actualOptimisedIncludeConcepts.explicitIncludeConcepts()).containsExactlyInAnyOrderElementsOf(expectedIncludeConcepts.explicitIncludeConcepts());
+            case VSComposeOptimiser.Empty actualEmpty -> {}
+            case VSComposeOptimiser.ExcludeAllOfUCUM excludeAllOfUCUM -> {}
+            case VSComposeOptimiser.IncludeAllOfUCUM includeAllOfUCUM -> {
+
+            }
+            case VSComposeOptimiser.OptimisedConcepts actualOptimisedConcepts -> {
+                VSComposeOptimiser.OptimisedConcepts expectedIncludeConcepts = (VSComposeOptimiser.OptimisedConcepts) expected;
+                assertThat(actualOptimisedConcepts.explicitConcepts()).containsExactlyInAnyOrderElementsOf(expectedIncludeConcepts.explicitConcepts());
             }
             case VSComposeOptimiser.OptimisedCanonicalFilter actualOptimisedCanonicalFilter -> {
                 VSComposeOptimiser.OptimisedCanonicalFilter expectedOptimisedCanonicalFilter = (VSComposeOptimiser.OptimisedCanonicalFilter) expected;
@@ -108,6 +103,7 @@ public class VSComposeOptimiserTest {
                 two_include_canonical_filters(),
                 all_of_ucum_exclude_canonical_eq_filter(),
                 single_include_canonical_eq_filter(),
+                all_of_ucum_exclude_concept(),
                 exclude_all_of_ucum(),
                 all_of_ucum_no_exclude()
         );
@@ -233,6 +229,14 @@ public class VSComposeOptimiserTest {
         return new Pair(composeComponent, optimisationResult);
     }
 
+    private static Pair all_of_ucum_exclude_concept() {
+        ValueSet.ValueSetComposeComponent  composeComponent = new ValueSet.ValueSetComposeComponent();
+        composeComponent.addInclude().setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
+        ValueSet.ConceptSetComponent exclude = composeComponent.addExclude().setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
+        exclude.addConcept().setCode("m");
+        return new Pair(composeComponent, new VSComposeOptimiser.OptimisedConcepts(false, of("m")));
+    }
+
     private static Pair include_canonical_filter_complex() {
         ValueSet.ValueSetComposeComponent  composeComponent = new ValueSet.ValueSetComposeComponent();
         composeComponent.addInclude()
@@ -275,13 +279,13 @@ public class VSComposeOptimiserTest {
         composeComponent.addInclude().setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM)
                 .addConcept()
                 .setCode("[ft_i]");
-        return new Pair(composeComponent, new VSComposeOptimiser.OptimisedIncludeConcepts(of("[ft_i]")));
+        return new Pair(composeComponent, new VSComposeOptimiser.OptimisedConcepts(true, of("[ft_i]")));
     }
 
     private static Pair exclude_all_of_ucum() {
         ValueSet.ValueSetComposeComponent  composeComponent = new ValueSet.ValueSetComposeComponent();
         composeComponent.addExclude().setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
-        return new Pair(composeComponent, new VSComposeOptimiser.NotOptimised());
+        return new Pair(composeComponent, new VSComposeOptimiser.ExcludeAllOfUCUM());
     }
 
     private static Pair two_include_canonical_filters() {
@@ -313,7 +317,7 @@ public class VSComposeOptimiserTest {
     private static Pair all_of_ucum_no_exclude() {
         ValueSet.ValueSetComposeComponent  composeComponent = new ValueSet.ValueSetComposeComponent();
         composeComponent.addInclude().setSystem(UCUMOntoOperationPlugin.UCUM_SYSTEM);
-        return new Pair(composeComponent, new VSComposeOptimiser.NotOptimised());
+        return new Pair(composeComponent, new VSComposeOptimiser.IncludeAllOfUCUM());
     }
 
     private static Pair single_include_canonical_eq_filter() {
