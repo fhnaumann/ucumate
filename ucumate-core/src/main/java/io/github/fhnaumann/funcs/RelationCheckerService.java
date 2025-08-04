@@ -1,5 +1,6 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.funcs.ValidatorService.ParserError;
 import io.github.fhnaumann.model.UCUMExpression;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
      * @return A RelationResult containing information about the relation between the two terms.
      *
      */
-    public RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2);
+    public RelationCheckerService.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2);
 
     /**
      * Checks the commensurability relation between two UCUMTerms.
@@ -28,11 +29,11 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
      *
      * @see RelationChecker.CommensurableResult
      */
-    public default RelationChecker.CommensurableResult checkCommensurable(String term1, String term2) {
+    public default RelationCheckerService.CommensurableResult checkCommensurable(String term1, String term2) {
         try {
             return checkCommensurable(parseOrError(term1), parseOrError(term2));
         } catch (Validator.ParserException e) {
-            return new Validator.ParserError();
+            return new ParserError();
         }
     }
 
@@ -43,9 +44,9 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
      * @param term2 The second term in the relation.
      * @return A CommensurableResult containing information about the relation between the two terms.
      *
-     * @see RelationChecker.CommensurableResult
+     * @see RelationCheckerService.CommensurableResult
      */
-    public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2);
+    public RelationCheckerService.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2);
 
     /**
      * Contains information about the relation check.
@@ -60,9 +61,9 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
     /**
      * The relation check failed. The subclasses provide more details.
      */
-    sealed interface FailedRelationCheck extends RelationResult permits FailedCommensurableCheck, Failure, ValidatorService.ParserError {}
+    sealed interface FailedRelationCheck extends RelationResult permits FailedCommensurableCheck, Failure, ParserError {}
 
-    sealed interface FailedCommensurableCheck extends RelationChecker.CommensurableResult, FailedRelationCheck permits Validator.ParserError {}
+    sealed interface FailedCommensurableCheck extends RelationCheckerService.CommensurableResult, FailedRelationCheck permits ParserError {}
 
     /**
      * The two given terms are not equal. Information about the commensurability is found here and in the subclasses.

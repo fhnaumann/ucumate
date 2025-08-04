@@ -4,6 +4,7 @@ import io.github.fhnaumann.util.PreciseDecimal;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 
 public class DefaultSpecialUnitsFunctionProvider implements SpecialUnitsFunctionProvider {
@@ -80,14 +81,14 @@ public class DefaultSpecialUnitsFunctionProvider implements SpecialUnitsFunction
         );
     }
 
-    private static ConversionFunction of(Function<Double, Double> fromCanonical, Function<Double, Double> toCanonical) {
+    private static ConversionFunction of(DoubleUnaryOperator fromCanonical, DoubleUnaryOperator toCanonical) {
         return new ConversionFunction() {
             @Override public PreciseDecimal fromCanonical(PreciseDecimal value) {
-                return PreciseDecimal.fromDoubleFixedScale(fromCanonical.apply(value.getValue().doubleValue()));
+                return PreciseDecimal.fromDoubleFixedScale(fromCanonical.applyAsDouble(value.getValue().doubleValue()));
             }
 
             @Override public PreciseDecimal toCanonical(PreciseDecimal value) {
-                return PreciseDecimal.fromDoubleFixedScale(toCanonical.apply(value.getValue().doubleValue()));
+                return PreciseDecimal.fromDoubleFixedScale(toCanonical.applyAsDouble(value.getValue().doubleValue()));
             }
         };
     }

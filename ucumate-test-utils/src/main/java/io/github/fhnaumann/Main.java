@@ -2,6 +2,8 @@ package io.github.fhnaumann;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
+        /*
+        Do nothing as this is meant to be used a library. (Optional) dependencies are loaded through the ServiceProvider.
+         */
     }
 }

@@ -7,7 +7,10 @@ import com.mongodb.client.model.ReplaceOptions;
 import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.funcs.*;
+import io.github.fhnaumann.funcs.Canonicalizer;
+import io.github.fhnaumann.funcs.PrinterService;
+import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -122,14 +125,14 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public void saveValidated(ValKey key, Validator.ValidationResult value) {
+    public void saveValidated(ValKey key, ValidatorService.ValidationResult value) {
         Document doc = new Document("key", key.toStorageKey(FeatureFlagsContext.get()))
                 .append("valid", value instanceof Validator.Success);
         validationColl.replaceOne(eq("key", key.toStorageKey(FeatureFlagsContext.get())), doc, new ReplaceOptions().upsert(true));
     }
 
     @Override
-    public Validator.ValidationResult getValidated(ValKey key) {
+    public ValidatorService.ValidationResult getValidated(ValKey key) {
         Document doc = validationColl.find(eq("key", key.toStorageKey(FeatureFlagsContext.get()))).first();
         if(doc == null) {
             return null;
@@ -144,8 +147,8 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     }
 
     @Override
-    public Map<ValKey, Validator.ValidationResult> getAllValidated() {
-        Map<ValKey, Validator.ValidationResult> resultMap = new HashMap<>();
+    public Map<ValKey, ValidatorService.ValidationResult> getAllValidated() {
+        Map<ValKey, ValidatorService.ValidationResult> resultMap = new HashMap<>();
 
         for(Document doc : validationColl.find()) {
             String key = doc.getString("unit_key");
@@ -155,7 +158,7 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
             }
             boolean valid = doc.getBoolean("valid", false);
 
-            Validator.ValidationResult result = valid
+            ValidatorService.ValidationResult result = valid
                     ? new ValidatorService.ComplexSuccess(Validator.parseByPassChecks(valKey.expression(), ucumVersion))
                     : new Validator.Failure();
 

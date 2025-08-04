@@ -4,7 +4,6 @@ import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.model.UcumVersion;
-import io.github.fhnaumann.util.UCUMRegistry;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

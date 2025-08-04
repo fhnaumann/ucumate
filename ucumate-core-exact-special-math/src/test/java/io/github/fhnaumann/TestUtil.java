@@ -1,14 +1,14 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.model.UCUMDefinition;
-import io.github.fhnaumann.model.UcumVersion;
-import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.funcs.printer.WolframAlphaSyntaxPrinter;
+import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
+import io.github.fhnaumann.util.UCUMRegistry;
 
 public class TestUtil {
 

@@ -1,12 +1,11 @@
 package io.github.fhnaumann.adapters;
 
-import io.github.fhnaumann.configuration.ConfigurationRegistry;
-import io.github.fhnaumann.model.UCUMDefinition;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.fhnaumann.model.UCUMDefinition;
 
 import java.io.IOException;
 

@@ -1,12 +1,10 @@
 package io.github.fhnaumann.providers;
 
 import io.github.fhnaumann.ConnectionPoolFactory;
-import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.model.UcumVersion;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**

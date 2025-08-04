@@ -21,8 +21,6 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
 
     private static final Logger logger = LoggerFactory.getLogger(InMemoryPersistenceProvider.class);
 
-    private final UcumVersion ucumVersion;
-
     private Cache<CanonKey, Canonicalizer.CanonicalStepResult> canonCache;
     private Cache<ValKey, Validator.ValidationResult> valCache;
 
@@ -32,8 +30,7 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
 
     private boolean enabled;
 
-    public InMemoryPersistenceProvider(UcumVersion ucumVersion, int canonCacheMaxSize, int valCacheMaxSize, boolean recordStats) {
-        this.ucumVersion = ucumVersion;
+    public InMemoryPersistenceProvider(int canonCacheMaxSize, int valCacheMaxSize, boolean recordStats) {
         if(recordStats) {
             canonCache = Caffeine.newBuilder().maximumSize(canonCacheMaxSize).recordStats().build();
             valCache = Caffeine.newBuilder().maximumSize(valCacheMaxSize).recordStats().build();
@@ -46,11 +43,9 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
 
     public void preHeat(List<String> ucumCodes) {
         ucumCodes.forEach(code -> {
-            Validator.ValidationResult valResult = validatorService.validate(code);
+            ValidatorService.ValidationResult valResult = validatorService.validate(code);
             switch (valResult) {
-                case Validator.Failure failure -> {
-                    logger.debug("Preheated {}: Result: invalid. Skipping canonicalization preheat.", code);
-                }
+                case ValidatorService.Failure failure -> logger.debug("Preheated {}: Result: invalid. Skipping canonicalization preheat.", code);
                 case Validator.Success success -> {
                     logger.debug("Preheated {}: Result: valid", code);
                     CanonicalizerService.CanonicalizationResult canonResult = canonicalizerService.canonicalize(success.term());

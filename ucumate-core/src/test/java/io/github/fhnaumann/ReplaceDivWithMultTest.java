@@ -5,7 +5,8 @@ import io.github.fhnaumann.model.UCUMExpression;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static io.github.fhnaumann.TestUtil.*;
+import static io.github.fhnaumann.TestUtil.parse_canonical;
+import static io.github.fhnaumann.TestUtil.print;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Disabled("The class under test is obsolete and not used anymore.")

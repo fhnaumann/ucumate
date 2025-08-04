@@ -2,16 +2,19 @@ package io.github.fhnaumann.util;
 
 public class Constants {
 
-    /*
-    Per definition, UCUM does not allow annotations after an expression that is wrapped
-    in parentheses (see Backus Naur Form). But in text form, these two rules exist:
-    2.4 §12 1. "Curly braces may be used to enclose annotations that are often written in place of units or behind units [...]"
-    and
-    2.2 §10 1. "Unit terms with operators may be enclosed in parentheses (‘(’ and ‘)’) and used in place of simple units."
+    private Constants() {
+    }
 
-    The second rule indicates that any (valid) expression can be wrapped in parentheses, and it will be treated
-    as a simple unit. This would mean (m.s){annot} (or even (m){annot}) would be valid.
-     */
+    /*
+        Per definition, UCUM does not allow annotations after an expression that is wrapped
+        in parentheses (see Backus Naur Form). But in text form, these two rules exist:
+        2.4 §12 1. "Curly braces may be used to enclose annotations that are often written in place of units or behind units [...]"
+        and
+        2.2 §10 1. "Unit terms with operators may be enclosed in parentheses (‘(’ and ‘)’) and used in place of simple units."
+
+        The second rule indicates that any (valid) expression can be wrapped in parentheses, and it will be treated
+        as a simple unit. This would mean (m.s){annot} (or even (m){annot}) would be valid.
+         */
     public static final boolean ALLOW_ANNOT_AFTER_PARENS = false;
 
     /*

@@ -22,7 +22,6 @@ import static io.github.fhnaumann.TestUtil.parse;
 import static io.github.fhnaumann.TestUtil.print;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Felix Naumann
@@ -47,12 +46,9 @@ public abstract class DBPersistenceIntegrationTestBase {
     @BeforeEach
     public void setup() throws SQLException {
         ConfigurationRegistry.initialize(Configuration.builder().enableSQLitePersistence(false).build());
-        //connection = getConnection();
         ConnectionPoolFactory.shutdownAll();
         registerPersistenceProvider();
         PersistenceRegistry.disableInMemoryCache(true);
-        //PersistenceRegistry.register("postgres", new PostgresPersistenceProvider(connection, null, null));
-
         clearDatabaseState();
     }
 
@@ -68,7 +64,7 @@ public abstract class DBPersistenceIntegrationTestBase {
         ((CanonicalizerService.Success) canonicalizerService.canonicalize(parsedTerm)).canonicalTerm();
         Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(CanonKey.of(parsedTerm, UcumVersion.getLatest()));
         assertThat(canonicalStepResult).isNotNull();
-        assertThat("g").isEqualTo(printerService.print(canonicalStepResult.term()));
+        assertThat(printerService.print(canonicalStepResult.term())).isEqualTo("g");
         assertThat(new PreciseDecimal("1")).isEqualTo(canonicalStepResult.magnitude());
         assertThat(new PreciseDecimal("1")).isEqualTo(canonicalStepResult.cfPrefix());
         assertFalse(canonicalStepResult.specialHandlingActive());
@@ -79,7 +75,7 @@ public abstract class DBPersistenceIntegrationTestBase {
         canonicalizerService.canonicalize("S");
         Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(CanonKey.of(parse("S"), UcumVersion.getLatest()));
         assertThat(canonicalStepResult).isNotNull();
-        assertThat("C+2.g-1.m-2.s").isEqualTo(printerService.print(canonicalStepResult.term()));
+        assertThat(printerService.print(canonicalStepResult.term())).isEqualTo("C+2.g-1.m-2.s");
         assertThat(new PreciseDecimal("0.001")).isEqualTo(canonicalStepResult.magnitude());
         assertThat(new PreciseDecimal("1")).isEqualTo(canonicalStepResult.cfPrefix());
         assertFalse(canonicalStepResult.specialHandlingActive());

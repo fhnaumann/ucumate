@@ -26,15 +26,13 @@ public class DimensionAnalyzer {
     }
 
     public static Map<DimensionType, Integer> analyze(UCUMExpression.CanonicalTerm term) {
-        Map<DimensionType, Integer> map = analyze(term, 1);
-        //return filterEmpty(map);
-        return map;
+        return analyze(term, 1);
     }
 
     private static Map<DimensionType, Integer> analyze(UCUMExpression.CanonicalTerm term, int sign) {
         return switch(term) {
             case UCUMExpression.CanonicalComponentTerm componentTerm -> analyzeComponent(componentTerm.component(), sign);
-            case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> Collections.EMPTY_MAP;
+            case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> Collections.emptyMap();
             case UCUMExpression.CanonicalAnnotTerm canonicalAnnotTerm -> analyze(canonicalAnnotTerm.term(), sign);
             case UCUMExpression.CanonicalBinaryTerm binaryTerm -> analyzeBinaryTerm(binaryTerm, sign);
             case UCUMExpression.CanonicalParenTerm canonicalParenTerm -> analyze(canonicalParenTerm.term(), sign);

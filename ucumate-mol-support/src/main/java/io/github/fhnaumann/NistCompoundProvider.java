@@ -46,7 +46,7 @@ public class NistCompoundProvider implements CompoundProvider {
     private static InputStream createDefaultProvider() {
         InputStream in = NistCompoundProvider.class.getResourceAsStream("/nist_compounds.csv");
         if(in == null) {
-            throw new RuntimeException("Failed to load default compounds!");
+            throw new IllegalStateException("Failed to load default compounds!");
         }
         return in;
     }
@@ -76,7 +76,7 @@ public class NistCompoundProvider implements CompoundProvider {
                     .map(MoleCompoundData.class::cast)
                     .toList();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 

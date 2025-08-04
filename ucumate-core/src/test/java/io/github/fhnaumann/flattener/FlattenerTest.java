@@ -1,16 +1,11 @@
 package io.github.fhnaumann.flattener;
 
-import io.github.fhnaumann.builders.CombineTermBuilder;
-import io.github.fhnaumann.builders.SoloTermBuilder;
-import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.Flattener;
 import io.github.fhnaumann.model.UCUMExpression;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.github.fhnaumann.TestUtil.*;
+import static io.github.fhnaumann.TestUtil.parse_canonical;
+import static io.github.fhnaumann.TestUtil.print;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class FlattenerTest {

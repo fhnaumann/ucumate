@@ -6,10 +6,10 @@ import io.github.fhnaumann.util.PreciseDecimal;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class PreciseSpecialUnitsFunctionProvider implements SpecialUnitsFunctionProvider {
 
@@ -83,7 +83,7 @@ public class PreciseSpecialUnitsFunctionProvider implements SpecialUnitsFunction
         return Map.copyOf(funcs);
     }
 
-    private static ConversionFunction ofBigDecimal(Function<BigDecimal, BigDecimal> fromCanonical, Function<BigDecimal, BigDecimal> toCanonical) {
+    private static ConversionFunction ofBigDecimal(UnaryOperator<BigDecimal> fromCanonical, UnaryOperator<BigDecimal> toCanonical) {
         return new ConversionFunction() {
             @Override public PreciseDecimal fromCanonical(PreciseDecimal value) {
                 return new PreciseDecimal(fromCanonical.apply(value.getValue()).toPlainString());

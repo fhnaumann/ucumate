@@ -1,15 +1,15 @@
 package io.github.fhnaumann.special;
 
 import io.github.fhnaumann.funcs.Canonicalizer;
-import io.github.fhnaumann.funcs.CanonicalizerService.Success;
 import io.github.fhnaumann.funcs.CanonicalizerService;
+import io.github.fhnaumann.funcs.CanonicalizerService.Success;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.printer.Printer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.github.fhnaumann.CanonicalizerUtil.*;
+import static io.github.fhnaumann.CanonicalizerUtil.assert_success;
 import static io.github.fhnaumann.TestUtil.*;
 import static io.github.fhnaumann.special.SpecialUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,27 +101,11 @@ public class CanonicalizerSpecialTest {
         assert_success(result, pd_l("0.000175"), rad_term());
     }
 
-    @Test
-    public void canonicalize_cf1_5_percent_slope() {
-
-    }
-
-    @Test
-    public void canonicalize_cf5_5_percent_slope() {
-
-    }
-
    @Test
    public void canonicalize_cf1_5_kelvin() {
         var result = (Success) canonicalizer.canonicalize(_5_kelvin_term());
 
         assertThat(print(result.canonicalTerm())).isEqualTo("K");
    }
-
-    @Test
-    public void canonicalize_cf3_5_kelvin() {
-        var result = (Success) canonicalizer.canonicalize(_5_kelvin_term());
-        assertThat(print(result.canonicalTerm())).isEqualTo("K");
-    }
 
 }

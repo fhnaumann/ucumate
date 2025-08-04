@@ -1,10 +1,11 @@
 package io.github.fhnaumann;
 
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
-import io.github.fhnaumann.funcs.*;
-import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.funcs.Converter;
+import io.github.fhnaumann.funcs.ConverterService;
+import io.github.fhnaumann.funcs.RelationChecker;
+import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.model.UcumVersion;
-import io.github.fhnaumann.util.PreciseDecimal;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

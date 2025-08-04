@@ -1,6 +1,5 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.Printer;
@@ -58,8 +57,10 @@ public class SyntaxMatchHelper {
     private static final Map<String, Score> WRONG_UNIT_CODES_TO_CORRECT_UNIT_CODES = createWrongToCorrectUnitCodes();
 
     private static Map<String, Score> createWrongToCorrectUnitCodes() {
-        // TODO: This uses UCUM version 2.2 but may also be used for other versions because afaik nothing here changes between versions
-        return UCUMRegistry.getInstance().getAll(UcumVersion.V2_2).stream()
+        /*
+        This always used the latest UCUM version, but realistically it shouldn't change
+         */
+        return UCUMRegistry.getInstance().getAll(UcumVersion.getLatest()).stream()
                 .filter(UCUMDefinition.UCUMUnit.class::isInstance)
                 .map(UCUMDefinition.UCUMUnit.class::cast)
                 .flatMap(unit -> generateVariants(unit).stream())
@@ -154,10 +155,6 @@ public class SyntaxMatchHelper {
                 .filter(ucumUnitIntegerEntry -> ucumUnitIntegerEntry.getValue() == minScore.getAsInt())
                 .map(Map.Entry::getKey)
                 .toList();
-        //UCUMDefinition.UCUMPrefix matchedPrefix = lookForPrefix(invalidInput, registry);
-        //int prefixOffset = matchedPrefix != null ? matchedPrefix.code().length() : 0;
-
-        //String matchedPrefixPrint = matchedPrefix != null ? UCUMService.print(matchedPrefix) : "";
         String matchedUnitsString = highestScoredUnits.stream()
                 .map(printer::print)
                 .collect(Collectors.joining(","));

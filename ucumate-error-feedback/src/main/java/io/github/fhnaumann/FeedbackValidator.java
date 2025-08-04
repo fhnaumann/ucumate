@@ -54,7 +54,6 @@ public class FeedbackValidator implements ValidatorService {
             SyntaxMatchHelper.checkWhiteSpace(tokens, errorMessages);
 
             ErrorFeedbackUCUMParser parser = new ErrorFeedbackUCUMParser(tokens);
-            // parser.getInterpreter().setPredictionMode(PredictionMode.LL);
             parser.removeErrorListeners();
             parser.addErrorListener(new BaseErrorListener() {
                 @Override
@@ -90,9 +89,7 @@ public class FeedbackValidator implements ValidatorService {
             else {
                 return new Failure(errorMessages);
             }
-        } catch (Validator.ParserException | LexerException e) {
-            //e.printStackTrace();
-
+        } catch (ValidatorService.ParserException | LexerException e) {
             String analysedMessage = SyntaxMatchHelper.analyseUnitForErrorDetails(input, ucumVersion);
             if(analysedMessage != null) {
                 errorMessages.add(analysedMessage);
@@ -101,7 +98,8 @@ public class FeedbackValidator implements ValidatorService {
                 if(e instanceof ParserException parserException) {
                     errorMessages.addAll(SyntaxMatchHelper.extractErrorMessagesFrom(parserException));
                 }
-                else if(e instanceof LexerException lexerException) {
+                else {
+                    LexerException lexerException = (LexerException) e;
                     errorMessages.addAll(SyntaxMatchHelper.extractErrorMessagesFrom(lexerException));
 
                 }

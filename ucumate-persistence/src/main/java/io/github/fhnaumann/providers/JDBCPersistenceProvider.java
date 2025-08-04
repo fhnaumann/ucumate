@@ -3,7 +3,10 @@ package io.github.fhnaumann.providers;
 import io.github.fhnaumann.configuration.CanonKey;
 import io.github.fhnaumann.configuration.FeatureFlagsContext;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.funcs.*;
+import io.github.fhnaumann.funcs.Canonicalizer;
+import io.github.fhnaumann.funcs.PrinterService;
+import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.UCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -35,7 +38,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
     protected final String canonicalTableName;
     protected final String validateTableName;
 
-    public JDBCPersistenceProvider(UcumVersion ucumVersion, Connection connection, String canonicalTableName, String validateTableName) {
+    protected JDBCPersistenceProvider(UcumVersion ucumVersion, Connection connection, String canonicalTableName, String validateTableName) {
         this.ucumVersion = ucumVersion;
         this.connection = connection;
         this.canonicalTableName = canonicalTableName != null ? canonicalTableName : "ucumate_canonical";
@@ -51,13 +54,13 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
     protected void executeSQLFile(String path) {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(path)) {
-            if (input == null) throw new RuntimeException("Missing SQL file: " + path);
+            if (input == null) throw new IllegalStateException("Missing SQL file: " + path);
             String sql = new String(input.readAllBytes(), StandardCharsets.UTF_8);
             try (Statement stmt = connection.createStatement()) {
                 stmt.execute(sql);
             }
         } catch (IOException | SQLException e) {
-            throw new RuntimeException("Failed to execute SQL file: " + path, e);
+            throw new IllegalStateException("Failed to execute SQL file: " + path, e);
         }
     }
 
@@ -85,7 +88,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             stmt.executeUpdate();
             logger.debug("Saved key={}, canonStep={} to {}.", keyString, canonStep, connection.getMetaData());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save canonical data", e);
+            throw new IllegalStateException("Failed to save canonical data", e);
         }
     }
 
@@ -110,26 +113,28 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
                     );
                 }
                 Canonicalizer.CanonicalStepResult canonicalStepResult = new Canonicalizer.CanonicalStepResult(term, magnitude, cfPrefix, special, ucumFunction);
-                logger.debug("Read from {}: key={}, canonStep={}", connection.getMetaData(), keyString, rs.getString("term"));
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Read from {}: key={}, canonStep={}", connection.getMetaData(), keyString, rs.getString("term"));
+                }
                 return canonicalStepResult;
             }
             return null;
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to load canonical", e);
+            throw new IllegalStateException("Failed to load canonical", e);
         }
     }
 
     @Override
-    public void saveValidated(ValKey key, Validator.ValidationResult value) {
+    public void saveValidated(ValKey key, ValidatorService.ValidationResult value) {
         try (PreparedStatement stmt = connection.prepareStatement(getValidateUpsertQuery())) {
             stmt.setString(1, key.toStorageKey(FeatureFlagsContext.get()));
             stmt.setBoolean(2, switch (value) {
-                case Validator.Failure failure -> false;
-                case Validator.Success success -> true;
+                case ValidatorService.Failure failure -> false;
+                case ValidatorService.Success success -> true;
             });
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to save validated data", e);
+            throw new IllegalStateException("Failed to save validated data", e);
         }
     }
 
@@ -152,7 +157,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             }
             return null;
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to load validated data", e);
+            throw new IllegalStateException("Failed to load validated data", e);
         }
     }
 
@@ -183,7 +188,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to load validation entries", e);
+            throw new IllegalStateException("Failed to load validation entries", e);
         }
 
         return resultMap;
@@ -231,7 +236,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to load canonical entries", e);
+            throw new IllegalStateException("Failed to load canonical entries", e);
         }
 
         return resultMap;
@@ -247,7 +252,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
         try {
             connection.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }

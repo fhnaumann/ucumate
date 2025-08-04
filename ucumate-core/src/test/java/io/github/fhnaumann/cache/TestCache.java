@@ -4,7 +4,10 @@ import io.github.fhnaumann.configuration.CacheConfiguration;
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.funcs.*;
+import io.github.fhnaumann.funcs.Converter;
+import io.github.fhnaumann.funcs.ConverterService;
+import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.persistence.PersistenceRegistry;
@@ -61,7 +64,6 @@ public class TestCache {
         Validator.ValidationResult valResult = validatorService.validate(expression);
         assertThat(valResult).isInstanceOf(Validator.Failure.class);
         System.out.println(ConfigurationRegistry.get());
-        System.out.println(PersistenceRegistry.cache.isEnabled());
         Validator.ValidationResult allEnabledValResult = PersistenceRegistry.getInstance().getValidated(new ValKey(expression, ALL_ENABLED.asFeatureFlags(), UcumVersion.V2_2));
         assertThat(allEnabledValResult).isInstanceOf(Validator.Success.class);
     }

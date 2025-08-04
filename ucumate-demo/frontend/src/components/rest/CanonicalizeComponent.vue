@@ -28,13 +28,13 @@
 
 <script setup lang="ts">
 
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
+import {Input} from '@/components/ui/input'
+import {Label} from '@/components/ui/label'
+import {Button} from '@/components/ui/button'
 import RenderFormats from '@/components/RenderFormats.vue'
 import InvalidInputMessage from '@/components/InvalidInputMessage.vue'
 import OutputRenderedFormats from '@/components/OutputRenderedFormats.vue'
-import { ref } from 'vue'
+import {ref} from 'vue'
 
 const selectedRenderFormats = ref(['ucum_expressive'])
 

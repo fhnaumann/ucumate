@@ -9,8 +9,9 @@ import java.math.BigDecimal;
  * @author Felix Naumann
  */
 public class CompoundUtil {
-
-    private static final Logger log = LoggerFactory.getLogger(CompoundUtil.class);
+    
+    private CompoundUtil() {
+    }
 
     public static String resolveMolarMass(String input) {
         if(input == null) {

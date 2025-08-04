@@ -1,8 +1,5 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.persistence.PersistenceRegistry;
-
 import java.sql.SQLException;
 
 /**
@@ -10,5 +7,8 @@ import java.sql.SQLException;
  */
 public class Main {
     public static void main(String[] args) throws SQLException {
+        /*
+        Do nothing as this is meant to be used a library. (Optional) dependencies are loaded through the ServiceProvider.
+         */
     }
 }

@@ -55,8 +55,8 @@
 
 <script setup lang="ts">
 import RenderedOutputComponent from '@/components/RenderedOutputComponent.vue'
-import { Button } from '@/components/ui/button'
-import { computed, ref } from 'vue'
+import {Button} from '@/components/ui/button'
+import {computed, ref} from 'vue'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import html2canvas from 'html2canvas-pro'

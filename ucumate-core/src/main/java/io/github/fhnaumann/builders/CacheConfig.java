@@ -1,7 +1,5 @@
 package io.github.fhnaumann.builders;
 
-import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
 /**

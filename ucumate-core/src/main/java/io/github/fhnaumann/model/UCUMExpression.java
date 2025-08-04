@@ -1,8 +1,8 @@
 package io.github.fhnaumann.model;
 
 
-import io.github.fhnaumann.util.PreciseDecimal;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.github.fhnaumann.util.PreciseDecimal;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.CLASS,
@@ -104,7 +104,6 @@ public sealed interface UCUMExpression permits UCUMDefinition, UCUMExpression.An
     }
 
     record Annotation(String annotation) implements UCUMExpression {}
-
     record AnnotOnlyTerm(Annotation annotation) implements CanonicalTerm, MixedTerm, SingleUnitTerm {}
 
     record CanonicalComponentTerm(CanonicalComponent component) implements CanonicalTerm, ComponentTerm {}

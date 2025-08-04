@@ -33,7 +33,7 @@ public interface Sorter {
     private UCUMExpression.CanonicalTerm rebuild(List<UCUMExpression.CanonicalComponentTerm> flattened) {
         return flattened.stream()
                 .map(UCUMExpression.CanonicalTerm.class::cast)
-                .reduce((left, right) -> CombineTermBuilder.builder().left(left).multiplyWith().right(right).buildCanonical())
+                .reduce((left, right) -> CombineTermBuilder.dirtyBuilder().left(left).multiplyWith().right(right).buildCanonical())
                 .orElse((UCUMExpression.CanonicalComponentTerm) SoloTermBuilder.UNITY);
     }
 

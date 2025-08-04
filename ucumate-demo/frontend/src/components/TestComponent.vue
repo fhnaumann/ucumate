@@ -120,19 +120,16 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { Button } from '@/components/ui/button'
-  import { Input } from '@/components/ui/input'
-  import ValidateComponent from '@/components/rest/ValidateComponent.vue'
-  import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-  import CanonicalizeComponent from '@/components/rest/CanonicalizeComponent.vue'
-  import ConvertComponent from '@/components/rest/ConvertComponent.vue'
-  import ClickableUnit from '@/components/clickableunit/ClickableUnit.vue'
-  import ValidateClickableUnit from '@/components/clickableunit/ValidateClickableUnit.vue'
+import {ref} from 'vue'
+import ValidateComponent from '@/components/rest/ValidateComponent.vue'
+import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs'
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
+import CanonicalizeComponent from '@/components/rest/CanonicalizeComponent.vue'
+import ConvertComponent from '@/components/rest/ConvertComponent.vue'
+import ValidateClickableUnit from '@/components/clickableunit/ValidateClickableUnit.vue'
 
 
-  const validateComponentRef = ref()
+const validateComponentRef = ref()
 
   const insertAndValidate = (term: string) => {
     if (validateComponentRef.value) {

@@ -2,11 +2,10 @@ package io.github.fhnaumann.builders;
 
 import io.github.fhnaumann.model.UCUMExpression;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static io.github.fhnaumann.TestUtil.meter_term;
-import static io.github.fhnaumann.builders.BuilderUtil.*;
+import static io.github.fhnaumann.builders.BuilderUtil.giga_newton_exp2_annot_term;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CombineTermBuilderCanonicalContractTest {

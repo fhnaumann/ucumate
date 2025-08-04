@@ -1,5 +1,7 @@
 package io.github.fhnaumann.builders;
 
+import io.github.fhnaumann.funcs.Flattener;
+import io.github.fhnaumann.funcs.Normalizer;
 import io.github.fhnaumann.model.UCUMExpression;
 
 import java.util.function.BinaryOperator;
@@ -23,16 +25,30 @@ public class CombineTermBuilder {
     }
 
     public static LeftStep builder() {
-        return new Builder();
+        return new Builder(false);
+    }
+
+    public static LeftStep dirtyBuilder() {
+        return new Builder(true);
     }
 
     public static final BinaryOperator<UCUMExpression.CanonicalTerm> APPEND_RIGHT_MUL = (canonicalTerm, canonicalTerm2) -> CombineTermBuilder.builder().left(canonicalTerm).multiplyWith().right(canonicalTerm2).buildCanonical();
 
     private static class Builder implements FinishStep, RightStep, OperatorStep, LeftStep {
 
+        /*
+        True means that the creator is an internal component (such as Flattener) and it has to construct new terms.
+        Don't apply the flattener and normalizer steps here.
+         */
+        private boolean dirty;
+
         private UCUMExpression.Term left;
         private UCUMExpression.Term right;
         private UCUMExpression.Operator operator;
+
+        private Builder(boolean dirty) {
+            this.dirty = dirty;
+        }
 
         @Override
         public UCUMExpression.Term build() {
@@ -50,15 +66,20 @@ public class CombineTermBuilder {
                     case UCUMExpression.MixedTerm mixedTerm -> new UCUMExpression.MixedUnaryDivTerm(mixedTerm);
                 };
             }
-            throw new RuntimeException("Builder reached unexpected stage.");
+            throw new IllegalStateException("Builder reached unexpected stage.");
         }
 
         @Override
         public UCUMExpression.CanonicalTerm buildCanonical() {
             try {
-                return (UCUMExpression.CanonicalTerm) build();
+                UCUMExpression.CanonicalTerm canonicalTerm = (UCUMExpression.CanonicalTerm) build();
+                if(dirty) {
+                    return canonicalTerm;
+                }
+                canonicalTerm = Flattener.flattenAndCancel(canonicalTerm);
+                return (UCUMExpression.CanonicalTerm) new Normalizer().normalize(canonicalTerm);
             } catch (ClassCastException e) {
-                throw new RuntimeException("Builder was directed to build a canonical term but the contents given were mixed!");
+                throw new IllegalStateException("Builder was directed to build a canonical term but the contents given were mixed!");
             }
         }
 
@@ -70,8 +91,7 @@ public class CombineTermBuilder {
 
         @Override
         public RightStep unaryDiv() {
-            this.operator = UCUMExpression.Operator.DIV;
-            return this;
+            return divideBy();
         }
 
         @Override

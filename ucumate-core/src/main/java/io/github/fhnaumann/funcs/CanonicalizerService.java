@@ -4,6 +4,8 @@ import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 
+import static io.github.fhnaumann.funcs.Validator.*;
+
 /**
  * @author Felix Naumann
  */
@@ -29,8 +31,8 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
     public default CanonicalizationResult canonicalize(String term, PreciseDecimal substanceMolarMassCoeff) {
         try {
             return canonicalize(parseOrError(term), substanceMolarMassCoeff);
-        } catch (Validator.ParserException e) {
-            return new Validator.ParserError();
+        } catch (ParserException e) {
+            return new ParserError();
         }
     }
 
@@ -58,8 +60,8 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
     public default CanonicalizationResult canonicalize(PreciseDecimal factor, String term) {
         try {
             return canonicalize(factor, parseOrError(term));
-        } catch (Validator.ParserException e) {
-            return new Validator.ParserError();
+        } catch (ParserException e) {
+            return new ParserError();
         }
     }
 
@@ -78,58 +80,6 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
     public CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term, PreciseDecimal substanceMolarMassCoeff);
 
     /**
-     * Test if a given string term is canonical.
-     *
-     * @param term A term as a string.
-     * @return true if canonical, false otherwise.
-     *
-     * @see UCUMService#isCanonical(UCUMExpression.Term)
-     */
-    public default boolean isCanonical(String term) {
-        CanonicalizationResult canonResult = canonicalize(term);
-        return switch (canonResult) {
-            case FailedCanonicalization failedCanonicalization -> false;
-            case Success success -> true;
-        };
-    }
-
-    /**
-     * Test if a given term is canonical.
-     *
-     * @param term A term.
-     * @return true if canonical, false otherwise.
-     *
-     * @see UCUMService#isCanonical(String)
-     */
-    public default boolean isCanonical(UCUMExpression.Term term) {
-        return switch (term) {
-            case UCUMExpression.CanonicalTerm canonicalTerm -> true;
-            case UCUMExpression.MixedTerm mixedTerm -> switch (term) {
-                case UCUMExpression.ComponentTerm componentTerm -> isCanonical(componentTerm.component().unit());
-                case UCUMExpression.ParenTerm parenTerm -> isCanonical(parenTerm.term());
-                case UCUMExpression.AnnotTerm annotTerm -> isCanonical(annotTerm.term());
-                case UCUMExpression.UnaryDivTerm unaryDivTerm -> isCanonical(unaryDivTerm.term());
-                case UCUMExpression.BinaryTerm binaryTerm -> isCanonical(binaryTerm.left()) && isCanonical(binaryTerm.right());
-                case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> true;
-            };
-        };
-    }
-
-    public default boolean isCanonical(UCUMExpression.Unit unit) {
-        return switch (unit) {
-            case UCUMExpression.CanonicalUnit canonicalUnit -> true;
-            case UCUMExpression.MixedUnit mixedUnit -> false;
-        };
-    }
-
-    public default boolean isCanonical(UCUMDefinition.UCUMUnit ucumUnit) {
-        return switch (ucumUnit) {
-            case UCUMDefinition.BaseUnit baseUnit -> true;
-            case UCUMDefinition.DefinedUnit definedUnit -> false;
-        };
-    }
-
-    /**
      * Contains information about the canonicalization.
      */
     sealed interface CanonicalizationResult {}
@@ -137,7 +87,7 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
     /**
      * Represents a failed canonicalization. The subclasses provide more details.
      */
-    sealed interface FailedCanonicalization extends CanonicalizationResult permits TermContainsPHAndCanonicalizingToMass, TermHasArbitraryUnit, Validator.ParserError {}
+    sealed interface FailedCanonicalization extends CanonicalizationResult permits TermContainsPHAndCanonicalizingToMass, TermHasArbitraryUnit, ParserError {}
 
     /**
      * The canonicalization was successful.

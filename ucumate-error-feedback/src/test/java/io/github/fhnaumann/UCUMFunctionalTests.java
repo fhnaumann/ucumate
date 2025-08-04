@@ -5,7 +5,6 @@ import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PreciseDecimal;
-import io.github.fhnaumann.util.UCUMRegistry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;

@@ -1,8 +1,5 @@
 package io.github.fhnaumann.funcs;
 
-import io.github.fhnaumann.model.UCUMExpression;
-import io.github.fhnaumann.model.UcumVersion;
-
 /**
  * @author Felix Naumann
  */

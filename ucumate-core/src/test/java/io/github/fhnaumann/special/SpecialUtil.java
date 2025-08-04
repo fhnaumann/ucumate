@@ -1,9 +1,9 @@
 package io.github.fhnaumann.special;
 
-import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.builders.CombineTermBuilder;
 import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.funcs.Converter;
+import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 

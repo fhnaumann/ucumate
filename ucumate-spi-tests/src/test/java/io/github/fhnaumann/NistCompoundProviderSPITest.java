@@ -33,14 +33,6 @@ public class NistCompoundProviderSPITest {
     }
 
     @Test
-    public void delete() {
-        Validator val2_1 = new Validator(UcumVersion.V2_1);
-        Validator val2_2 = new Validator(UcumVersion.V2_2);
-        FeedbackValidator feedbackValidator2_1 = new FeedbackValidator(UcumVersion.V2_1);
-        FeedbackValidator feedbackValidator2_2 = new FeedbackValidator(UcumVersion.V2_2);
-    }
-
-    @Test
     public void test_spi_provider_is_auto_discovered_when_accessing_UCUMService() {
         ConfigurationRegistry.initialize(Configuration.builder().enableMolMassConversion(true).build());
         Converter.ConversionResult result = new Converter(new Printer(), new Validator()).convert("1", "mol", "g", "1309-37-1");

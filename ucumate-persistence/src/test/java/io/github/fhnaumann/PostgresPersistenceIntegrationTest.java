@@ -11,9 +11,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import static io.github.fhnaumann.TestUtil.print;
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author Felix Naumann
  */

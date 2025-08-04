@@ -1,7 +1,5 @@
 package io.github.fhnaumann;
 
-import java.lang.module.Configuration;
-
 public sealed interface TestCase {
 
     String id();

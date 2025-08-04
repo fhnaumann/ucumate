@@ -9,7 +9,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class LogUtil {
 
-
+    private LogUtil() {
+    }
 
     public static <T> T logAndThrow(Logger logger, String message, Object... args) throws RuntimeException {
         return logAndThrow(logger, RuntimeException.class, message, args);
@@ -20,7 +21,7 @@ public class LogUtil {
             args = new Object[] {};
         }
         logger.error(message, args);
-        throw new RuntimeException(message, base);
+        throw new IllegalStateException(message, base);
     }
 
     public static <T> T logAndThrow(Logger logger, Class<? extends RuntimeException> exceptionClazz, String message, Object... args) throws RuntimeException {
@@ -31,7 +32,7 @@ public class LogUtil {
         try {
             throw exceptionClazz.getConstructor(String.class).newInstance(String.format(message.replace("{}", "%s"), args));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }

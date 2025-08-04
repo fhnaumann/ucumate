@@ -2,7 +2,7 @@ package io.github.fhnaumann.configuration;
 
 import io.github.fhnaumann.model.UcumVersion;
 
-import java.util.*;
+import java.util.Properties;
 
 public class Configuration {
 
@@ -146,9 +146,7 @@ public class Configuration {
 
     public static Properties interpolateProps(Properties properties) {
         Properties interpolated = new Properties();
-        properties.forEach((o, o2) -> {
-            interpolated.put(o, o2.toString().replace("${user.dir}", System.getProperty("user.dir")));
-        });
+        properties.forEach((o, o2) -> interpolated.put(o, o2.toString().replace("${user.dir}", System.getProperty("user.dir"))));
         return interpolated;
     }
 

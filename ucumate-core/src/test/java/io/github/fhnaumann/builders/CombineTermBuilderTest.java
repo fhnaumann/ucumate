@@ -2,7 +2,6 @@ package io.github.fhnaumann.builders;
 
 import io.github.fhnaumann.model.UCUMExpression;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 import static io.github.fhnaumann.TestUtil.*;
-import static io.github.fhnaumann.builders.BuilderUtil.*;
+import static io.github.fhnaumann.builders.BuilderUtil.giga_newton_exp2_annot_term;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 

@@ -1,18 +1,14 @@
 package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.ValidatorService;
-import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.assertj.core.api.InstanceOfAssertFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;

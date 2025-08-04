@@ -10,6 +10,9 @@ import io.github.fhnaumann.model.UcumVersion;
  */
 public class MolMassUtil {
 
+    private MolMassUtil() {
+    }
+
     public static boolean containsMol(UCUMExpression.Term term, UcumVersion version) {
         return switch (term) {
             case UCUMExpression.ComponentTerm componentTerm -> isMolUnit(componentTerm.component().unit(), version);

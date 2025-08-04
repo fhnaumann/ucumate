@@ -24,6 +24,9 @@ public class ConfigurationRegistry {
 
     public static final List<String> SUPPORTED_UCUM_VERSIONS = List.of("2.2", "2.1");
 
+    private ConfigurationRegistry() {
+    }
+
     public static void initialize(Configuration configuration) {
         if(configuration == null) {
             // reset to the default values (ignore all user set values)
@@ -83,7 +86,8 @@ public class ConfigurationRegistry {
         Properties fallbackProps = loadFallBackConfig();
         Properties devProps = loadDevConfig();
         Properties merged = Configuration.merge(devProps, fallbackProps);
-        return Configuration.fromProps(merged);
+        Properties mergedWithSystemProps = Configuration.mergeWithSystemProps(merged);
+        return Configuration.fromProps(mergedWithSystemProps);
     }
 
     public static Properties loadDevConfig() {
@@ -108,7 +112,7 @@ public class ConfigurationRegistry {
                 return LogUtil.logAndThrow(log, "Failed to load fallback props at {}", FALLBACK_CONFIG_FILE);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load default configuration file", e);
+            throw new IllegalStateException("Failed to load default configuration file", e);
         }
     }
 }

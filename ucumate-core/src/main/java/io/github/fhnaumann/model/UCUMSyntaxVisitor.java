@@ -8,15 +8,12 @@ import io.github.fhnaumann.funcs.PrinterService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.ValidatorService.ParserException;
 import io.github.fhnaumann.funcs.printer.Printer;
-import io.github.fhnaumann.model.UCUMExpression.Operator;
+import io.github.fhnaumann.model.UCUMExpression.*;
 import io.github.fhnaumann.util.IUCUMRegistry;
 import io.github.fhnaumann.util.ParseUtil;
-import io.github.fhnaumann.util.SyntaxVisitorHelper;
-import io.github.fhnaumann.util.UCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.github.fhnaumann.model.UCUMExpression.*;
 import static io.github.fhnaumann.util.SyntaxVisitorHelper.*;
 
 public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
@@ -26,7 +23,6 @@ public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
 
     private final Validator validator = new Validator();
     private final PrinterService printerService = new Printer(validator);
-    private final Canonicalizer canonicalizer = new Canonicalizer(printerService, validator);
 
     public UCUMSyntaxVisitor(IUCUMRegistry registry) {
         this.registry = registry;
@@ -89,8 +85,7 @@ public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
 
     @Override
     public UCUMExpression visitNumberUnit(NewUCUMParser.NumberUnitContext ctx) {
-        IntegerUnit integerUnit = (IntegerUnit) visit(ctx.digitSymbols());
-        return integerUnit;
+        return visit(ctx.digitSymbols());
     }
 
     @Override

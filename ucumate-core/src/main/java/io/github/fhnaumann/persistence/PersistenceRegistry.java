@@ -3,18 +3,16 @@ package io.github.fhnaumann.persistence;
 import io.github.fhnaumann.configuration.*;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
+import io.github.fhnaumann.model.UcumVersion;
+import io.github.fhnaumann.util.PropertiesUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Stream;
-
-import io.github.fhnaumann.funcs.ValidatorService;
-import io.github.fhnaumann.model.UcumVersion;
-import io.github.fhnaumann.util.PropertiesUtil;
-import io.github.fhnaumann.util.ReflectionUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Felix Naumann
@@ -29,17 +27,12 @@ public class PersistenceRegistry implements PersistenceProvider {
 
     private static final String CACHE_SETTINGS_PROPERTY_FILE_NAME = "ucumate_fallback.properties";
 
-    public static InMemoryPersistenceProvider cache;
+    private static InMemoryPersistenceProvider cache;
     private static final Map<String, PersistenceProvider> additionalProviders = new HashMap<>();
 
     static {
-        //try {
-            initCache(); // initialize cache with default config or from property file on classpath
-            // Class.forName("io.github.fhnaumann.SQLiteAutoRegistrar"); // try to auto-register sqlite provider if persistence module is on classpath, otherwise ignore
-            searchSPI();
-        //} catch (ClassNotFoundException ignored) {
-            // Persistence module not on classpath — ignore
-        //}
+        initCache(); // initialize cache with default config or from property file on classpath
+        searchSPI();
     }
 
     /**
@@ -48,10 +41,8 @@ public class PersistenceRegistry implements PersistenceProvider {
      * See more <a href="https://fhnaumann.github.io/ucumate/cache/">in the online documentation</a>.
      */
     public static void initCache() {
-        Properties props = ConfigurationRegistry.loadDevConfig();
-        Properties mergeWithSystemProps = Configuration.mergeWithSystemProps(props);
-        Properties interpolatedProps = Configuration.interpolateProps(mergeWithSystemProps);
-        initCache(CacheConfiguration.fromProps(interpolatedProps));
+        Configuration configuration = ConfigurationRegistry.get();
+        initCache(CacheConfiguration.fromProps(configuration.asProps()));
     }
 
     /**
@@ -74,13 +65,11 @@ public class PersistenceRegistry implements PersistenceProvider {
                 cache.clearCache();
                 cache.close();
             }
-            if(!enableCache) {
-                if(cache != null) {
+            if(!enableCache && cache != null) {
                     cache.setEnabled(false);
-                }
             }
-            UcumVersion version = ConfigurationRegistry.get().getUCUMVersionAsEnum();
-            cache = new InMemoryPersistenceProvider(version, maxCanonSize, maxValSize, recordStats);
+
+            cache = new InMemoryPersistenceProvider(maxCanonSize, maxValSize, recordStats);
             cache.setEnabled(enableCache);
             if(enableCache && preHeat) {
                 List<String> mergedCodes = Stream.concat(overrideInsteadOfAdd ? new ArrayList<String>().stream() : defaultPreHeatCodes.stream(), preHeatCodes.stream())
@@ -89,22 +78,8 @@ public class PersistenceRegistry implements PersistenceProvider {
                 cache.preHeat(mergedCodes);
             }
         } catch (IOException | ClassCastException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
-    }
-
-    private static Properties findCacheSettingsFromPropertyFileOnClasspath() {
-        Properties props = new Properties();
-        try (InputStream in = PersistenceRegistry.class.getClassLoader().getResourceAsStream(CACHE_SETTINGS_PROPERTY_FILE_NAME)) {
-            if (in != null) {
-                props.load(in);
-                logger.debug("Loaded properties from {}.", CACHE_SETTINGS_PROPERTY_FILE_NAME);
-                logger.debug("Picked up: {}", props);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load ucumate_fallback.properties", e);
-        }
-        return props;
     }
 
     /**
@@ -167,14 +142,6 @@ public class PersistenceRegistry implements PersistenceProvider {
         cache.setEnabled(false);
     }
 
-    public static void setCache(InMemoryPersistenceProvider newCache, boolean transferEntriesOver) {
-        if(cache != null) {
-            cache.clearCache();
-            cache.setEnabled(false);
-        }
-        cache = newCache;
-    }
-
     public static PersistenceRegistry getInstance() {
         return INSTANCE;
     }
@@ -208,18 +175,18 @@ public class PersistenceRegistry implements PersistenceProvider {
         if(additionalProviders.isEmpty()) {
             return Map.of();
         }
-        return additionalProviders.entrySet().stream().findFirst().get().getValue().getAllCanonical();
+        return additionalProviders.entrySet().stream().findFirst().get().getValue().getAllCanonical(); //NOSONAR
     }
 
     @Override
-    public void saveValidated(ValKey key, Validator.ValidationResult value) {
+    public void saveValidated(ValKey key, ValidatorService.ValidationResult value) {
         cache.saveValidated(key, value);
         additionalProviders.forEach((s, entry) -> entry.saveValidated(key, value));
     }
 
     @Override
-    public Validator.ValidationResult getValidated(ValKey key) {
-        Validator.ValidationResult validationResult = cache.getValidated(key);
+    public ValidatorService.ValidationResult getValidated(ValKey key) {
+        ValidatorService.ValidationResult validationResult = cache.getValidated(key);
         if(validationResult != null) {
             return validationResult;
         }
@@ -233,14 +200,14 @@ public class PersistenceRegistry implements PersistenceProvider {
     }
 
     @Override
-    public Map<ValKey, Validator.ValidationResult> getAllValidated() {
+    public Map<ValKey, ValidatorService.ValidationResult> getAllValidated() {
         if(cache != null && cache.isEnabled()) {
             return cache.getAllValidated();
         }
         if(additionalProviders.isEmpty()) {
             return Map.of();
         }
-        return additionalProviders.entrySet().stream().findFirst().get().getValue().getAllValidated();
+        return additionalProviders.entrySet().stream().findFirst().get().getValue().getAllValidated(); //NOSONAR
     }
 
     @Override

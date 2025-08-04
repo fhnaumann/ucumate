@@ -2,8 +2,6 @@ package io.github.fhnaumann.validation;
 
 import io.github.fhnaumann.BenchmarkSetup;
 import io.github.fhnaumann.TestCase;
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.fhir.ucum.UcumException;
 import org.openjdk.jmh.annotations.*;
 import org.slf4j.Logger;

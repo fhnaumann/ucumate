@@ -8,6 +8,8 @@ import io.github.fhnaumann.model.UCUMExpression;
  */
 public class SyntaxVisitorHelper {
 
+    private SyntaxVisitorHelper() {}
+
     public static UCUMExpression fromUCUMUnit(UCUMDefinition.UCUMUnit unit) {
         return switch (unit) {
             case UCUMDefinition.BaseUnit baseUnit -> new UCUMExpression.CanonicalNoPrefixSimpleUnit(baseUnit);

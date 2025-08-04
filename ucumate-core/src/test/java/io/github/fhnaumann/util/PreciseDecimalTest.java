@@ -8,7 +8,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static io.github.fhnaumann.TestUtil.*;
+import static io.github.fhnaumann.TestUtil.pd_l;
+import static io.github.fhnaumann.TestUtil.pd_u;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Disabled("Still unsure how to implemented precision/scale correctly.")

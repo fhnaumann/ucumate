@@ -2,8 +2,6 @@ package io.github.fhnaumann.conversion;
 
 import io.github.fhnaumann.BenchmarkSetup;
 import io.github.fhnaumann.TestCase;
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.fhir.ucum.Decimal;
 import org.fhir.ucum.UcumException;
 import org.openjdk.jmh.annotations.*;
@@ -26,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 public class BenchmarkConversionJSON {
 
-    private static final Logger logger = LoggerFactory.getLogger(BenchmarkConversionJSON.class);
+    private static final Logger logger = LoggerFactory.getLogger(BenchmarkConversionJSON.class); //NOSONAR needed later
 
     private BenchmarkSetup.Data data;
 

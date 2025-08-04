@@ -28,9 +28,9 @@
 </template>
 
 <script setup lang="ts">
-import { Input } from '@/components/ui/input'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Label } from '@/components/ui/label'
+import {Input} from '@/components/ui/input'
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from '@/components/ui/tooltip'
+import {Label} from '@/components/ui/label'
 
 const props = defineProps<{
   renderedForm: string

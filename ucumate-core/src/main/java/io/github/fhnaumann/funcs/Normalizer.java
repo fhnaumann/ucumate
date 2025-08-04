@@ -6,10 +6,6 @@ import io.github.fhnaumann.model.UCUMExpression;
 
 public class Normalizer {
 
-    public Normalizer() {
-
-    }
-
     public UCUMExpression.Term normalize(UCUMExpression.Term term) {
         return switch(term) {
             case UCUMExpression.ComponentTerm componentTerm -> normalizeComponent(componentTerm);
@@ -62,9 +58,6 @@ public class Normalizer {
         else if(isLeftUnity && binaryTerm.operator() == UCUMExpression.Operator.MUL) {
             return normalizedRight; // 1.b -> b
         }
-        if(binaryTerm.operator() == UCUMExpression.Operator.DIV) {
-            //DimensionAnalyzer.compare(normalizedLeft, normalizedRight);
-        }
         return switch (binaryTerm.operator()) {
             case MUL -> CombineTermBuilder.builder().left(normalizedLeft).multiplyWith().right(normalizedRight).build();
             case DIV -> CombineTermBuilder.builder().left(normalizedLeft).divideBy().right(normalizedRight).build();
@@ -94,10 +87,7 @@ public class Normalizer {
         if(leftIsUnity && rightIsUnity) {
             return true;
         }
-        else if(!leftIsUnity && rightIsUnity) {
-            return true;
-        }
-        return false;
+        else return !leftIsUnity && rightIsUnity;
     }
 
     private boolean isUnaryDivTermUnity(UCUMExpression.UnaryDivTerm unaryDivTerm) {

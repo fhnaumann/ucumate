@@ -43,14 +43,12 @@
 
 <script setup lang="ts">
 
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import RenderFormats from '@/components/RenderFormats.vue'
+import {Input} from '@/components/ui/input'
+import {Label} from '@/components/ui/label'
+import {Button} from '@/components/ui/button'
 import InvalidInputMessage from '@/components/InvalidInputMessage.vue'
-import OutputRenderedFormats from '@/components/OutputRenderedFormats.vue'
-import { computed, ref } from 'vue'
-import { NumberField, NumberFieldContent, NumberFieldInput } from '@/components/ui/number-field'
+import {computed, ref} from 'vue'
+import {NumberField, NumberFieldContent, NumberFieldInput} from '@/components/ui/number-field'
 
 const selectedRenderFormats = ref(['ucum_expressive'])
 

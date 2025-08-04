@@ -8,6 +8,9 @@ import java.util.stream.Stream;
 
 public class MapUtil {
 
+    private MapUtil() {
+    }
+
     private static final Function<Boolean, Predicate<Map.Entry<?, Integer>>> filterEmptyIfDesired = aBoolean -> entry -> !aBoolean || entry.getValue() != 0;
     public static <K> Map<K, Integer> calculateDiff(Map<K,Integer> map1, Map<K,Integer> map2, boolean filterEmpty) {
         return Stream.concat(map1.entrySet().stream(), map2.entrySet().stream())

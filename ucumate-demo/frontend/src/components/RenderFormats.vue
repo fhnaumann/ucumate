@@ -29,10 +29,9 @@
 </template>
 
 <script setup lang="ts">
-  import { Checkbox } from '@/components/ui/checkbox'
-  import { ref } from 'vue'
+import {Checkbox} from '@/components/ui/checkbox'
 
-  const props = defineProps<{
+const props = defineProps<{
     modelValue: string[]
   }>()
 

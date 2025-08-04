@@ -75,25 +75,17 @@ public class SoloTermBuilder {
         public AnnotationStep withExponent(int exponent) {
             UCUMExpression.Exponent exponentObj = new UCUMExpression.Exponent(exponent);
             if(unit instanceof UCUMExpression.CanonicalUnit canonicalUnit) {
-                if(exponent == 0) {
-                    this.component = new UCUMExpression.CanonicalComponentNoExponent(new UCUMExpression.IntegerUnit(1));
-                }
-                else if(exponent == 1) {
-                    this.component = new UCUMExpression.CanonicalComponentNoExponent(canonicalUnit);
-                }
-                else {
-                    this.component = new UCUMExpression.CanonicalComponentExponent(canonicalUnit, exponentObj);
+                switch (exponent) {
+                    case 0 -> this.component = new UCUMExpression.CanonicalComponentNoExponent(new UCUMExpression.IntegerUnit(1));
+                    case 1 -> this.component = new UCUMExpression.CanonicalComponentNoExponent(canonicalUnit);
+                    default -> this.component = new UCUMExpression.CanonicalComponentExponent(canonicalUnit, exponentObj);
                 }
             }
             else {
-                if(exponent == 0) {
-                    this.component = new UCUMExpression.MixedComponentNoExponent(new UCUMExpression.IntegerUnit(1));
-                }
-                else if(exponent == 1) {
-                    this.component = new UCUMExpression.MixedComponentNoExponent(unit);
-                }
-                else {
-                    this.component = new UCUMExpression.MixedComponentExponent(unit, exponentObj);
+                switch (exponent) {
+                    case 0 -> this.component = new UCUMExpression.MixedComponentNoExponent(new UCUMExpression.IntegerUnit(1));
+                    case 1 -> this.component = new UCUMExpression.MixedComponentNoExponent(unit);
+                    default -> this.component = new UCUMExpression.MixedComponentExponent(unit, exponentObj);
                 }
             }
             return this;
@@ -125,7 +117,6 @@ public class SoloTermBuilder {
             this.term = switch(this.unit) {
                     case UCUMExpression.CanonicalUnit canonicalUnit -> new UCUMExpression.CanonicalComponentTerm(new UCUMExpression.CanonicalComponentNoExponent(canonicalUnit));
                     case UCUMExpression.MixedUnit mixedUnit -> new UCUMExpression.MixedComponentTerm(new UCUMExpression.MixedComponentNoExponent(mixedUnit));
-                    default -> throw new RuntimeException("REMOVE");
             };
             return this;
         }

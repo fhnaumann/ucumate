@@ -5,7 +5,6 @@ import io.github.fhnaumann.NewUCUMParser;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.util.IUCUMRegistry;
 import io.github.fhnaumann.util.ParseUtil;
-import io.github.fhnaumann.util.UCUMRegistry;
 
 /**
  * @author Felix Naumann
@@ -24,7 +23,7 @@ public class CanonicalUCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpressio
             int number = Integer.parseInt(digitsAsText);
             return new UCUMExpression.IntegerUnit(number);
         } catch(NumberFormatException e) {
-            throw new RuntimeException("ANTLR4 should not have matched a number if it can't be parsed.");
+            throw new IllegalStateException("ANTLR4 should not have matched a number if it can't be parsed.");
         }
     }
 
@@ -60,8 +59,7 @@ public class CanonicalUCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpressio
 
     @Override
     public UCUMExpression visitNumberUnit(NewUCUMParser.NumberUnitContext ctx) {
-        UCUMExpression.IntegerUnit integerUnit = (UCUMExpression.IntegerUnit) visit(ctx.digitSymbols());
-        return integerUnit;
+        return visit(ctx.digitSymbols());
     }
 
     @Override
@@ -86,11 +84,6 @@ public class CanonicalUCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpressio
     @Override
     public UCUMExpression visitTermWithAnnotation(NewUCUMParser.TermWithAnnotationContext ctx) {
         UCUMExpression.CanonicalTerm term = (UCUMExpression.CanonicalTerm) visit(ctx.term());
-        /*
-        if(!(term instanceof UCUMExpression.ComponentTerm componentTerm)) {
-            throw new RuntimeException("Term has annotation when its not allowed!");
-        }
-        */
         UCUMExpression.Annotation annotation = (UCUMExpression.Annotation) visit(ctx.annotation());
         return new UCUMExpression.CanonicalAnnotTerm(term, annotation);
     }

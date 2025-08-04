@@ -8,13 +8,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CanonicalizerUtil {
 
-    public static void assert_success(CanonicalizerService.CanonicalizationResult result, PreciseDecimal expectedConvFactor, UCUMExpression.Term expectedCanonicalTerm) {
+    public static void assert_success(CanonicalizerService.CanonicalizationResult result, PreciseDecimal expectedConvFactor, UCUMExpression.Term expectedCanonicalTerm) { //NOSONAR
         assertThat(result)
                 .isNotNull()
                 .isInstanceOf(CanonicalizerService.Success.class)
                 .extracting(CanonicalizerService.Success.class::cast)
                 .satisfies(success -> {
-                    //assertThat(success.conversionFactor()).isEqualTo(expectedConvFactor);
+                    //assertThat(success.conversionFactor()).isEqualTo(expectedConvFactor); // NOSONAR need this when I decide to implement correct decimal handling
                     assertThat(success.canonicalTerm()).isEqualTo(expectedCanonicalTerm);
                 });
     }

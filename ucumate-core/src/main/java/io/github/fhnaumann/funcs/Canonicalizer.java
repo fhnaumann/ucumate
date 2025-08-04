@@ -1,20 +1,20 @@
 package io.github.fhnaumann.funcs;
 
-import io.github.fhnaumann.configuration.CanonKey;
-import io.github.fhnaumann.configuration.ConfigurationRegistry;
-import io.github.fhnaumann.funcs.sorter.AlphabeticalSorter;
-import io.github.fhnaumann.model.UCUMDefinition.*;
-import io.github.fhnaumann.model.UcumVersion;
-import io.github.fhnaumann.persistence.PersistenceRegistry;
-import io.github.fhnaumann.util.MolMassUtil;
-import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.builders.CombineTermBuilder;
 import io.github.fhnaumann.builders.SoloTermBuilder;
+import io.github.fhnaumann.configuration.CanonKey;
+import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.ValidatorService.Failure;
+import io.github.fhnaumann.funcs.sorter.AlphabeticalSorter;
+import io.github.fhnaumann.model.UCUMDefinition.*;
 import io.github.fhnaumann.model.UCUMExpression.*;
+import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.model.special.SpecialUnits;
 import io.github.fhnaumann.model.special.SpecialUnitsFunctionProvider;
+import io.github.fhnaumann.persistence.PersistenceRegistry;
+import io.github.fhnaumann.util.MolMassUtil;
 import io.github.fhnaumann.util.PreciseDecimal;
+import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public class Canonicalizer implements CanonicalizerService {
 
     private CanonicalStepResult multiplyValues(CanonicalStepResult left, CanonicalStepResult right) {
         if(left.specialHandlingActive && right.specialHandlingActive) {
-            throw new RuntimeException("Dont know what to do yet.");
+            throw new InternalError("Dont know what to do yet.");
         }
         else if(left.specialHandlingActive) {
             return new CanonicalStepResult(
@@ -99,28 +99,6 @@ public class Canonicalizer implements CanonicalizerService {
                 null
             );
         }
-        /*
-
-        if (left.specialHandlingActive || right.specialHandlingActive) {
-            // If either side has special handling, multiply cfPrefix only
-            return new CanonicalStepResult(
-                null,
-                left.cfPrefix.multiply(right.cfPrefix),
-                left.magnitude.multiply(right.magnitude),
-                true,
-                left.specialFunction != null ? left.specialFunction : right.specialFunction
-            );
-        } else {
-            return new CanonicalStepResult(
-                null,
-                left.magnitude.multiply(right.magnitude),
-                PreciseDecimal.ONE,
-                false,
-                null
-            );
-        }
-
-         */
     }
 
     private CanonicalStepResult divideValues(CanonicalStepResult left, CanonicalStepResult right) {
@@ -173,7 +151,7 @@ public class Canonicalizer implements CanonicalizerService {
         try {
             CanonicalStepResult canonicalStep = canonicalizeImpl(term, new CanonicalStepResult(term, PreciseDecimal.ONE, PreciseDecimal.ONE, false, null), substanceMolarMassCoeff);
             if(!(canonicalStep.term() instanceof CanonicalTerm canonicalTerm)) {
-                throw new RuntimeException("Expected CanonicalTerm, got " + canonicalStep.term());
+                throw new IllegalStateException("Expected CanonicalTerm, got " + canonicalStep.term());
             }
             CanonicalTerm resultTerm = canonicalTerm;
             if(flatten) {
@@ -243,55 +221,13 @@ public class Canonicalizer implements CanonicalizerService {
         }
     }
 
-    private PreciseDecimal extractPrefixOrDimlessFactorFromSpecialUnit(String specialUnitFunctionUnit) {
-        return switch (validatorService.validate(specialUnitFunctionUnit)) {
-            case Failure failure -> throw new RuntimeException("Failed to extract prefix or dimless factor from special unit definition " + specialUnitFunctionUnit);
-            case Validator.Success success -> extractPrefixOrDimlessFactorFromSpecialUnitImpl(success.term(), PreciseDecimal.ONE);
-        };
-    }
-
-    private PreciseDecimal extractPrefixOrDimlessFactorFromSpecialUnitImpl(Term term, PreciseDecimal factor) {
-        return switch (term) {
-            case ComponentTerm componentTerm -> switch (componentTerm.component()) {
-                case ComponentNoExponent componentNoExponent -> extractPrefixOrDimlessFactorFromComponent(componentNoExponent, factor);
-                case ComponentExponent componentExponent -> extractPrefixOrDimlessFactorFromComponent(componentExponent, factor).pow(componentExponent.exponent().exponent());
-            };
-            case BinaryTerm binaryTerm -> {
-                PreciseDecimal leftFactor = extractPrefixOrDimlessFactorFromSpecialUnitImpl(binaryTerm.left(), factor);
-                PreciseDecimal rightFactor = extractPrefixOrDimlessFactorFromSpecialUnitImpl(binaryTerm.right(), factor);
-                yield factor.multiply(leftFactor.multiply(rightFactor));
-            }
-            case UnaryDivTerm unaryDivTerm -> extractPrefixOrDimlessFactorFromSpecialUnitImpl(unaryDivTerm.term(), PreciseDecimal.ONE.divide(factor));
-            case ParenTerm parenTerm -> extractPrefixOrDimlessFactorFromSpecialUnitImpl(parenTerm.term(), factor);
-            case AnnotTerm annotTerm -> extractPrefixOrDimlessFactorFromSpecialUnitImpl(annotTerm.term(), factor);
-            case AnnotOnlyTerm annotOnlyTerm -> PreciseDecimal.ONE;
-        };
-    }
-
-    private PreciseDecimal extractPrefixOrDimlessFactorFromComponent(Component component, PreciseDecimal factor) {
-        return switch (component.unit()) {
-            case PrefixSimpleUnit prefixSimpleUnit -> factor.multiply(prefixSimpleUnit.prefix().value()
-                .conversionFactor()).multiply(extractPrefixOrDimlessFactorFromUCUMUnitImpl(prefixSimpleUnit.ucumUnit()));
-            case NoPrefixSimpleUnit noPrefixSimpleUnit -> extractPrefixOrDimlessFactorFromUCUMUnitImpl(noPrefixSimpleUnit.ucumUnit());
-            case IntegerUnit integerUnit -> integerUnit.asPreciseDecimal();
-        };
-    }
-
-    private PreciseDecimal extractPrefixOrDimlessFactorFromUCUMUnitImpl(UCUMUnit ucumUnit) {
-        return switch (ucumUnit) {
-            case BaseUnit baseUnit -> PreciseDecimal.ONE;
-            case DimlessUnit dimlessUnit -> dimlessUnit.value().conversionFactor();
-            case DefinedUnit definedUnit -> PreciseDecimal.ONE;
-        };
-    }
-
     private CanonicalStepResult canonicalizeImpl(Term term, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
         throws TermHasArbitraryUnitException {
         CanonicalStepResult cached = PersistenceRegistry.getInstance().getCanonical(CanonKey.of(term, getUCUMVersion()));
         if(cached != null) {
             return cached;
         }
-        CanonicalStepResult result = switch (term) {
+        return switch (term) {
             case ComponentTerm componentTerm -> handleCompTerm(componentTerm, canonicalStep, substanceMolarMassCoeff);
             case BinaryTerm binaryTerm -> handleBinaryTerm(binaryTerm, canonicalStep, substanceMolarMassCoeff);
             case UnaryDivTerm unaryDivTerm -> canonicalizeImpl(
@@ -300,8 +236,6 @@ public class Canonicalizer implements CanonicalizerService {
             case AnnotTerm annotTerm -> canonicalizeImpl(annotTerm.term(), canonicalStep, substanceMolarMassCoeff);
             case AnnotOnlyTerm annotOnlyTerm -> new CanonicalStepResult(SoloTermBuilder.UNITY, PreciseDecimal.ONE, PreciseDecimal.ONE, canonicalStep.specialHandlingActive(), canonicalStep.specialFunction());
         };
-        //PersistenceRegistry.getInstance().saveCanonical(term, result);
-        return result;
     }
 
     private CanonicalStepResult handleBinaryTerm(BinaryTerm binaryTerm, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
@@ -361,7 +295,6 @@ public class Canonicalizer implements CanonicalizerService {
         Term unitOnly = SoloTermBuilder.builder().withoutPrefix(prefixSimpleUnit.ucumUnit()).noExpNoAnnot().asTerm().build();
         CanonicalStepResult unitOnlyStep = canonicalizeImpl(unitOnly, canonicalStep, substanceMolarMassCoeff); // ? null
         return composeConsideringSpecial(unitOnlyStep, factor);
-        //return canonicalizeUCUMConcept(prefixSimpleUnit.prefix(), canonicalStep);
     }
 
     private CanonicalStepResult canonicalizeUCUMConcept(Concept concept, CanonicalStepResult canonicalStep, PreciseDecimal substanceMolarMassCoeff)
@@ -447,8 +380,8 @@ public class Canonicalizer implements CanonicalizerService {
         }
     }
 
-    private static class TermHasArbitraryUnitException extends Throwable {
-        private final ArbitraryUnit arbitraryUnit;
+    private static class TermHasArbitraryUnitException extends Exception {
+        private final transient ArbitraryUnit arbitraryUnit;
 
         public TermHasArbitraryUnitException(ArbitraryUnit arbitraryUnit) {
             this.arbitraryUnit = arbitraryUnit;

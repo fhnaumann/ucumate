@@ -11,6 +11,9 @@ public class ErrorMessages {
 
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("error_messages", Locale.ENGLISH);
 
+    private ErrorMessages() {
+    }
+
     public static String get(String key, Object... args) {
         String pattern = BUNDLE.getString(key);
         return MessageFormat.format(pattern, args);

@@ -4,13 +4,7 @@ import io.github.fhnaumann.TestCase;
 import io.github.fhnaumann.TestCaseLoader;
 import io.github.fhnaumann.TestSuite;
 import io.github.fhnaumann.UcumateToUcumJavaTestBase;
-import io.github.fhnaumann.funcs.Converter;
-import io.github.fhnaumann.funcs.ConverterService;
-import io.github.fhnaumann.funcs.RelationChecker;
 import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.model.UCUMExpression;
-import io.github.fhnaumann.util.PreciseDecimal;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -21,9 +15,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @Tag("functional-tests")

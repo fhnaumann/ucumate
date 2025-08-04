@@ -1,10 +1,5 @@
 package io.github.fhnaumann.configuration;
 
-import io.github.fhnaumann.persistence.PersistenceRegistry;
-import io.github.fhnaumann.util.PropertiesUtil;
-
-import java.io.IOException;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -32,12 +27,12 @@ public record CacheConfiguration(boolean enable, int maxCanonSize, int maxValSiz
 
     public Properties asProps() {
         Properties props = new Properties();
-        props.put("ucumate.cache.enable", enable);
-        props.put("ucumate.cache.maxCanonSize", maxCanonSize);
-        props.put("ucumate.cache.maxValSize", maxValSize);
-        props.put("ucumate.cache.recordStats", recordStats);
-        props.put("ucumate.cache.preheat", preheat);
-        props.put("ucumate.cache.preheat.override", preheatOverride);
+        props.put("ucumate.cache.enable", Boolean.toString(enable));
+        props.put("ucumate.cache.maxCanonSize", Integer.toString(maxCanonSize));
+        props.put("ucumate.cache.maxValSize", Integer.toString(maxValSize));
+        props.put("ucumate.cache.recordStats", Boolean.toString(recordStats));
+        props.put("ucumate.cache.preheat", Boolean.toString(preheat));
+        props.put("ucumate.cache.preheat.override", Boolean.toString(preheatOverride));
         props.put("ucumate.cache.preheat.codes", preheatCodeFilename);
         return props;
     }

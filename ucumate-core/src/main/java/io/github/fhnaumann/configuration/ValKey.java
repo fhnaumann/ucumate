@@ -1,8 +1,5 @@
 package io.github.fhnaumann.configuration;
 
-import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.printer.Printer;
-import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 
 /**

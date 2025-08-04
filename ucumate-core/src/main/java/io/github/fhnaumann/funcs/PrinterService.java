@@ -56,7 +56,6 @@ public interface PrinterService extends QuickParse {
      * @see UCUMService#print(UCUMExpression)
      */
     public String print(UCUMExpression ucumExpression, Printer.PrintType printType);
-        // return printers.get(printType).print(ucumExpression);
 
     /**
      * Creates a string representation of a given UCUMExpression.

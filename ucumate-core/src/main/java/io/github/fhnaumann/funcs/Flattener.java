@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 
 public class Flattener {
 
+    private Flattener() {
+    }
+
     public static UCUMExpression.CanonicalTerm flattenToProduct(UCUMExpression.CanonicalTerm canonicalTerm) {
         var flat = flatten(canonicalTerm);
         return buildFlatProduct(flat);
@@ -42,11 +45,6 @@ public class Flattener {
                     case UCUMExpression.CanonicalComponentNoExponent componentNoExponent -> 1;
                     case UCUMExpression.CanonicalComponentExponent componentExponent -> componentExponent.exponent().exponent();
                 };
-                /*
-                if(componentTerm.component().unit() instanceof Expression.IntegerUnit) {
-                    // ignore integer units because they behave differently when cancelling out
-                    return;
-                }*/
                 out.add(Map.entry(componentTerm.component().unit(), sign * exponent));
             }
             case UCUMExpression.CanonicalAnnotTerm canonicalAnnotTerm -> flattenImpl(canonicalAnnotTerm.term(), sign, out);
@@ -62,20 +60,8 @@ public class Flattener {
                 .orElse((UCUMExpression.CanonicalTerm) SoloTermBuilder.UNITY); // use 1 only if truly empty
     }
 
-    private static UCUMExpression.CanonicalTerm accumulate(UCUMExpression.CanonicalTerm acc, Map.Entry<UCUMExpression.CanonicalUnit, Integer> entry) {
-        UCUMExpression.CanonicalUnit unit = entry.getKey();
-        int exponent = entry.getValue();
-        UCUMExpression.CanonicalTerm next = componentTerm(unit, exponent);
-        return combineMul(acc, next);
-    }
-
     private static UCUMExpression.CanonicalTerm combineMul(UCUMExpression.CanonicalTerm left, UCUMExpression.CanonicalTerm right) {
-        return CombineTermBuilder.builder().left(left).multiplyWith().right(right).buildCanonical();
-    }
-
-    private static UCUMExpression.CanonicalTerm combineDiv(UCUMExpression.CanonicalTerm left, UCUMExpression.CanonicalTerm right) {
-        //return CombineTermBuilder.builder().left(left).multiplyWith().right(right.invert()).buildCanonical();
-        return CombineTermBuilder.builder().left(left).divideBy().right(right).buildCanonical();
+        return CombineTermBuilder.dirtyBuilder().left(left).multiplyWith().right(right).buildCanonical();
     }
 
     public static UCUMExpression.CanonicalTerm flattenAndCancel(UCUMExpression.CanonicalTerm term) {

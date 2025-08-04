@@ -7,7 +7,6 @@ import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.ParseUtil;
-import io.github.fhnaumann.util.SyntaxVisitorHelper;
 import io.github.fhnaumann.util.UCUMRegistry;
 import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
@@ -42,7 +41,7 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
             int number = Integer.parseInt(digitsAsText);
             return new IntegerUnit(number);
         } catch(NumberFormatException e) {
-            throw new RuntimeException("ANTLR4 should not have matched a number if it can't be parsed.");
+            throw new IllegalStateException("ANTLR4 should not have matched a number if it can't be parsed.");
         }
     }
 
@@ -92,8 +91,7 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
 
     @Override
     public UCUMExpression visitNumberUnit(ErrorFeedbackUCUMParser.NumberUnitContext ctx) {
-        IntegerUnit integerUnit = (IntegerUnit) visit(ctx.digitSymbols());
-        return integerUnit;
+        return visit(ctx.digitSymbols());
     }
 
     @Override
@@ -120,11 +118,6 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
     @Override
     public UCUMExpression visitTermWithAnnotation(ErrorFeedbackUCUMParser.TermWithAnnotationContext ctx) {
         Term term = (Term) visit(ctx.term());
-        /*
-        if(!(term instanceof UCUMExpression.ComponentTerm componentTerm)) {
-            throw new RuntimeException("Term has annotation when its not allowed!");
-        }
-        */
         Annotation annotation = (Annotation) visit(ctx.annotation());
         return from(term, annotation);
     }
@@ -166,11 +159,6 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
     }
 
     @Override
-    public UCUMExpression visitEmptyMainTerm(ErrorFeedbackUCUMParser.EmptyMainTermContext ctx) {
-        return super.visitEmptyMainTerm(ctx);
-    }
-
-    @Override
     public UCUMExpression visitCompleteMainTerm(ErrorFeedbackUCUMParser.CompleteMainTermContext ctx) {
         return visit(ctx.term());
     }
@@ -192,30 +180,10 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
     }
 
     @Override
-    public UCUMExpression visitMissingLeftParen(ErrorFeedbackUCUMParser.MissingLeftParenContext ctx) {
-        //errorMessages.addAll(ErrorMessages.get("binary_term_missing_left_paren", ))
-        return super.visitMissingLeftParen(ctx);
-    }
-
-    @Override
     public UCUMExpression visitInvalidNumberUnit(ErrorFeedbackUCUMParser.InvalidNumberUnitContext ctx) {
         // only negative numbers for now
         errorMessages.add(ErrorMessages.get("negative_number", ctx.getText()));
         return super.visitInvalidNumberUnit(ctx);
-    }
-
-    @Override
-    public UCUMExpression visitStigmatizedSymbolUnitMissingClosingSquareBracket(ErrorFeedbackUCUMParser.StigmatizedSymbolUnitMissingClosingSquareBracketContext ctx) {
-        // Will be checked earlier by SyntaxMatchHelper#searchForAnyUnbalancedParens
-        //errorMessages.add(ErrorMessages.get("missing_right_square_bracket", ctx.getText()));
-        return super.visitStigmatizedSymbolUnitMissingClosingSquareBracket(ctx);
-    }
-
-    @Override
-    public UCUMExpression visitStigmatizedSymbolunitMissingOpeningSquareBracket(ErrorFeedbackUCUMParser.StigmatizedSymbolunitMissingOpeningSquareBracketContext ctx) {
-        // Will be checked earlier by SyntaxMatchHelper#searchForAnyUnbalancedParens
-        //errorMessages.add(ErrorMessages.get("missing_left_square_bracket", ctx.getText()));
-        return super.visitStigmatizedSymbolunitMissingOpeningSquareBracket(ctx);
     }
 
     public List<String> getErrorMessages() {

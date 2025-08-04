@@ -2,6 +2,7 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.printer.ExpressiveUCUMSyntaxPrinter;
 import io.github.fhnaumann.model.UCUMExpression;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static io.github.fhnaumann.TestUtil.*;
@@ -9,6 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ParserTest {
 
+    @BeforeAll
+    public static void init() {
+        System.setProperty("ucumate.cache.enable", "false");
+    }
 
     @Test
     public void test_ambiguity_when_parsing_prefix_or_unit() {

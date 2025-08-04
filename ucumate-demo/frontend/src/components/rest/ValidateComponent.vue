@@ -29,10 +29,10 @@
 
 <script setup lang="ts">
 import dukeImg from '@/assets/duke_nukem.png'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { ref } from 'vue'
-import { Label } from '@/components/ui/label'
+import {Input} from '@/components/ui/input'
+import {Button} from '@/components/ui/button'
+import {ref} from 'vue'
+import {Label} from '@/components/ui/label'
 import InvalidInputMessage from '@/components/InvalidInputMessage.vue'
 import RenderFormats from '@/components/RenderFormats.vue'
 import OutputRenderedFormats from '@/components/OutputRenderedFormats.vue'

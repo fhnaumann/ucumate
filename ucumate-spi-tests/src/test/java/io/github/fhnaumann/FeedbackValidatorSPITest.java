@@ -1,7 +1,6 @@
 package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.UCUMService;
-import io.github.fhnaumann.funcs.ValidatorService;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,6 +1,5 @@
 package io.github.fhnaumann.funcs;
 
-import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.ParseUtil;
 

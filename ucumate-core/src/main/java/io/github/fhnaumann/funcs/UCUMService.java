@@ -1,6 +1,7 @@
 package io.github.fhnaumann.funcs;
+
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
-import io.github.fhnaumann.funcs.printer.*;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
@@ -11,8 +12,6 @@ import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.ServiceLoader;
 
 /**
@@ -95,12 +94,12 @@ public class UCUMService implements IUCUMService {
     }
 
     @Override
-    public RelationChecker.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2) {
+    public RelationCheckerService.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2) {
         return relationCheckerService.checkRelation(term1, term2);
     }
 
     @Override
-    public RelationChecker.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2) {
+    public RelationCheckerService.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2) {
         return relationCheckerService.checkCommensurable(term1, term2);
     }
 

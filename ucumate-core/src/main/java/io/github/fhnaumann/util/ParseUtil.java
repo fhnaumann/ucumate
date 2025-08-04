@@ -1,7 +1,7 @@
 package io.github.fhnaumann.util;
 
-import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.funcs.ValidatorService.ParserException;
+import io.github.fhnaumann.model.UCUMDefinition;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.Comparator;
@@ -81,18 +81,16 @@ public class ParseUtil {
                                                   ))
                                                   .toList();
         return matchResults.stream()
-                           .filter(matchResult -> matchResult instanceof SuccessResult)
-                .sorted(preferUnitsOverPrefixedUnits())
-                           .findFirst()
-                           .orElse(new InvalidResults(matchResults.stream()
-                                   .distinct()
-                                                                  .filter(matchResult -> matchResult instanceof FailureResult)
-                                                                  .map(FailureResult.class::cast)
-                                                                  .toList())
-                           );
+                .filter(SuccessResult.class::isInstance)
+                .min(preferUnitsOverPrefixedUnits())
+                .orElse(new InvalidResults(matchResults.stream()
+                               .distinct()
+                              .filter(FailureResult.class::isInstance)
+                              .map(FailureResult.class::cast)
+                              .toList())
+                       );
     }
 
-    // TODO Rework this when proper error handling/correction suggestion is implemented
     public sealed interface MatchResult {}
 
     sealed interface SuccessResult extends MatchResult {}

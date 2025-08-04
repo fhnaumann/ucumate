@@ -1,6 +1,9 @@
 package io.github.fhnaumann;
 
-import io.github.fhnaumann.funcs.*;
+import io.github.fhnaumann.funcs.Converter;
+import io.github.fhnaumann.funcs.ConverterService;
+import io.github.fhnaumann.funcs.RelationChecker;
+import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.special.SpecialUnits;
 import io.github.fhnaumann.util.PreciseDecimal;
@@ -24,7 +27,6 @@ public class PreciseUCUMTests {
 
     @BeforeAll
     public void initalSetup() throws IOException {
-        //ConfigurationRegistry.initialize(Configuration.builder().enableMolMassConversion(true).build());
         SpecialUnits.setProvider(new PreciseSpecialUnitsFunctionProvider());
         testSuite = TestCaseLoader.load();
         service = new UCUMService();
@@ -82,10 +84,5 @@ public class PreciseUCUMTests {
                 .isInstanceOf(Converter.FailedConversion.class);
         }
 
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        // System.out.println(GraphLayout.parseInstance(Canonicalizer.cache).toFootprint());
     }
 }

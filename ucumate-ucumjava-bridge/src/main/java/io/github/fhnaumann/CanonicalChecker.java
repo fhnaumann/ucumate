@@ -8,6 +8,8 @@ import io.github.fhnaumann.model.UCUMExpression;
  */
 public class CanonicalChecker {
 
+    private CanonicalChecker() {}
+
     public static boolean containsOnlyCanonicalExpressions(UCUMExpression.Term term) {
         return switch (term) {
             case UCUMExpression.ComponentTerm componentTerm -> containsOnlyCanonicalUnit(componentTerm.component().unit());

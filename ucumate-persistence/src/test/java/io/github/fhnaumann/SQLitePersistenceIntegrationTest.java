@@ -7,8 +7,9 @@ import io.github.fhnaumann.providers.SQLitePersistenceProvider;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author Felix Naumann

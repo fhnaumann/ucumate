@@ -1,14 +1,14 @@
 package io.github.fhnaumann.model;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.github.fhnaumann.adapters.PreciseDecimalAdapter;
-import io.github.fhnaumann.adapters.UCUMUnitAdapter;
-import io.github.fhnaumann.util.PreciseDecimal;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import io.github.fhnaumann.adapters.PreciseDecimalAdapter;
+import io.github.fhnaumann.adapters.UCUMUnitAdapter;
+import io.github.fhnaumann.util.PreciseDecimal;
 
 import java.util.Collection;
 import java.util.List;

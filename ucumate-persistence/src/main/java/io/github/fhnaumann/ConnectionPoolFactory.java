@@ -10,6 +10,9 @@ public class ConnectionPoolFactory {
 
     private static final Map<String, HikariDataSource> pools = new ConcurrentHashMap<>();
 
+    private ConnectionPoolFactory() {
+    }
+
     public static synchronized HikariDataSource getOrCreate(String jdbcUrl, String username, String password) {
         String key = jdbcUrl + "|" + username;
         HikariDataSource existing = pools.get(key);
