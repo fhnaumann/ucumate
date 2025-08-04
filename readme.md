@@ -11,7 +11,7 @@ An [online demo](https://virtuous-respect-production.up.railway.app/) is also av
 <dependency>
     <groupId>com.github.fhnaumann.ucumate</groupId>
     <artifactId>ucumate-core</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
 </dependency>
 ```
 
