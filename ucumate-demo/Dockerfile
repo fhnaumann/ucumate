@@ -14,6 +14,6 @@ RUN mvn clean package spring-boot:repackage -DskipTests
 
 FROM eclipse-temurin:21.0.8_9-jdk
 WORKDIR /app
-COPY --from=build /app/target/ucumate-demo-1.0.5.jar app.jar
+COPY --from=build /app/target/ucumate-demo-1.0.6.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ucumate-core</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 
     <parent>
         <groupId>io.github.fhnaumann</groupId>
         <artifactId>ucumate-parent</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6</version>
     </parent>
     <packaging>jar</packaging>
 
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-test-utils</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.6</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jol</groupId>
