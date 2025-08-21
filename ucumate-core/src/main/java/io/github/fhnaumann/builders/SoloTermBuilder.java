@@ -51,23 +51,19 @@ public class SoloTermBuilder {
         @Override
         public TermStep withAnnotation(String annotation) {
             UCUMExpression.Annotation ann = new UCUMExpression.Annotation(annotation);
-            if(component instanceof UCUMExpression.CanonicalComponent canonicalComponent) {
-                this.term = new UCUMExpression.CanonicalAnnotTerm(new UCUMExpression.CanonicalComponentTerm(canonicalComponent), ann);
-            }
-            else {
-                this.term = new UCUMExpression.MixedAnnotTerm(new UCUMExpression.MixedComponentTerm(this.component), ann);
-            }
+            this.term = switch (component) {
+                case UCUMExpression.CanonicalComponent canonicalComponent -> new UCUMExpression.CanonicalAnnotTerm(new UCUMExpression.CanonicalComponentTerm(canonicalComponent), ann);
+                case UCUMExpression.MixedComponent mixedComponent -> new UCUMExpression.MixedAnnotTerm(new UCUMExpression.MixedComponentTerm(mixedComponent), ann);
+            };
             return this;
         }
 
         @Override
         public TermStep withoutAnnotation() {
-            if(component instanceof UCUMExpression.CanonicalComponent canonicalComponent) {
-                this.term = new UCUMExpression.CanonicalComponentTerm(canonicalComponent);
-            }
-            else {
-                this.term = new UCUMExpression.MixedComponentTerm(this.component);
-            }
+            this.term = switch (component) {
+                case UCUMExpression.CanonicalComponent canonicalComponent -> new UCUMExpression.CanonicalComponentTerm(canonicalComponent);
+                case UCUMExpression.MixedComponent mixedComponent -> new UCUMExpression.MixedComponentTerm(mixedComponent);
+            };
             return this;
         }
 

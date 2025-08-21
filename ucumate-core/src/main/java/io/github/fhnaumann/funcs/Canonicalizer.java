@@ -250,9 +250,11 @@ public class Canonicalizer implements CanonicalizerService {
         Term leftTerm = leftStep.term();
         Term rightTerm = rightStep.term();
 
-        Term resultTerm = (leftTerm instanceof CanonicalTerm l && rightTerm instanceof CanonicalTerm r)
-            ? new CanonicalBinaryTerm(l, binaryTerm.operator(), r)
-            : new MixedBinaryTerm(leftTerm, binaryTerm.operator(), rightTerm);
+        Term resultTerm = CombineTermBuilder.dirtyBuilder()
+                .left(leftTerm)
+                .operator(binaryTerm.operator())
+                .right(rightTerm)
+                .build();
         return combineValue.withTerm(resultTerm);
     }
 

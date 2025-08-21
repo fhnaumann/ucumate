@@ -18,6 +18,7 @@ public class CombineTermBuilder {
     public interface OperatorStep {
         RightStep multiplyWith();
         RightStep divideBy();
+        RightStep operator(UCUMExpression.Operator operator);
     }
     public interface LeftStep {
         OperatorStep left(UCUMExpression.Term left);
@@ -103,6 +104,12 @@ public class CombineTermBuilder {
         @Override
         public RightStep divideBy() {
             this.operator = UCUMExpression.Operator.DIV;
+            return this;
+        }
+
+        @Override
+        public RightStep operator(UCUMExpression.Operator operator) {
+            this.operator = operator;
             return this;
         }
 
