@@ -47,6 +47,7 @@ public class SyntaxMatchHelper {
 
     private record Score(Set<UCUMDefinition.UCUMUnit> units, int score) {}
 
+
     /*
     The key can be:
     - The case-insensitive code
@@ -54,25 +55,31 @@ public class SyntaxMatchHelper {
     - The print symbol instead of the code
     - A stigmatized unit without the square brackets
      */
-    private static final Map<String, Score> WRONG_UNIT_CODES_TO_CORRECT_UNIT_CODES = createWrongToCorrectUnitCodes();
+    private static final Map<UcumVersion, Map<String, Score>> WRONG_UNIT_CODES_TO_CORRECT_UNIT_CODES = createWrongToCorrectUnitCodes();
 
-    private static Map<String, Score> createWrongToCorrectUnitCodes() {
-        /*
-        This always used the latest UCUM version, but realistically it shouldn't change
-         */
-        return UCUMRegistry.getInstance().getAll(UcumVersion.getLatest()).stream()
+    private static Map<UcumVersion, Map<String, Score>> createWrongToCorrectUnitCodes() {
+        Map<UcumVersion, Map<String, Score>> map = new EnumMap<>(UcumVersion.class);
+        for(UcumVersion version : UcumVersion.values()) {
+            Map<String, Score> scoreMap = createScoresForVersion(UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(version));
+            map.put(version, scoreMap);
+        }
+        return map;
+    }
+
+    private static Map<String, Score> createScoresForVersion(VersionSpecificUCUMRegistry registry) {
+        return registry.getAll().stream()
                 .filter(UCUMDefinition.UCUMUnit.class::isInstance)
                 .map(UCUMDefinition.UCUMUnit.class::cast)
                 .flatMap(unit -> generateVariants(unit).stream())
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> new Score(Set.of(entry.getValue().getKey()), entry.getValue().getValue()),
-                         (score1, score2) -> {
+                        (score1, score2) -> {
                             Set<UCUMDefinition.UCUMUnit> mergedUnits = new HashSet<>();
                             mergedUnits.addAll(score1.units());
                             mergedUnits.addAll(score2.units());
                             return new Score(mergedUnits, Math.min(score1.score(), score2.score()));
-                         }
+                        }
                 ));
     }
 
@@ -82,7 +89,11 @@ public class SyntaxMatchHelper {
         For now, only show matches with the lowest score (multiple may have the same score).
          */
         List<Map.Entry<String, Map.Entry<UCUMDefinition.UCUMUnit, Integer>>> list = new ArrayList<>();
-        list.add(Map.entry(unit.codeCaseInsensitive(), Map.entry(unit, 100)));
+
+        // Some units in the 2.1 ucum-essence file don't have a case-insensitive code listed and are therefore null
+        if(unit.codeCaseInsensitive() != null) {
+            list.add(Map.entry(unit.codeCaseInsensitive(), Map.entry(unit, 100)));
+        }
         if(unit.printSymbol() != null) {
             list.add(Map.entry(unit.printSymbol(), Map.entry(unit, 200)));
         }
@@ -123,9 +134,13 @@ public class SyntaxMatchHelper {
     }
 
     public static List<String> extractErrorMessagesFrom(Validator.ParserException parserException) {
-        return parserException.getFailures().stream()
+        List<String> failureMessages = parserException.getFailures().stream()
                 .map(SyntaxMatchHelper::mapErrorTypeToErrorMessage)
                 .toList();
+        if(!failureMessages.isEmpty()) {
+            return failureMessages;
+        }
+        return List.of(parserException.getMessage());
     }
 
     public static List<String> extractErrorMessagesFrom(ValidatorService.LexerException lexerException) {
@@ -174,7 +189,7 @@ public class SyntaxMatchHelper {
                 list.add(Map.entry(optDirectMatch.get(), 0)); // direct matches have the best score
                 continue;
             }
-            Score wrongMatched = WRONG_UNIT_CODES_TO_CORRECT_UNIT_CODES.get(potentialUnit);
+            Score wrongMatched = WRONG_UNIT_CODES_TO_CORRECT_UNIT_CODES.get(registry.getUcumVersion()).get(potentialUnit);
             if(wrongMatched != null) {
                 wrongMatched.units().forEach(unit -> list.add(Map.entry(unit, wrongMatched.score())));
             }

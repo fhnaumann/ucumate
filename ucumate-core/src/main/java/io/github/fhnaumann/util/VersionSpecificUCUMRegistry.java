@@ -139,6 +139,11 @@ public class VersionSpecificUCUMRegistry implements IUCUMRegistry {
         return Optional.empty();
     }
 
+    @Override
+    public UcumVersion getUcumVersion() {
+        return version;
+    }
+
     private UCUMExpression.Term translateUnitInsideDefinedUnitToTerm(UCUMDefinition.DefinedUnit definedUnit) {
         return switch(definedUnit) {
             case UCUMDefinition.DerivedUnit derivedUnit -> handleCommon(definedUnit);

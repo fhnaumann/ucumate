@@ -2,6 +2,7 @@ package io.github.fhnaumann.util;
 
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
+import io.github.fhnaumann.model.UcumVersion;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +23,7 @@ public interface IUCUMRegistry {
     public Optional<UCUMDefinition.DefinedUnit> getDefinedUnit(String definedUnit);
     public UCUMExpression.Term getDefinedUnitSourceDefinition(UCUMDefinition.DefinedUnit definedUnit, boolean enableMolarMassConversion);
     public Optional<UCUMDefinition.UCUMUnit> getUCUMUnit(String unit);
+    public UcumVersion getUcumVersion();
 
     public void warmup();
 

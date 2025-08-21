@@ -13,7 +13,7 @@ public class SyntaxVisitorHelper {
     public static UCUMExpression fromUCUMUnit(UCUMDefinition.UCUMUnit unit) {
         return switch (unit) {
             case UCUMDefinition.BaseUnit baseUnit -> new UCUMExpression.CanonicalNoPrefixSimpleUnit(baseUnit);
-            case UCUMDefinition.DefinedUnit definedUnit -> new UCUMExpression.MixedNoPrefixSimpleUnit(unit);
+            case UCUMDefinition.DefinedUnit definedUnit -> new UCUMExpression.MixedNoPrefixSimpleUnit(definedUnit);
             case null -> null;
         };
     }
@@ -21,7 +21,7 @@ public class SyntaxVisitorHelper {
     public static UCUMExpression from(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.UCUMUnit unit) {
         return switch (unit) {
             case UCUMDefinition.BaseUnit baseUnit -> new UCUMExpression.CanonicalPrefixSimpleUnit(prefix, baseUnit);
-            case UCUMDefinition.DefinedUnit definedUnit -> new UCUMExpression.MixedPrefixSimpleUnit(prefix, unit);
+            case UCUMDefinition.DefinedUnit definedUnit -> new UCUMExpression.MixedPrefixSimpleUnit(prefix, definedUnit);
             case null -> null;
         };
     }
@@ -47,7 +47,7 @@ public class SyntaxVisitorHelper {
     public static UCUMExpression from(UCUMExpression.Component component) {
         return switch (component) {
             case UCUMExpression.CanonicalComponent canonicalComponent -> new UCUMExpression.CanonicalComponentTerm(canonicalComponent);
-            case UCUMExpression.MixedComponent mixedComponent -> new UCUMExpression.MixedComponentTerm(component);
+            case UCUMExpression.MixedComponent mixedComponent -> new UCUMExpression.MixedComponentTerm(mixedComponent);
             case null -> null;
         };
     }
@@ -55,7 +55,7 @@ public class SyntaxVisitorHelper {
     public static UCUMExpression from(UCUMExpression.Term term, UCUMExpression.Annotation annotation) {
         return switch (term) {
             case UCUMExpression.CanonicalTerm canonicalTerm -> new UCUMExpression.CanonicalAnnotTerm(canonicalTerm, annotation);
-            case UCUMExpression.MixedTerm mixedTerm -> new UCUMExpression.MixedAnnotTerm(term, annotation);
+            case UCUMExpression.MixedTerm mixedTerm -> new UCUMExpression.MixedAnnotTerm(mixedTerm, annotation);
             case null -> null;
         };
     }
@@ -63,7 +63,7 @@ public class SyntaxVisitorHelper {
     public static UCUMExpression fromForUnaryDiv(UCUMExpression.Term term) {
         return switch (term) {
             case UCUMExpression.CanonicalTerm canonicalTerm -> new UCUMExpression.CanonicalUnaryDivTerm(canonicalTerm);
-            case UCUMExpression.MixedTerm mixedTerm -> new UCUMExpression.MixedUnaryDivTerm(term);
+            case UCUMExpression.MixedTerm mixedTerm -> new UCUMExpression.MixedUnaryDivTerm(mixedTerm);
             case null -> null;
         };
     }
@@ -80,7 +80,7 @@ public class SyntaxVisitorHelper {
     public static UCUMExpression fromForParen(UCUMExpression.Term term) {
         return switch (term) {
             case UCUMExpression.CanonicalTerm canonicalTerm -> new UCUMExpression.CanonicalParenTerm(canonicalTerm);
-            case UCUMExpression.MixedTerm mixedTerm -> new UCUMExpression.MixedParenTerm(term);
+            case UCUMExpression.MixedTerm mixedTerm -> new UCUMExpression.MixedParenTerm(mixedTerm);
             case null -> null;
         };
     }

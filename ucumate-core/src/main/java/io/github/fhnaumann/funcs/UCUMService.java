@@ -1,5 +1,6 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
@@ -12,6 +13,7 @@ import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Properties;
 import java.util.ServiceLoader;
 
 /**
@@ -176,6 +178,9 @@ public class UCUMService implements IUCUMService {
         relationCheckerService.setUCUMVersion(ucumVersion);
         canonicalizerService.setUCUMVersion(ucumVersion);
         converterService.setUCUMVersion(ucumVersion);
+        Properties old = ConfigurationRegistry.get().asProps();
+        old.put("ucumate.ucumVersion", ucumVersion.getVersion());
+        ConfigurationRegistry.initialize(Configuration.fromProps(old));
         this.ucumVersion = ucumVersion;
     }
 

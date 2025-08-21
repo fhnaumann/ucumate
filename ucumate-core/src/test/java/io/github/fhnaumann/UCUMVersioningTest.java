@@ -15,6 +15,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class UCUMVersioningTest {
 
     @Test
+    public void test_setting_version_in_service_sets_version_in_config_registry() {
+        ConfigurationRegistry.initialize(Configuration.builder().withUCUMVersion("2.2").build());
+        new UCUMService().setUCUMVersion(UcumVersion.V2_1);
+        assertThat(ConfigurationRegistry.get().getUCUMVersionAsEnum()).isEqualTo(UcumVersion.V2_1);
+    }
+
+    @Test
     public void test_default_UCUM_version_is_2_2() {
         ConfigurationRegistry.initialize(null);
         assertThat(new UCUMService().getUCUMVersion()).isEqualTo(UcumVersion.V2_2);
