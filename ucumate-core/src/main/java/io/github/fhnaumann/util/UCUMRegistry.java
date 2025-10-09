@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UCUMRegistry {
 
@@ -52,6 +53,10 @@ public class UCUMRegistry {
 
     public List<UCUMDefinition.Concept> getAll(UcumVersion version) {
         return getOrThrow(version).getAll();
+    }
+
+    public Collection<UCUMDefinition.UCUMUnit> getUCUMUnits(UcumVersion version) {
+        return getOrThrow(version).getUCUMUnits();
     }
 
     private VersionSpecificUCUMRegistry getOrThrow(UcumVersion version) {

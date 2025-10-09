@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.fhnaumann</groupId>
         <artifactId>ucumate-parent</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
     </parent>
 
     <artifactId>ucumate-spi-tests</artifactId>
@@ -57,22 +57,22 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-mol-support</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-persistence</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-error-feedback</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
     </dependencies>
 

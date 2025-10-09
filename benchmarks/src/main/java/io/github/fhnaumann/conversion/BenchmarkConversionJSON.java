@@ -2,6 +2,7 @@ package io.github.fhnaumann.conversion;
 
 import io.github.fhnaumann.BenchmarkSetup;
 import io.github.fhnaumann.TestCase;
+import io.github.fhnaumann.persistence.PersistenceRegistry;
 import org.fhir.ucum.Decimal;
 import org.fhir.ucum.UcumException;
 import org.openjdk.jmh.annotations.*;
@@ -49,11 +50,11 @@ public class BenchmarkConversionJSON {
     }
 
     @Benchmark
-    public void benchmarkUcumateValidation() {
-        // logger.warn("Cache size: " + PersistenceRegistry.getInstance().getAllCanonical().size());
+    public void benchmarkUcumateConversion() {
+        //logger.warn("Cache size: " + PersistenceRegistry.getInstance().getAllCanonical().size());
         for (TestCase.ConvertTestCase testCase : data.convertCases()) {
             data.ucumateService().convert(testCase.conversionFactor(), testCase.from(), testCase.to());
-            //logger.warn("After Cache size: " + PersistenceRegistry.getInstance().getAllValidated().size());
+            //logger.warn("After Cache size: " + PersistenceRegistry.getInstance().getAllCanonical().size());
         }
     }
 }

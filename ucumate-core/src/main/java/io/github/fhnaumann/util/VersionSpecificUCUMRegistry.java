@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Felix Naumann
@@ -137,6 +138,11 @@ public class VersionSpecificUCUMRegistry implements IUCUMRegistry {
             return Optional.of(optionalDefinedUnit.get());
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Collection<UCUMDefinition.UCUMUnit> getUCUMUnits() {
+        return Stream.concat(getBaseUnits().stream(), getDefinedUnits().stream()).toList();
     }
 
     @Override

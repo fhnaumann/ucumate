@@ -1,11 +1,15 @@
 package io.github.fhnaumann.persistence;
 
+import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.configuration.*;
 import io.github.fhnaumann.funcs.Canonicalizer;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.ValidatorService;
+import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PropertiesUtil;
+import io.github.fhnaumann.util.UCUMRegistry;
+import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,12 +104,33 @@ public class PersistenceRegistry implements PersistenceProvider {
         logger.debug("Registering {}", provider.getClass().getSimpleName());
         additionalProviders.put(name, provider);
 
-        // try and load saved data into cache if enabled
+        // load registry into cache if enabled
         if(cache != null && cache.isEnabled()) {
             logger.debug("Populating cache with values from {}", provider.getClass().getSimpleName());
+
+            copyRegistryIntoNewProvider(provider);
+
             provider.getAllValidated().forEach(cache::saveValidated);
             provider.getAllCanonical().forEach(cache::saveCanonical);
         }
+    }
+
+    private static void copyRegistryIntoNewProvider(PersistenceProvider provider) {
+        Arrays.stream(UcumVersion.values())
+                        .forEach(ucumVersion -> {
+                            VersionSpecificUCUMRegistry registry = UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(ucumVersion);
+                            registry.getUCUMUnits().forEach(unit -> {
+                                UCUMExpression.SingleUnitTerm singleUnitTerm;
+                                try {
+                                    singleUnitTerm = (UCUMExpression.SingleUnitTerm) SoloTermBuilder.builder().withoutPrefix(unit).noExpNoAnnot().asTerm().build();
+                                } catch (ClassCastException e) {
+                                    throw new RuntimeException("Unexpected error during registry provider transfer: Expected the registry to only contain SingleUnitTerms.", e);
+                                }
+                                // always "simple success" because expressions in the registry are single terms (and always valid)
+                                ValidatorService.ValidationResult valResult = new ValidatorService.SimpleSuccess(singleUnitTerm);
+                                provider.saveValidated(ValKey.of(null, ucumVersion), valResult);
+                            });
+                        });
     }
 
     public static void unregister(String name) {

@@ -23,6 +23,7 @@ public interface IUCUMRegistry {
     public Optional<UCUMDefinition.DefinedUnit> getDefinedUnit(String definedUnit);
     public UCUMExpression.Term getDefinedUnitSourceDefinition(UCUMDefinition.DefinedUnit definedUnit, boolean enableMolarMassConversion);
     public Optional<UCUMDefinition.UCUMUnit> getUCUMUnit(String unit);
+    public Collection<UCUMDefinition.UCUMUnit> getUCUMUnits();
     public UcumVersion getUcumVersion();
 
     public void warmup();

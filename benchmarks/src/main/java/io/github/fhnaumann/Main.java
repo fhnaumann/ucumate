@@ -1,6 +1,7 @@
 package io.github.fhnaumann;
 
 import io.github.fhnaumann.funcs.UCUMService;
+import org.fhir.ucum.Decimal;
 import org.fhir.ucum.UcumException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +18,9 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws IOException, UcumException, ParserConfigurationException, SAXException {
-        System.setProperty("ucumate.cache.enable", "false");
-        UCUMService service = new UCUMService();
-        service.validate("m.s");
-        service.validate("s.m");
         //org.openjdk.jmh.Main.main(args);
-
+        BenchmarkSetup.Data data = BenchmarkSetup.loadSetup("disable");
+        data.service().convert(new Decimal(1), "S", "C2.g-1.m-2.s");
 
         //logger.debug("TEST");
         //Properties properties = new Properties();
@@ -33,9 +31,5 @@ public class Main {
         //obj.loadData();
         //List<String> diff = obj.aggregateWhereUcumJavaDiffers();
         //System.out.println(String.join("\n", diff));
-    }
-
-    public void runCode() {
-
     }
 }

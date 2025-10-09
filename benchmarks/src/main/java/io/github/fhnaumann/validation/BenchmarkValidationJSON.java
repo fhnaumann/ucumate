@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit;
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 0)
-@Measurement(iterations = 1)
-@Fork(0)
+@Warmup(iterations = 1)
+@Measurement(iterations = 3)
+@Fork(3)
 @State(Scope.Thread)
 public class BenchmarkValidationJSON {
 
