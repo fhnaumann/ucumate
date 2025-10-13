@@ -9,8 +9,8 @@ import java.sql.Connection;
  */
 public class MySQLPersistenceProvider extends JDBCPersistenceProvider {
 
-    public MySQLPersistenceProvider(UcumVersion ucumVersion, Connection connection, String canonicalTableName, String validateTableName) {
-        super(ucumVersion, connection, canonicalTableName, validateTableName);
+    public MySQLPersistenceProvider(Connection connection, String canonicalTableName, String validateTableName) {
+        super(connection, canonicalTableName, validateTableName);
     }
 
     @Override

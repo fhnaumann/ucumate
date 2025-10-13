@@ -69,11 +69,12 @@ public class SQLitePersistenceProviderSPITest {
 
     @Test
     public void test_spi_provider_is_auto_discovered_when_accessing_UCUMService() {
-        new Validator().validate("[ft_i]");
+        new Validator().validate("3.[ft_i]");
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath)) {
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM ucumate_validate");
+            // need to search for the validated code explicitly since the provider automatically stores everything from the code registry (essence file)
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM ucumate_validate WHERE unit_key LIKE '%3.[ft_i]%'");
             assertThat(rs.next()).isTrue();
             assertThat(rs.getInt(1)).isEqualTo(1);
         } catch (SQLException e) {

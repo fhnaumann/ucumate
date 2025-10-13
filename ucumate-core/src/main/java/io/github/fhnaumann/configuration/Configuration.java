@@ -6,7 +6,7 @@ import java.util.Properties;
 
 public class Configuration {
 
-    private final String ucumVersion;
+    private String ucumVersion;
     private final Boolean enablePrefixOnNonMetricUnits;
     private final Boolean enableMolMassConversion;
     private final Boolean allowAnnotAfterParens;
@@ -62,6 +62,10 @@ public class Configuration {
 
     public String getSqliteDBPath() {
         return sqliteDBPath;
+    }
+
+    public void setUcumVersion(String ucumVersion) {
+        this.ucumVersion = ucumVersion;
     }
 
     @Override

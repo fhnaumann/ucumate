@@ -30,15 +30,13 @@ import static com.mongodb.client.model.Filters.eq;
  */
 public class MongoDBPersistenceProvider implements PersistenceProvider {
 
-    private final UcumVersion ucumVersion;
     private final MongoClient client;
     private final MongoCollection<Document> canonicalColl;
     private final MongoCollection<Document> validationColl;
 
     private static final PrinterService printer = new UCUMSyntaxPrinter();
 
-    public MongoDBPersistenceProvider(UcumVersion ucumVersion, MongoClient client, String dbName) {
-        this.ucumVersion = ucumVersion;
+    public MongoDBPersistenceProvider(MongoClient client, String dbName) {
         this.client = client;
         MongoDatabase db = client.getDatabase(dbName);
         this.canonicalColl = db.getCollection("ucumate_canonical");
@@ -74,7 +72,7 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
         }
         PreciseDecimal magnitude = new PreciseDecimal(doc.getString("magnitude"));
         PreciseDecimal cfPrefix = new PreciseDecimal(doc.getString("cfPrefix"));
-        UCUMExpression.Term term = Validator.parseCanonical(doc.getString("term"), ucumVersion);
+        UCUMExpression.Term term = Validator.parseCanonical(doc.getString("term"), key.version());
         boolean special = doc.getBoolean("special", false);
         UCUMDefinition.UCUMFunction func = null;
 
@@ -93,32 +91,34 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     public Map<CanonKey, Canonicalizer.CanonicalStepResult> getAllCanonical() {
         Map<CanonKey, Canonicalizer.CanonicalStepResult> resultMap = new HashMap<>();
 
-        for (Document doc : canonicalColl.find()) {
-            String unitKey = doc.getString("unit_key");
-            CanonKey canonKey = CanonKey.fromStorageKey(unitKey, ucumVersion);
-            if(canonKey.version() != ucumVersion) {
-                continue;
+        for(UcumVersion ucumVersion : UcumVersion.values()) {
+            for (Document doc : canonicalColl.find()) {
+                String unitKey = doc.getString("unit_key");
+                CanonKey canonKey = CanonKey.fromStorageKey(unitKey, ucumVersion);
+                if(canonKey.version() != ucumVersion) {
+                    continue;
+                }
+                String termStr = doc.getString("term");
+                UCUMExpression.Term term = Validator.parseCanonical(termStr, ucumVersion);
+                PreciseDecimal magnitude = new PreciseDecimal(doc.getString("magnitude"));
+                PreciseDecimal cfPrefix = new PreciseDecimal(doc.getString("cfPrefix"));
+
+                boolean special = doc.getBoolean("special", false);
+                UCUMDefinition.UCUMFunction func = null;
+
+                if(special) {
+                    String name = doc.getString("specialName");
+                    String unit = doc.getString("specialUnit");
+                    String value = doc.getString("specialValue");
+                    func = new UCUMDefinition.UCUMFunction(name, new PreciseDecimal(value), unit);
+                }
+
+                Canonicalizer.CanonicalStepResult result = new Canonicalizer.CanonicalStepResult(
+                        term, magnitude, cfPrefix, special, func
+                );
+
+                resultMap.put(canonKey, result);
             }
-            String termStr = doc.getString("term");
-            UCUMExpression.Term term = Validator.parseCanonical(termStr, ucumVersion);
-            PreciseDecimal magnitude = new PreciseDecimal(doc.getString("magnitude"));
-            PreciseDecimal cfPrefix = new PreciseDecimal(doc.getString("cfPrefix"));
-
-            boolean special = doc.getBoolean("special", false);
-            UCUMDefinition.UCUMFunction func = null;
-
-            if(special) {
-                String name = doc.getString("specialName");
-                String unit = doc.getString("specialUnit");
-                String value = doc.getString("specialValue");
-                func = new UCUMDefinition.UCUMFunction(name, new PreciseDecimal(value), unit);
-            }
-
-            Canonicalizer.CanonicalStepResult result = new Canonicalizer.CanonicalStepResult(
-                    term, magnitude, cfPrefix, special, func
-            );
-
-            resultMap.put(canonKey, result);
         }
 
         return resultMap;
@@ -140,7 +140,7 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
 
         boolean valid = doc.getBoolean("valid", false);
         if(valid) {
-            return new ValidatorService.ComplexSuccess(Validator.parseByPassChecks(key.expression(), ucumVersion));
+            return new ValidatorService.ComplexSuccess(Validator.parseByPassChecks(key.expression(), key.version()));
         } else {
             return new Validator.Failure();
         }
@@ -150,20 +150,24 @@ public class MongoDBPersistenceProvider implements PersistenceProvider {
     public Map<ValKey, ValidatorService.ValidationResult> getAllValidated() {
         Map<ValKey, ValidatorService.ValidationResult> resultMap = new HashMap<>();
 
-        for(Document doc : validationColl.find()) {
-            String key = doc.getString("unit_key");
-            ValKey valKey = ValKey.fromStorageKey(key);
-            if(valKey.version() != ucumVersion) {
-                continue;
+        for(UcumVersion ucumVersion : UcumVersion.values()) {
+            for(Document doc : validationColl.find()) {
+                String key = doc.getString("key");
+                ValKey valKey = ValKey.fromStorageKey(key);
+                if(valKey.version() != ucumVersion) {
+                    continue;
+                }
+                boolean valid = doc.getBoolean("valid", false);
+
+                ValidatorService.ValidationResult result = valid
+                        ? new ValidatorService.ComplexSuccess(Validator.parseByPassChecks(valKey.expression(), ucumVersion))
+                        : new Validator.Failure();
+
+                resultMap.put(valKey, result);
             }
-            boolean valid = doc.getBoolean("valid", false);
-
-            ValidatorService.ValidationResult result = valid
-                    ? new ValidatorService.ComplexSuccess(Validator.parseByPassChecks(valKey.expression(), ucumVersion))
-                    : new Validator.Failure();
-
-            resultMap.put(valKey, result);
         }
+
+
 
         return resultMap;
     }

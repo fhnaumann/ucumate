@@ -22,7 +22,7 @@ public class PersistenceProviderFactory {
         String jdbcUrl = "jdbc:sqlite:" + defaultSQLitePath.toAbsolutePath();
         HikariDataSource ds = ConnectionPoolFactory.getOrCreate(jdbcUrl, "", "");
         try {
-            return new SQLitePersistenceProvider(ConfigurationRegistry.get().getUCUMVersionAsEnum(), ds.getConnection(), null, null);
+            return new SQLitePersistenceProvider(ds.getConnection(), null, null);
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to create SQLitePersistenceProvider", e);
         }

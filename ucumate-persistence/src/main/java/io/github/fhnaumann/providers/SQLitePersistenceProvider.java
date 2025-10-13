@@ -15,14 +15,13 @@ public class SQLitePersistenceProvider extends JDBCPersistenceProvider {
 
     public SQLitePersistenceProvider() throws SQLException {
         super(
-                ConfigurationRegistry.get().getUCUMVersionAsEnum(),
                 ConnectionPoolFactory.getOrCreate("jdbc:sqlite:%s".formatted(ConfigurationRegistry.get().getSqliteDBPath()), "", "").getConnection(),
                 null,
                 null);
     }
 
-    public SQLitePersistenceProvider(UcumVersion ucumVersion, Connection connection, String canonicalTableName, String validateTableName) {
-        super(ucumVersion, connection, canonicalTableName, validateTableName);
+    public SQLitePersistenceProvider( Connection connection, String canonicalTableName, String validateTableName) {
+        super(connection, canonicalTableName, validateTableName);
     }
 
     @Override

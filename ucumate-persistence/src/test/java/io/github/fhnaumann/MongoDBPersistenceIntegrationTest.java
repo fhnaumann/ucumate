@@ -23,7 +23,7 @@ public class MongoDBPersistenceIntegrationTest extends DBPersistenceIntegrationT
     @Override
     protected void registerPersistenceProvider() {
         client = MongoClients.create(mongo.getReplicaSetUrl());
-        PersistenceRegistry.register("mongo", new MongoDBPersistenceProvider(UcumVersion.V2_2, client, "ucumate"));
+        PersistenceRegistry.register("mongo", new MongoDBPersistenceProvider(client, "ucumate"));
     }
 
     @Override

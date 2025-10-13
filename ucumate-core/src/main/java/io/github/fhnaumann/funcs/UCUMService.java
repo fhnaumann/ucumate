@@ -178,9 +178,9 @@ public class UCUMService implements IUCUMService {
         relationCheckerService.setUCUMVersion(ucumVersion);
         canonicalizerService.setUCUMVersion(ucumVersion);
         converterService.setUCUMVersion(ucumVersion);
-        Properties old = ConfigurationRegistry.get().asProps();
-        old.put("ucumate.ucumVersion", ucumVersion.getVersion());
-        ConfigurationRegistry.initialize(Configuration.fromProps(old));
+
+        ConfigurationRegistry.get().setUcumVersion(ucumVersion.getVersion());
+
         this.ucumVersion = ucumVersion;
     }
 

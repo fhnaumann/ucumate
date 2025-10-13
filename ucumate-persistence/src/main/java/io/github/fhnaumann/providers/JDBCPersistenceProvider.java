@@ -33,13 +33,11 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
     private static final PrinterService printer = new UCUMSyntaxPrinter();
 
-    private final UcumVersion ucumVersion;
     public final Connection connection;
     protected final String canonicalTableName;
     protected final String validateTableName;
 
-    protected JDBCPersistenceProvider(UcumVersion ucumVersion, Connection connection, String canonicalTableName, String validateTableName) {
-        this.ucumVersion = ucumVersion;
+    protected JDBCPersistenceProvider(Connection connection, String canonicalTableName, String validateTableName) {
         this.connection = connection;
         this.canonicalTableName = canonicalTableName != null ? canonicalTableName : "ucumate_canonical";
         this.validateTableName = validateTableName != null ? validateTableName : "ucumate_validate";
@@ -102,7 +100,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             if (rs.next()) {
                 PreciseDecimal magnitude = new PreciseDecimal(rs.getString("magnitude"));
                 PreciseDecimal cfPrefix = new PreciseDecimal(rs.getString("cfPrefix"));
-                UCUMExpression.Term term = Validator.parseCanonical(rs.getString("term"), ucumVersion);
+                UCUMExpression.Term term = Validator.parseCanonical(rs.getString("term"), key.version());
                 boolean special = rs.getBoolean("special");
                 UCUMDefinition.UCUMFunction ucumFunction = null;
                 if(special) {
@@ -148,7 +146,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
             if (rs.next()) {
                 boolean valid = rs.getBoolean("valid");
                 if(valid) {
-                    UCUMExpression.Term parsedKey = Validator.parseByPassChecks(key.expression(), ucumVersion);
+                    UCUMExpression.Term parsedKey = Validator.parseByPassChecks(key.expression(), key.version());
                     return new ValidatorService.ComplexSuccess(parsedKey);
                 }
                 else {
@@ -177,7 +175,7 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
 
                 Validator.ValidationResult result;
                 if (valid) {
-                    UCUMExpression.Term parsed = Validator.parseByPassChecks(valKey.expression(), ucumVersion);
+                    UCUMExpression.Term parsed = Validator.parseByPassChecks(valKey.expression(), valKey.version());
                     result = new ValidatorService.ComplexSuccess(parsed);
                 } else {
                     result = new Validator.Failure();
@@ -203,36 +201,38 @@ public abstract class JDBCPersistenceProvider implements PersistenceProvider {
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                String unitKey = rs.getString("unit_key");
-                CanonKey canonKey = CanonKey.fromStorageKey(unitKey, ucumVersion);
-                String magnitudeStr = rs.getString("magnitude");
-                String cfPrefixStr = rs.getString("cfPrefix");
-                String termStr = rs.getString("term");
-                boolean special = rs.getBoolean("special");
-                UCUMExpression.Term term = Validator.parseCanonical(termStr, ucumVersion);
-                PreciseDecimal magnitude = new PreciseDecimal(magnitudeStr);
-                PreciseDecimal cfPrefix = new PreciseDecimal(cfPrefixStr);
+            for(UcumVersion ucumVersion : UcumVersion.values()) {
+                while (rs.next()) {
+                    String unitKey = rs.getString("unit_key");
+                    CanonKey canonKey = CanonKey.fromStorageKey(unitKey, ucumVersion);
+                    String magnitudeStr = rs.getString("magnitude");
+                    String cfPrefixStr = rs.getString("cfPrefix");
+                    String termStr = rs.getString("term");
+                    boolean special = rs.getBoolean("special");
+                    UCUMExpression.Term term = Validator.parseCanonical(termStr, ucumVersion);
+                    PreciseDecimal magnitude = new PreciseDecimal(magnitudeStr);
+                    PreciseDecimal cfPrefix = new PreciseDecimal(cfPrefixStr);
 
-                UCUMDefinition.UCUMFunction function = null;
-                if (special) {
-                    String name = rs.getString("specialName");
-                    String unit = rs.getString("specialUnit");
-                    String valueStr = rs.getString("specialValue");
-                    function = new UCUMDefinition.UCUMFunction(name, new PreciseDecimal(valueStr), unit);
+                    UCUMDefinition.UCUMFunction function = null;
+                    if (special) {
+                        String name = rs.getString("specialName");
+                        String unit = rs.getString("specialUnit");
+                        String valueStr = rs.getString("specialValue");
+                        function = new UCUMDefinition.UCUMFunction(name, new PreciseDecimal(valueStr), unit);
+                    }
+
+                    Canonicalizer.CanonicalStepResult step = new Canonicalizer.CanonicalStepResult(
+                            term,
+                            magnitude,
+                            cfPrefix,
+                            special,
+                            function
+                    );
+
+                    logger.debug("Loaded {} from data source into cache.", unitKey);
+
+                    resultMap.put(canonKey, step);
                 }
-
-                Canonicalizer.CanonicalStepResult step = new Canonicalizer.CanonicalStepResult(
-                        term,
-                        magnitude,
-                        cfPrefix,
-                        special,
-                        function
-                );
-
-                logger.debug("Loaded {} from data source into cache.", unitKey);
-
-                resultMap.put(canonKey, step);
             }
 
         } catch (SQLException e) {

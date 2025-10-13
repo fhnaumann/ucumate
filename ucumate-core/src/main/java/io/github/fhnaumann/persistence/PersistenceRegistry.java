@@ -3,8 +3,10 @@ package io.github.fhnaumann.persistence;
 import io.github.fhnaumann.builders.SoloTermBuilder;
 import io.github.fhnaumann.configuration.*;
 import io.github.fhnaumann.funcs.Canonicalizer;
+import io.github.fhnaumann.funcs.UCUMService;
 import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.ValidatorService;
+import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.PropertiesUtil;
@@ -104,12 +106,11 @@ public class PersistenceRegistry implements PersistenceProvider {
         logger.debug("Registering {}", provider.getClass().getSimpleName());
         additionalProviders.put(name, provider);
 
+        copyRegistryIntoNewProvider(provider);
+
         // load registry into cache if enabled
         if(cache != null && cache.isEnabled()) {
             logger.debug("Populating cache with values from {}", provider.getClass().getSimpleName());
-
-            copyRegistryIntoNewProvider(provider);
-
             provider.getAllValidated().forEach(cache::saveValidated);
             provider.getAllCanonical().forEach(cache::saveCanonical);
         }
@@ -118,17 +119,18 @@ public class PersistenceRegistry implements PersistenceProvider {
     private static void copyRegistryIntoNewProvider(PersistenceProvider provider) {
         Arrays.stream(UcumVersion.values())
                         .forEach(ucumVersion -> {
+                            UCUMService service = new UCUMService(ucumVersion);
                             VersionSpecificUCUMRegistry registry = UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(ucumVersion);
                             registry.getUCUMUnits().forEach(unit -> {
                                 UCUMExpression.SingleUnitTerm singleUnitTerm;
                                 try {
                                     singleUnitTerm = (UCUMExpression.SingleUnitTerm) SoloTermBuilder.builder().withoutPrefix(unit).noExpNoAnnot().asTerm().build();
                                 } catch (ClassCastException e) {
-                                    throw new RuntimeException("Unexpected error during registry provider transfer: Expected the registry to only contain SingleUnitTerms.", e);
+                                    throw new IllegalStateException("Unexpected error during registry provider transfer: Expected the registry to only contain SingleUnitTerms.", e);
                                 }
                                 // always "simple success" because expressions in the registry are single terms (and always valid)
                                 ValidatorService.ValidationResult valResult = new ValidatorService.SimpleSuccess(singleUnitTerm);
-                                provider.saveValidated(ValKey.of(null, ucumVersion), valResult);
+                                provider.saveValidated(ValKey.of(service.print(singleUnitTerm, Printer.PrintType.UCUM_SYNTAX), ucumVersion), valResult);
                             });
                         });
     }

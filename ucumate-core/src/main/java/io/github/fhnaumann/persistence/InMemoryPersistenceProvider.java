@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -72,9 +73,15 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
     @Override
     public Canonicalizer.CanonicalStepResult getCanonical(CanonKey key) {
         if(isEnabled()) {
+            if(logger.isDebugEnabled()) {
+                logger.debug("Cache hit for '{}'", printerService.print(key.expression()));
+            }
             return canonCache.getIfPresent(key);
         }
         else {
+            if(logger.isDebugEnabled()) {
+                logger.debug("Cache miss for '{}'", printerService.print(key.expression()));
+            }
             return null;
         }
     }
@@ -104,7 +111,7 @@ public class InMemoryPersistenceProvider implements PersistenceProvider, InMemor
 
     @Override
     public Map<ValKey, Validator.ValidationResult> getAllValidated() {
-        return valCache.asMap();
+        return getAllValidatedLazy().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override

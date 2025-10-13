@@ -33,7 +33,7 @@ public class MysqlPersistenceIntegrationTest extends DBPersistenceIntegrationTes
                     mysql.getUsername(),
                     mysql.getPassword()
             );
-            PersistenceRegistry.register("mysql", new MySQLPersistenceProvider(UcumVersion.V2_2, connection, null, null));
+            PersistenceRegistry.register("mysql", new MySQLPersistenceProvider(connection, null, null));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

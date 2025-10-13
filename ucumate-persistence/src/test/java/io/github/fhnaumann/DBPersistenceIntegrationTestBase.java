@@ -38,6 +38,7 @@ public abstract class DBPersistenceIntegrationTestBase {
 
     @BeforeAll
     public static void init() {
+        ConfigurationRegistry.initialize(Configuration.builder().withUCUMVersion(UcumVersion.getLatest().getVersion()).build());
         printerService = new Printer();
         validatorService = new Validator();
         canonicalizerService = new Canonicalizer(printerService, validatorService);
@@ -45,7 +46,7 @@ public abstract class DBPersistenceIntegrationTestBase {
 
     @BeforeEach
     public void setup() throws SQLException {
-        ConfigurationRegistry.initialize(Configuration.builder().enableSQLitePersistence(false).build());
+        ConfigurationRegistry.initialize(Configuration.builder().enableSQLitePersistence(false).withUCUMVersion(UcumVersion.V2_2.getVersion()).build());
         ConnectionPoolFactory.shutdownAll();
         registerPersistenceProvider();
         PersistenceRegistry.disableInMemoryCache(true);

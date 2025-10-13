@@ -33,7 +33,7 @@ public class PostgresPersistenceIntegrationTest extends DBPersistenceIntegration
                     postgres.getUsername(),
                     postgres.getPassword()
             );
-            PersistenceRegistry.register("postgres", new PostgresPersistenceProvider(UcumVersion.V2_2, connection, null, null));
+            PersistenceRegistry.register("postgres", new PostgresPersistenceProvider(connection, null, null));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
