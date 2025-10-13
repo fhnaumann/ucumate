@@ -43,3 +43,33 @@ BenchmarkFunctionalJSONTests.benchmarkUcumateCommensurability   enableWithPreHea
 BenchmarkFunctionalJSONTests.benchmarkUcumateConversion         enableWithPreHeat  avgt    4   0,280 ± 0,021  ms/op
 BenchmarkFunctionalJSONTests.benchmarkUcumateValidation         enableWithPreHeat  avgt    4   0,030 ± 0,010  ms/op
 BenchmarkFunctionalJSONTests.benchmarkucumJavaConversion        enableWithPreHeat  avgt    4  26,271 ± 0,227  ms/op
+
+# json
+
+## validation
+
+### cache=disabled
+
+Benchmark                                            (ucumateCaching)   Mode  Cnt  Score   Error   Units
+BenchmarkValidationJSON.benchmarkUcumJavaValidation           disable  thrpt   15  0,698 ± 0,057  ops/ms
+BenchmarkValidationJSON.benchmarkUcumateValidation            disable  thrpt   15  0,110 ± 0,002  ops/ms
+
+### cache=enabled
+
+Benchmark                                            (ucumateCaching)   Mode  Cnt  Score   Error   Units
+BenchmarkValidationJSON.benchmarkUcumJavaValidation            enable  thrpt   15  0,663 ± 0,023  ops/ms
+BenchmarkValidationJSON.benchmarkUcumateValidation             enable  thrpt   15  2,613 ± 0,055  ops/ms
+
+## conversion
+
+### cache=disabled
+
+Benchmark                                            (ucumateCaching)   Mode  Cnt  Score    Error   Units
+BenchmarkConversionJSON.benchmarkUcumateConversion            disable  thrpt   15  1,335 ±  0,013  ops/ms
+BenchmarkConversionJSON.benchmarkucumJavaConversion           disable  thrpt   15  0,037 ±  0,001  ops/ms
+
+### cache=enabled
+
+Benchmark                                            (ucumateCaching)   Mode  Cnt  Score    Error   Units
+BenchmarkConversionJSON.benchmarkUcumateConversion             enable  thrpt   15  4,733 ±  0,043  ops/ms
+BenchmarkConversionJSON.benchmarkucumJavaConversion            enable  thrpt   15  0,037 ±  0,001  ops/ms

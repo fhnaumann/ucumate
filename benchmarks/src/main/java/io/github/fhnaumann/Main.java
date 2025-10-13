@@ -18,9 +18,14 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws IOException, UcumException, ParserConfigurationException, SAXException {
-        //org.openjdk.jmh.Main.main(args);
-        BenchmarkSetup.Data data = BenchmarkSetup.loadSetup("disable");
-        data.service().convert(new Decimal(1), "S", "C2.g-1.m-2.s");
+        /*
+        Debugging: -jvmArgs "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
+         */
+
+
+        org.openjdk.jmh.Main.main(args);
+//        BenchmarkSetup.Data data = BenchmarkSetup.loadSetup("disable");
+//        data.service().convert(new Decimal(1), "S", "C2.g-1.m-2.s");
 
         //logger.debug("TEST");
         //Properties properties = new Properties();

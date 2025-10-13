@@ -23,26 +23,17 @@ public class BenchmarkSetup {
         List<TestCase.CommensurableTestCase> commensurableCases = suite.commensurable;
         List<TestCase.ConvertTestCase> convertCases = suite.convert;
 
-        UcumEssenceService service = new UcumEssenceService(BenchmarkSetup.class.getResourceAsStream("/ucum-essence.xml"));
-        UCUMService ucumateService = new UCUMService();
-
-        // just to make sure any "accidental" caching in setup loading is removed
-        PersistenceRegistry.disableInMemoryCache(true);
-
-        if(ucumateCaching == null) {
-            System.out.println("caching not configured!");
-            throw new RuntimeException();
-        }
+        System.setProperty("ucumate.cache.preheat", "false");
 
         if(ucumateCaching.equals("disable")) {
-            PersistenceRegistry.disableInMemoryCache(true);
+            System.setProperty("ucumate.cache.enable", "false");
         }
-        else {
-            Properties properties = new Properties();
-            properties.put("ucumate.cache.enable", true);
-            properties.put("ucumate.cache.preheat", ucumateCaching.equals("enableWithPreHeat"));
-            PersistenceRegistry.initCache(CacheConfiguration.fromProps(properties));
+        if(ucumateCaching.equals("enable")) {
+            System.setProperty("ucumate.cache.enable", "true");
         }
+
+        UcumEssenceService service = new UcumEssenceService(BenchmarkSetup.class.getResourceAsStream("/ucum-essence.xml"));
+        UCUMService ucumateService = new UCUMService();
         return new Data(validateCases, commensurableCases, convertCases, service, ucumateService);
     }
 }
