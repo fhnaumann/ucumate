@@ -13,9 +13,22 @@ import java.util.stream.IntStream;
 public class ParseUtil {
 
     public static void checkASCIIRangeForAnnotation(String rawAnnotation) {
-        boolean illegalSymbols = !rawAnnotation.isEmpty() && rawAnnotation.chars().noneMatch(annotChar -> annotChar >= 33 && annotChar <= 126 && annotChar != '{' && annotChar != '}');
-        if(illegalSymbols) {
-            throw new ParserException("Invalid ascii symbol in annotation.");
+        boolean hasInvalidAscii = !rawAnnotation.isEmpty() &&
+                rawAnnotation.chars().anyMatch(annotChar ->
+                        annotChar < 33 || annotChar > 126
+                );
+
+        boolean hasInvalidBrackets = !rawAnnotation.isEmpty() &&
+                rawAnnotation.chars().anyMatch(annotChar ->
+                        annotChar == '{' || annotChar == '}'
+                );
+
+        boolean illegal = hasInvalidAscii || hasInvalidBrackets;
+        if(hasInvalidAscii) {
+            throw new ParserException("Invalid ASCII symbol or in annotation.");
+        }
+        if(illegal) {
+            throw new ParserException("nesting");
         }
     }
 

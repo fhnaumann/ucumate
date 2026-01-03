@@ -2,6 +2,7 @@ package io.github.fhnaumann;
 
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.Validator;
+import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -72,8 +73,14 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
 
     @Override
     public UCUMExpression visitAnnotation(ErrorFeedbackUCUMParser.AnnotationContext ctx) {
-        String annotationText = ParseUtil.asText(ctx.withinCbSymbol());
-        ParseUtil.checkASCIIRangeForAnnotation(annotationText);
+        String annotationText = ctx.getText();
+        try {
+            ParseUtil.checkASCIIRangeForAnnotation(annotationText);
+        } catch (ValidatorService.ParserException e) {
+            if("nesting".equals(e.getMessage())) {
+                errorMessages.add(ErrorMessages.get("nested_annotations"));
+            }
+        }
         return new Annotation(annotationText);
     }
 
