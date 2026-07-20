@@ -1,0 +1,17 @@
+﻿# ucumate
+
+> ucumate is a developer-friendly Java library for working with units of measure based on the UCUM standard. At its core, it provides validation, canonicalization, conversion, and printing support with automatic caching.
+
+- [ucumate](https://fhnaumann.github.io/ucumate/home.md): ucumate
+- [Getting Started](https://fhnaumann.github.io/ucumate/getting_started.md): Use the UCUMService class to access the core functionality. This includes lookup, printing, validation, canonicalization and conversion.
+- [Core Functionality](https://fhnaumann.github.io/ucumate/core-lib.md): The ucumate library has these core features:
+- [Cache](https://fhnaumann.github.io/ucumate/cache.md): By default, the core library has a built-in cache that is enabled. Any expression that is encountered during validation or canonicalization is being cached. If the cache is full then older entries will be removed.
+- [Data Persistence](https://fhnaumann.github.io/ucumate/persistence.md): The core library ships with a default caffeine cache for validation and canonicalization results (except for mol units. On top of that it is also possible to add another persistent data storage.
+- [UCUM Tests](https://fhnaumann.github.io/ucumate/tests.md): Having a full testsuite to define accordance with the UCUM standard is important. The testsuite should cover a range of valid and invalid expressions and cover canonicalization and conversion including the resulting factors.
+- [Details on the Rounding Behaviour with Numbers provided by the ucum-essence File](https://fhnaumann.github.io/ucumate/precision.md): Conversion factors are usually exact numbers (even decimals) that have infinite precision. I.e. the conversion factor from inches to cm is 2.54. It is a decimal number and in a different context it has a limited precision of 3.
+- [Error Feedback on Validation](https://fhnaumann.github.io/ucumate/error_feedback.md): Add the dependency:
+- [Exact Math](https://fhnaumann.github.io/ucumate/exact_math.md): If you work with special units and need high precision during canonicalization or conversion then you should use this additional module.
+- [Feature Flags](https://fhnaumann.github.io/ucumate/feature_flags.md): The UCUM specification has some ambiguity, and therefore it is not easy to agree on what might be valid UCUM syntax and what not. ucumate provides some feature flags that let the developer choose by which rules to play by.
+- [Managing UCUM Versions](https://fhnaumann.github.io/ucumate/ucum_versions.md): ucumate currently supports two UCUM versions: 2.1 and 2.2. The default version is 2.2 but you can change that via the properties.
+- [Mole <-> Mass Conversion](https://fhnaumann.github.io/ucumate/mol_mass_conversion.md): In UCUM the mol unit is defined as dimensionless, more precisely 1 mol = 6.02214076*10^23. Here is their reasoning:
+- [Ucum-Java Legacy Support](https://fhnaumann.github.io/ucumate/ucumate_ucumjava_bridge.md): ucumate offers a drop-in replacement module for Ucum-java.

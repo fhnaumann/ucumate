@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark">
     <meta name="turbo-root" content="/ucumate">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.11.0.816055471706">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="4.6.0.837843029397">
 
     <!-- See retype.com -->
-    <meta name="generator" content="Retype 3.11.0">
+    <meta name="generator" content="Retype 4.6.0">
 
     <!-- Primary Meta Tags -->
     <title>Ucum-Java Legacy Support</title>
@@ -16,205 +17,177 @@
 
     <!-- Canonical -->
     <link rel="canonical" href="https://fhnaumann.github.io/ucumate/ucumate_ucumjava_bridge/">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="https://fhnaumann.github.io/ucumate/sitemap.xml">
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://fhnaumann.github.io/ucumate/ucumate_ucumjava_bridge/">
     <meta property="og:title" content="Ucum-Java Legacy Support">
     <meta property="og:description" content="ucumate offers a drop-in replacement module for Ucum-java.">
+    <meta property="og:site_name" content="Ucumate">
+    <meta property="og:locale" content="en_US">
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://fhnaumann.github.io/ucumate/ucumate_ucumjava_bridge/">
-    <meta property="twitter:title" content="Ucum-Java Legacy Support">
-    <meta property="twitter:description" content="ucumate offers a drop-in replacement module for Ucum-java.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://fhnaumann.github.io/ucumate/ucumate_ucumjava_bridge/">
+    <meta name="twitter:title" content="Ucum-Java Legacy Support">
+    <meta name="twitter:description" content="ucumate offers a drop-in replacement module for Ucum-java.">
+
+    <!-- Alternate Markdown -->
+    <link rel="alternate" type="text/markdown" href="https://fhnaumann.github.io/ucumate/ucumate_ucumjava_bridge.md">
 
     <script data-cfasync="false">(function(){var cl=document.documentElement.classList,ls=localStorage.getItem("retype_scheme"),hd=cl.contains("dark"),hl=cl.contains("light"),wm=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;if(ls==="dark"||(!ls&&wm&&!hd&&!hl)){cl.remove("light");cl.add("dark")}else if(ls==="light"||(!ls&&!wm&&!hd&&!hl)){cl.remove("dark");cl.add("light")}})();</script>
 
-    <link href="../favicon.png" rel="icon">
-    <link href="../resources/css/retype.css?v=3.11.0.816055471706" rel="stylesheet">
+    <link id="retype-favicon" rel="icon" href="../static/favicon.png" />
+    <link href="../resources/css/retype.css?v=4.6.0.837843029397" rel="stylesheet">
 
-    <script data-cfasync="false" src="../resources/js/config.js?v=3.11.0.816055471706" data-turbo-eval="false" defer></script>
-    <script data-cfasync="false" src="../resources/js/retype.js?v=3.11.0" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=3.11.0.816055471706" data-turbo-eval="false" defer></script>
-    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=3.11.0.816055471706" defer></script>
+    <script data-cfasync="false" src="../resources/js/config.js?v=4.6.0.837843029397" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../resources/js/retype.js?v=4.6.0" data-turbo-eval="false" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../resources/js/lunr.js?v=4.6.0.837843029397" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../resources/js/prism.js?v=4.6.0.837843029397" defer></script>
 </head>
 <body>
     <div id="retype-app" class="relative text-base antialiased text-base-text bg-base-bg font-body">
-        <div class="absolute bottom-0 left-0" style="top: 5rem; right: 50%"></div>
+    <div class="absolute bottom-0 left-0" style="top: 5rem; right: 50%"></div>
+
+    <header id="retype-header" class="sticky top-0 z-30 flex w-full h-16 bg-header-bg border-b border-header-border md:h-20">
+        <div class="container relative flex items-center justify-between pr-6 grow md:justify-start">
+            <!-- Mobile menu button skeleton -->
+            <button v-cloak class="skeleton retype-mobile-menu-button flex items-center justify-center shrink-0 overflow-hidden dark:text-white focus:outline-hidden rounded-full w-10 h-10 ml-3.5 md:hidden"><svg xmlns="http://www.w3.org/2000/svg" class="mb-px shrink-0" width="24" height="24" viewBox="0 0 24 24" role="presentation" style="margin-bottom: 0px;"><g fill="currentColor"><path d="M2 4h20v2H2zM2 11h20v2H2zM2 18h20v2H2z"></path></g></svg></button>
+            <div v-cloak id="retype-sidebar-left-toggle-button"></div>
     
-        <header id="retype-header" class="sticky top-0 z-30 flex w-full h-16 bg-header-bg border-b border-header-border md:h-20">
-            <div class="container relative flex items-center justify-between pr-6 grow md:justify-start">
-                <!-- Mobile menu button skeleton -->
-                <button v-cloak class="skeleton retype-mobile-menu-button flex items-center justify-center shrink-0 overflow-hidden dark:text-white focus:outline-none rounded-full w-10 h-10 ml-3.5 md:hidden"><svg xmlns="http://www.w3.org/2000/svg" class="mb-px shrink-0" width="24" height="24" viewBox="0 0 24 24" role="presentation" style="margin-bottom: 0px;"><g fill="currentColor"><path d="M2 4h20v2H2zM2 11h20v2H2zM2 18h20v2H2z"></path></g></svg></button>
-                <div v-cloak id="retype-sidebar-left-toggle-button"></div>
-        
-                <!-- Logo -->
-                <div class="flex items-center justify-between h-full py-2 md:w-75">
-                    <div class="flex items-center px-2 md:px-6">
-                        <a id="retype-branding-logo" href="../" class="flex items-center leading-snug text-2xl">
-                            <span class="w-10 mr-2 grow-0 shrink-0 overflow-hidden">
-                                <img class="max-h-10 dark:hidden md:inline-block" src="../static/favicon.png">
-                                <img class="max-h-10 hidden dark:inline-block" src="../static/favicon.png">
-                            </span>
-                            <span class="dark:text-white font-bold line-clamp-1 md:line-clamp-2">Ucumate</span>
-                        </a><span id="retype-branding-label" class="inline-flex mt-1 px-2 py-1 ml-4 text-xs font-medium leading-none items-center rounded-md bg-branding-label-bg text-branding-label-text ring-1 ring-branding-label-border ring-inset md:inline-block">Docs</span>
-                    </div>
-        
-                    <span class="hidden h-8 border-r md:inline-block border-base-border"></span>
+            <!-- Logo -->
+            <div class="flex items-center justify-between h-full py-2 md:w-75">
+                <div class="flex items-center px-2 md:px-6">
+                    <a id="retype-branding-logo" href="https://fhnaumann.github.io/ucumate/" class="flex items-center leading-snug text-2xl">
+                        <span class="w-10 mr-2 grow-0 shrink-0 overflow-hidden">
+                            <img class="max-h-10 md:inline-block" src="../static/favicon.png" alt="" width="40" height="40">
+                        </span>
+                        <span class="dark:text-white font-bold line-clamp-1 md:line-clamp-2">Ucumate</span>
+                    </a><span id="retype-branding-label" class="inline-flex mt-1 px-2 py-1 ml-4 text-xs font-medium leading-none items-center rounded-md bg-branding-label-bg text-branding-label-text ring-1 ring-branding-label-border ring-inset md:inline-block">Docs</span>
                 </div>
-        
-                <div class="flex justify-between md:grow">
-                    <!-- Top Nav -->
-                    <nav id="retype-header-nav" class="hidden md:flex">
-                        <ul class="flex flex-col mb-4 md:pl-16 md:mb-0 md:flex-row md:items-center">
-                            <li class="mr-6">
-                                <a class="py-2 md:mb-0 inline-flex items-center text-sm whitespace-nowrap transition-colors duration-200 ease-linear md:text-header-text font-header-text-weight hover:text-header-text-hover" href="https://retype.com/guides/getting-started/">Getting Started</a>
-                            </li>
-        
-                        </ul>
-                    </nav>
-        
-                    <!-- Header Right Skeleton -->
-                    <div v-cloak class="flex justify-end grow skeleton">
-        
-                        <!-- Search input mock -->
-                        <div class="relative hidden w-40 lg:block lg:max-w-sm lg:ml-auto">
-                            <div class="absolute flex items-center justify-center h-full pl-3 dark:text-dark-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon-base" width="16" height="16" viewBox="0 0 24 24" aria-labelledby="icon" role="presentation" style="margin-bottom: 1px;"><g fill="currentColor" ><path d="M21.71 20.29l-3.68-3.68A8.963 8.963 0 0020 11c0-4.96-4.04-9-9-9s-9 4.04-9 9 4.04 9 9 9c2.12 0 4.07-.74 5.61-1.97l3.68 3.68c.2.19.45.29.71.29s.51-.1.71-.29c.39-.39.39-1.03 0-1.42zM4 11c0-3.86 3.14-7 7-7s7 3.14 7 7c0 1.92-.78 3.66-2.04 4.93-.01.01-.02.01-.02.01-.01.01-.01.01-.01.02A6.98 6.98 0 0111 18c-3.86 0-7-3.14-7-7z" ></path></g></svg>
-                            </div>
-                            <input class="w-full h-10 placeholder-search-placeholder transition-colors duration-200 ease-in bg-search-bg border border-transparent rounded md:text-sm hover:border-search-border-hover focus:outline-none focus:border-search-border-focus" style="padding: 0.625rem 0.75rem 0.625rem 2rem" type="text" placeholder="Search">
-                        </div>
-        
-                        <!-- Mobile search button -->
-                        <div class="flex items-center justify-center w-10 h-10 lg:hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 icon-base" width="20" height="20" viewBox="0 0 24 24" aria-labelledby="icon" role="presentation" style="margin-bottom: 0px;"><g fill="currentColor" ><path d="M21.71 20.29l-3.68-3.68A8.963 8.963 0 0020 11c0-4.96-4.04-9-9-9s-9 4.04-9 9 4.04 9 9 9c2.12 0 4.07-.74 5.61-1.97l3.68 3.68c.2.19.45.29.71.29s.51-.1.71-.29c.39-.39.39-1.03 0-1.42zM4 11c0-3.86 3.14-7 7-7s7 3.14 7 7c0 1.92-.78 3.66-2.04 4.93-.01.01-.02.01-.02.01-.01.01-.01.01-.01.02A6.98 6.98 0 0111 18c-3.86 0-7-3.14-7-7z" ></path></g></svg>
-                        </div>
-        
-                        <!-- Dark mode switch placeholder -->
-                        <div class="w-10 h-10 lg:ml-2"></div>
-        
-                        <!-- History button -->
-                        <div class="flex items-center justify-center w-10 h-10" style="margin-right: -0.625rem;">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 icon-base" width="22" height="22" viewBox="0 0 24 24" aria-labelledby="icon" role="presentation" style="margin-bottom: 0px;"><g fill="currentColor" ><g ><path d="M12.01 6.01c-.55 0-1 .45-1 1V12a1 1 0 00.4.8l3 2.22a.985.985 0 001.39-.2.996.996 0 00-.21-1.4l-2.6-1.92V7.01c.02-.55-.43-1-.98-1z"></path><path d="M12.01 1.91c-5.33 0-9.69 4.16-10.05 9.4l-.29-.26a.997.997 0 10-1.34 1.48l1.97 1.79c.19.17.43.26.67.26s.48-.09.67-.26l1.97-1.79a.997.997 0 10-1.34-1.48l-.31.28c.34-4.14 3.82-7.41 8.05-7.41 4.46 0 8.08 3.63 8.08 8.09s-3.63 8.08-8.08 8.08c-2.18 0-4.22-.85-5.75-2.4a.996.996 0 10-1.42 1.4 10.02 10.02 0 007.17 2.99c5.56 0 10.08-4.52 10.08-10.08.01-5.56-4.52-10.09-10.08-10.09z"></path></g></g></svg>
-                        </div>
-                    </div>
-        
-                    <div v-cloak class="flex justify-end grow">
-                        <div id="retype-mobile-search-button"></div>
-                        <doc-search-desktop></doc-search-desktop>
-        
-                        <doc-theme-switch class="lg:ml-2"></doc-theme-switch>
-                        <doc-history></doc-history>
-                    </div>
+    
+                <span class="hidden h-8 border-r md:inline-block border-base-border"></span>
+            </div>
+    
+            <div class="flex justify-between md:grow">
+                <!-- Top Nav -->
+                <nav id="retype-header-nav" class="hidden md:flex">
+                    <ul class="flex flex-col mb-4 md:pl-16 md:mb-0 md:flex-row md:items-center">
+                        <li class="mr-6">
+                            <a class="py-2 md:mb-0 inline-flex items-center text-sm whitespace-nowrap transition-colors duration-200 ease-linear md:text-header-text font-header-text hover:text-header-text-hover" href="https://retype.com/guides/getting-started/">Getting Started</a>
+                        </li>
+    
+                    </ul>
+                </nav>
+    
+                <div v-cloak class="flex justify-end grow">
+                    <div id="retype-mobile-search-button"></div>
+                    <doc-search-desktop></doc-search-desktop>
+    
+                    <doc-theme-switch class="lg:ml-2"></doc-theme-switch>
+                    <doc-history></doc-history>
                 </div>
             </div>
-        </header>
-    
-    
-        <div id="retype-container" class="container relative flex bg-white">
-            <!-- Sidebar Skeleton -->
-            <div v-cloak class="fixed flex flex-col shrink-0 duration-300 ease-in-out bg-sidebar-left-bg border-sidebar-left-border sidebar top-20 w-75 border-r h-screen md:sticky transition-transform skeleton">
-            
-                <div class="flex items-center h-16 px-6">
-                    <input class="w-full h-8 px-3 py-2 transition-colors duration-200 ease-linear bg-filter-bg border border-filter-border rounded shadow-none text-sm focus:outline-none focus:border-filter-border-focus" type="text" placeholder="Filter">
-                </div>
-            
-                <div class="pl-6 mt-1 mb-4">
-                    <div class="w-32 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
-                    <div class="w-48 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
-                    <div class="w-40 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
-                    <div class="w-32 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
-                    <div class="w-48 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
-                    <div class="w-40 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
-                </div>
-            
-                <div class="shrink-0 mt-auto bg-transparent dark:border-base-border">
+        </div>
+    </header>
+
+
+    <div id="retype-container" class="container relative flex bg-white">
+        <!-- Sidebar Skeleton -->
+        <div v-cloak class="fixed flex flex-col shrink-0 duration-300 ease-in-out bg-sidebar-left-bg border-sidebar-left-border sidebar top-20 w-75 border-r h-screen md:sticky transition-transform skeleton">
+        
+            <div class="flex items-center h-16 px-6">
+                <input id="retype-filter-input-mock" class="w-full h-10 pl-8 px-3 py-2 transition-colors duration-200 ease-linear bg-filter-bg border border-filter-border rounded-lg shadow-none md:text-sm hover:border-filter-border-hover focus:outline-hidden focus:border-filter-border-focus placeholder-filter-placeholder" type="text">
+            </div>
+        
+            <div class="pl-6 mt-1 mb-4">
+                <div class="w-32 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
+                <div class="w-48 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
+                <div class="w-40 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
+                <div class="w-32 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
+                <div class="w-48 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
+                <div class="w-40 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
+            </div>
+        
+            <div class="shrink-0 mt-auto bg-transparent dark:border-base-border">
+                <a class="flex items-center justify-center flex-nowrap h-16 text-gray-350 dark:text-dark-400 hover:text-gray-600 dark:hover:text-dark-300 transition-colors duration-150 ease-in docs-powered-by" target="_blank" href="https://retype.com/" rel="noopener">
+                    <span class="text-xs whitespace-nowrap">Powered by</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ml-2" fill="currentColor" width="96" height="20" overflow="visible"><path d="M0 0v20h13.59V0H0zm11.15 17.54H2.44V2.46h8.71v15.08zM15.8 20h2.44V4.67L15.8 2.22zM20.45 6.89V20h2.44V9.34z"/><g><path d="M40.16 8.44c0 1.49-.59 2.45-1.75 2.88l2.34 3.32h-2.53l-2.04-2.96h-1.43v2.96h-2.06V5.36h3.5c1.43 0 2.46.24 3.07.73s.9 1.27.9 2.35zm-2.48 1.1c.26-.23.38-.59.38-1.09 0-.5-.13-.84-.4-1.03s-.73-.28-1.39-.28h-1.54v2.75h1.5c.72 0 1.2-.12 1.45-.35zM51.56 5.36V7.2h-4.59v1.91h4.13v1.76h-4.13v1.92h4.74v1.83h-6.79V5.36h6.64zM60.09 7.15v7.48h-2.06V7.15h-2.61V5.36h7.28v1.79h-2.61zM70.81 14.64h-2.06v-3.66l-3.19-5.61h2.23l1.99 3.45 1.99-3.45H74l-3.19 5.61v3.66zM83.99 6.19c.65.55.97 1.4.97 2.55s-.33 1.98-1 2.51-1.68.8-3.04.8h-1.23v2.59h-2.06V5.36h3.26c1.42 0 2.45.28 3.1.83zm-1.51 3.65c.25-.28.37-.69.37-1.22s-.16-.92-.48-1.14c-.32-.23-.82-.34-1.5-.34H79.7v3.12h1.38c.68 0 1.15-.14 1.4-.42zM95.85 5.36V7.2h-4.59v1.91h4.13v1.76h-4.13v1.92H96v1.83h-6.79V5.36h6.64z"/></g></svg>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Sidebar component -->
+        <doc-sidebar v-cloak>
+            <template #sidebar-footer>
+                <div class="shrink-0 mt-auto border-t md:bg-transparent md:border-none dark:border-base-border">
+        
+                    <div class="py-3 px-6 md:hidden border-b dark:border-base-border">
+                        <nav>
+                            <ul class="flex flex-wrap justify-center items-center">
+                                <li class="mr-6">
+                                    <a class="block py-1 inline-flex items-center text-sm whitespace-nowrap transition-colors duration-200 ease-linear md:text-header-text font-header-text hover:text-header-text-hover" href="https://retype.com/guides/getting-started/">Getting Started</a>
+                                </li>
+        
+                            </ul>
+                        </nav>
+                    </div>
+        
                     <a class="flex items-center justify-center flex-nowrap h-16 text-gray-350 dark:text-dark-400 hover:text-gray-600 dark:hover:text-dark-300 transition-colors duration-150 ease-in docs-powered-by" target="_blank" href="https://retype.com/" rel="noopener">
                         <span class="text-xs whitespace-nowrap">Powered by</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="ml-2" fill="currentColor" width="96" height="20" overflow="visible"><path d="M0 0v20h13.59V0H0zm11.15 17.54H2.44V2.46h8.71v15.08zM15.8 20h2.44V4.67L15.8 2.22zM20.45 6.89V20h2.44V9.34z"/><g><path d="M40.16 8.44c0 1.49-.59 2.45-1.75 2.88l2.34 3.32h-2.53l-2.04-2.96h-1.43v2.96h-2.06V5.36h3.5c1.43 0 2.46.24 3.07.73s.9 1.27.9 2.35zm-2.48 1.1c.26-.23.38-.59.38-1.09 0-.5-.13-.84-.4-1.03s-.73-.28-1.39-.28h-1.54v2.75h1.5c.72 0 1.2-.12 1.45-.35zM51.56 5.36V7.2h-4.59v1.91h4.13v1.76h-4.13v1.92h4.74v1.83h-6.79V5.36h6.64zM60.09 7.15v7.48h-2.06V7.15h-2.61V5.36h7.28v1.79h-2.61zM70.81 14.64h-2.06v-3.66l-3.19-5.61h2.23l1.99 3.45 1.99-3.45H74l-3.19 5.61v3.66zM83.99 6.19c.65.55.97 1.4.97 2.55s-.33 1.98-1 2.51-1.68.8-3.04.8h-1.23v2.59h-2.06V5.36h3.26c1.42 0 2.45.28 3.1.83zm-1.51 3.65c.25-.28.37-.69.37-1.22s-.16-.92-.48-1.14c-.32-.23-.82-.34-1.5-.34H79.7v3.12h1.38c.68 0 1.15-.14 1.4-.42zM95.85 5.36V7.2h-4.59v1.91h4.13v1.76h-4.13v1.92H96v1.83h-6.79V5.36h6.64z"/></g></svg>
                     </a>
                 </div>
-            </div>
-            
-            <!-- Sidebar component -->
-            <doc-sidebar v-cloak>
-                <template #sidebar-footer>
-                    <div class="shrink-0 mt-auto border-t md:bg-transparent md:border-none dark:border-base-border">
-            
-                        <div class="py-3 px-6 md:hidden border-b dark:border-base-border">
-                            <nav>
-                                <ul class="flex flex-wrap justify-center items-center">
-                                    <li class="mr-6">
-                                        <a class="block py-1 inline-flex items-center text-sm whitespace-nowrap transition-colors duration-200 ease-linear md:text-header-text font-header-text-weight hover:text-header-text-hover" href="https://retype.com/guides/getting-started/">Getting Started</a>
-                                    </li>
-            
-                                </ul>
-                            </nav>
-                        </div>
-            
-                        <a class="flex items-center justify-center flex-nowrap h-16 text-gray-350 dark:text-dark-400 hover:text-gray-600 dark:hover:text-dark-300 transition-colors duration-150 ease-in docs-powered-by" target="_blank" href="https://retype.com/" rel="noopener">
-                            <span class="text-xs whitespace-nowrap">Powered by</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="ml-2" fill="currentColor" width="96" height="20" overflow="visible"><path d="M0 0v20h13.59V0H0zm11.15 17.54H2.44V2.46h8.71v15.08zM15.8 20h2.44V4.67L15.8 2.22zM20.45 6.89V20h2.44V9.34z"/><g><path d="M40.16 8.44c0 1.49-.59 2.45-1.75 2.88l2.34 3.32h-2.53l-2.04-2.96h-1.43v2.96h-2.06V5.36h3.5c1.43 0 2.46.24 3.07.73s.9 1.27.9 2.35zm-2.48 1.1c.26-.23.38-.59.38-1.09 0-.5-.13-.84-.4-1.03s-.73-.28-1.39-.28h-1.54v2.75h1.5c.72 0 1.2-.12 1.45-.35zM51.56 5.36V7.2h-4.59v1.91h4.13v1.76h-4.13v1.92h4.74v1.83h-6.79V5.36h6.64zM60.09 7.15v7.48h-2.06V7.15h-2.61V5.36h7.28v1.79h-2.61zM70.81 14.64h-2.06v-3.66l-3.19-5.61h2.23l1.99 3.45 1.99-3.45H74l-3.19 5.61v3.66zM83.99 6.19c.65.55.97 1.4.97 2.55s-.33 1.98-1 2.51-1.68.8-3.04.8h-1.23v2.59h-2.06V5.36h3.26c1.42 0 2.45.28 3.1.83zm-1.51 3.65c.25-.28.37-.69.37-1.22s-.16-.92-.48-1.14c-.32-.23-.82-.34-1.5-.34H79.7v3.12h1.38c.68 0 1.15-.14 1.4-.42zM95.85 5.36V7.2h-4.59v1.91h4.13v1.76h-4.13v1.92H96v1.83h-6.79V5.36h6.64z"/></g></svg>
-                        </a>
-                    </div>
-                </template>
-            </doc-sidebar>
-    
-            <div class="grow min-w-0 bg-body-bg">
-                <!-- Render "toolbar" template here on api pages --><!-- Render page content -->
-                <div class="flex">
-                    <div id="retype-main" class="min-w-0 p-4 grow md:px-16">
-                        <main class="relative pb-12 lg:pt-2">
-                            <div class="retype-markdown" id="retype-content">
-                                <!-- Rendered if sidebar right is enabled -->
-                                <div id="retype-sidebar-right-toggle"></div>
-                                <nav id="retype-breadcrumb" class="breadcrumb" aria-label="Breadcrumb">
-                                    <ol role="list">
-                                        <li class="pr-4">
-                                            <a href="../" class="pr-4">
-                                                ucumate
-                                            </a>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"/>
-                                            </svg>
-                                        </li>
-                                        <li class="pr-4">
-                                            <a href="../ucumate_ucumjava_bridge/" class="pr-4">
-                                                Ucum-​Java Legacy Support
-                                            </a>
-                                        </li>
-                                    </ol>
-                                </nav>
-                
-                                <!-- Page content  -->
-<doc-anchor-target id="ucum-java-legacy-support" class="break-words">
-    <h1>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#ucum-java-legacy-support">#</doc-anchor-trigger>
-        <span>Ucum-Java Legacy Support</span>
-    </h1>
-</doc-anchor-target>
-<p>ucumate offers a drop-in replacement module for <a href="https://github.com/FHIR/Ucum-java" class="outbound" target="_blank"><span>Ucum-java</span><svg xmlns="http://www.w3.org/2000/svg" class="retype-outbound-trigger docs-icon ml-1" viewBox="0 0 24 24" role="presentation"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a>.</p>
-<div class="codeblock-wrapper"><doc-codeblock>
+            </template>
+        </doc-sidebar>
+
+        <div class="grow min-w-0 bg-body-bg">
+            <!-- Render "toolbar" template here on api pages --><!-- Render page content -->
+<div class="flex">
+    <div id="retype-main" class="min-w-0 p-4 grow md:px-16">
+        <main class="relative pb-12 lg:pt-2">
+            <div class="relative retype-markdown" id="retype-content">
+                <!-- Rendered if sidebar right is enabled -->
+                <div id="retype-sidebar-right-toggle"></div>
+                <nav id="retype-breadcrumb" class="breadcrumb" aria-label="Breadcrumb">
+                    <ol role="list">
+                        <li class="pr-4">
+                            <a href="../" class="pr-4">
+                                ucumate
+                            </a>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"/>
+                            </svg>
+                        </li>
+                        <li class="pr-4">
+                            <a href="../ucumate_ucumjava_bridge/" class="pr-4">
+                                Ucum-​Java Legacy Support
+                            </a>
+                        </li>
+                    </ol>
+                </nav>
+
+                <doc-page-actions></doc-page-actions>
+
+                <!-- Page content  -->
+<h1 id="ucum-java-legacy-support">Ucum-Java Legacy Support</h1>
+<p>ucumate offers a drop-in replacement module for <a href="https://github.com/FHIR/Ucum-java" class="outbound" target="_blank"><span>Ucum-java</span><svg xmlns="http://www.w3.org/2000/svg" class="retype-outbound-trigger docs-icon ml-1" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a>.</p>
+<div id="ucum-java-legacy-support-code-1" class="codeblock-wrapper"><doc-codeblock>
 <pre translate="no" class="language-markup"><code v-pre class="language-markup">&lt;dependency&gt;
     &lt;groupId&gt;io.github.fhnaumann&lt;/groupId&gt;
     &lt;artifactId&gt;ucumate-ucumjava-bridge&lt;/artifactId&gt;
     &lt;version&gt;1.0.8&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </doc-codeblock></div>
-<p>You can construct a <code v-pre>UcumateToUcumJavaService</code> which implements most of the functionality from the <code v-pre>Ucum-java</code> interface definition.</p>
-<p>Below you find a detailed description on the differences to the old <code v-pre>Ucum-java</code> implementation.</p>
-<doc-anchor-target id="general-differences">
-    <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#general-differences">#</doc-anchor-trigger>
-        <span>General Differences</span>
-    </h2>
-</doc-anchor-target>
+<p>You can construct a <code translate="no" v-pre>UcumateToUcumJavaService</code> which implements most of the functionality from the <code translate="no" v-pre>Ucum-java</code> interface definition.</p>
+<p>Below you find a detailed description on the differences to the old <code translate="no" v-pre>Ucum-java</code> implementation.</p>
+<h2 id="general-differences">General Differences</h2>
 <div class="flex mb-6">
     <div class="shrink-0 w-1.5 rounded-tl-lg rounded-bl-lg bg-callout-warning"></div>
     <div class="flex w-full py-4 border border-l-0 rounded-tr-lg rounded-br-lg doc-callout bg-callout-base-bg border-callout-base-border" role="alert">
         <div class="flex items-center ml-4 h-7">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mb-px text-callout-warning" width="22" height="22" viewBox="0 0 24 24" role="presentation">
+            <svg xmlns="http://www.w3.org/2000/svg" class="block text-callout-warning" width="22" height="22" viewBox="0 0 24 24" role="presentation">
                 <g fill="currentColor"><g>
                     <path d="M22.48 15.59L14.01 1.45A2.968 2.968 0 0012.16.09c-.78-.19-1.58-.07-2.27.35-.41.25-.76.6-1.01 1.01v.01L.4 15.6c-.83 1.43-.33 3.27 1.1 4.1.45.26.95.4 1.48.4h16.95c.8-.01 1.55-.33 2.11-.9.56-.57.87-1.33.86-2.13a3.04 3.04 0 00-.42-1.48zm-1.87 2.21c-.19.19-.44.3-.69.3H2.99c-.17 0-.34-.05-.49-.13a.992.992 0 01-.37-1.35L10.6 2.48c.08-.14.2-.25.34-.33a.992.992 0 011.37.33l8.46 14.13c.09.15.13.32.13.49 0 .26-.1.51-.29.7z"></path>
                     <path d="M11.45 12.1c.55 0 1-.45 1-1v-4c0-.55-.45-1-1-1s-1 .45-1 1v4c0 .56.45 1 1 1zM11.46 14.1c-.56 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"></path>
@@ -223,12 +196,21 @@
         </div>
         <div class="pr-5 ml-3 w-full">
             <h5>Error Feedback</h5>
-<p><code v-pre>Ucum-java</code> provides some basic feedback when an action failed. I.e. if the given input is invalid, it will return a string
-message with details. If the input is valid, it returns null. The <code v-pre>ucumate-ucumjava-bridge</code> implementation does not return
-(the same) string error messages. You should only rely on <code v-pre>== null</code> or <code v-pre>!= null</code> checks but not on the string contents itself.</p>
+<p><code translate="no" v-pre>Ucum-java</code> provides some basic feedback when an action failed. I.e. if the given input is invalid, it will return a string
+message with details. If the input is valid, it returns null. The <code translate="no" v-pre>ucumate-ucumjava-bridge</code> implementation does not return
+(the same) string error messages. You should only rely on <code translate="no" v-pre>== null</code> or <code translate="no" v-pre>!= null</code> checks but not on the string contents itself.</p>
         </div>
     </div>
 </div>
+<retype-table copy-text="| Method                 | ucum-java                                                     | ucumate-ucumjava-bridge                                                                                                                  |
+|------------------------|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| validateInProperty     | Validate unit with specific property requirement              | Not Implemented                                                                                                                          |
+| validateUCUM           | A list of special units because they are not implemented here | An empty list, everything is implemented and supported                                                                                   |
+| analyse                | A string representation of the parsed input expression        | The same output as `ucum-java` but it prints a warning when parenthesis ambiguity is encountered                                         |
+| validateCanonicalUnits | Validate Canonical Units with potential error message         | The same as `ucum-java` but different error messages                                                                                     |
+| validate               | Validate an input                                             | In principle the same as `ucum-java` but there are some [key differences in validity](tests.md#conformance-to-the-ucumfunctiontestsxml). |
+| multiply               | Multiply two expressions                                      | Not Implemented                                                                                                                          |
+| divideBy               | Divide two expressions                                        | Not Implemented                                                                                                                          |">
 <div class="table-wrapper scrollbar overflow-hidden">
 <table class="comfortable">
 <thead>
@@ -252,17 +234,17 @@ message with details. If the input is valid, it returns null. The <code v-pre>uc
 <tr>
 <td>analyse</td>
 <td>A string representation of the parsed input expression</td>
-<td>The same output as <code v-pre>ucum-java</code> but it prints a warning when parenthesis ambiguity is encountered</td>
+<td>The same output as <code translate="no" v-pre>ucum-java</code> but it prints a warning when parenthesis ambiguity is encountered</td>
 </tr>
 <tr>
 <td>validateCanonicalUnits</td>
 <td>Validate Canonical Units with potential error message</td>
-<td>The same as <code v-pre>ucum-java</code> but different error messages</td>
+<td>The same as <code translate="no" v-pre>ucum-java</code> but different error messages</td>
 </tr>
 <tr>
 <td>validate</td>
 <td>Validate an input</td>
-<td>In principle the same as <code v-pre>ucum-java</code> but there are some <a href="../tests/#conformance-to-the-ucumfunctiontestsxml">key differences in validity</a>.</td>
+<td>In principle the same as <code translate="no" v-pre>ucum-java</code> but there are some <a href="../tests/#conformance-to-the-ucumfunctiontestsxml">key differences in validity</a>.</td>
 </tr>
 <tr>
 <td>multiply</td>
@@ -277,24 +259,36 @@ message with details. If the input is valid, it returns null. The <code v-pre>uc
 </tbody>
 </table>
 </div>
-<doc-anchor-target id="functional-xml-test-difference">
-    <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#functional-xml-test-difference">#</doc-anchor-trigger>
-        <span>Functional XML Test Difference</span>
-    </h2>
-</doc-anchor-target>
-<p>Please see the <a href="../tests/#conformance-to-the-ucumfunctiontestsxml">tests page</a> for the difference between <code v-pre>ucum-java</code> and <code v-pre>ucumate</code>. The <code v-pre>ucumate-ucumjava-bridge</code> does change any validation or conversion logic
+</retype-table>
+<h2 id="functional-xml-test-difference">Functional XML Test Difference</h2>
+<p>Please see the <a href="../tests/#conformance-to-the-ucumfunctiontestsxml">tests page</a> for the difference between <code translate="no" v-pre>ucum-java</code> and <code translate="no" v-pre>ucumate</code>. The <code translate="no" v-pre>ucumate-ucumjava-bridge</code> does change any validation or conversion logic
 compared to the core implementation.</p>
-<doc-anchor-target id="functional-json-test-difference">
-    <h2>
-        <doc-anchor-trigger class="header-anchor-trigger" to="#functional-json-test-difference">#</doc-anchor-trigger>
-        <span>Functional JSON Test Difference</span>
-    </h2>
-</doc-anchor-target>
+<h2 id="functional-json-test-difference">Functional JSON Test Difference</h2>
 <p>During the development of ucumate, a new additional <a href="../tests/">test suite</a> has been created. This adds more extensive edge case tests,
 but it also has some slightly different validation rules which will be highlighted below.</p>
-<p>Here are all the test cases from the JSON tests where <code v-pre>ucum-java</code> differs from <code v-pre>ucumate</code>. The <code v-pre>ucumate-ucumjava-bridge</code> does change any validation or conversion logic
+<p>Here are all the test cases from the JSON tests where <code translate="no" v-pre>ucum-java</code> differs from <code translate="no" v-pre>ucumate</code>. The <code translate="no" v-pre>ucumate-ucumjava-bridge</code> does change any validation or conversion logic
 compared to the core implementation.</p>
+<retype-table copy-text="| Test ID | Input (Diplay) | Expected | Ucum-java (Actual) | Reason                                                                                                                                                                                                                                                                                     |
+|---------|----------------|----------|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 32      | da             | Valid    | Invalid            | `da` is parsed as the single prefix (correctly marked as invalid). But it can also be parsed as `dezi * year` (if non-metric units are allowed to have prefixes).                                                                                                                          |
+| 52      | m\{\{\}        | Invalid  | Valid              | The UCUM spec states 'Curly brackets may not be nested' but includes `{` and `}` as valid symbols inside an annotation. This is ambiguous and there is no use case for this, so ucumate just disallows this. Also see [this discussion](https://github.com/orgs/ucum-org/discussions/380). |
+| 55      | m\{ \}         | Invalid  | Valid              | The space character is number 32, but only characters inside the range 33-126 may be used.                                                                                                                                                                                                 |
+| 66      | 2+5            | Valid    | Invalid            | `Ucum-java` does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so `ucumate` allows it.                                                                                                       |
+| 67      | 12+5           | Valid    | Invalid            | `Ucum-java` does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so `ucumate` allows it.                                                                                                       |
+| 68      | 10+5           | Valid    | Invalid            | `Ucum-java` does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so `ucumate` allows it.                                                                                                       |
+| 69      | 10-5           | Valid    | Invalid            | `Ucum-java` does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so `ucumate` allows it.                                                                                                       |
+| 71      | -1             | Invalid  | Valid              | Negative integers are not allowed in UCUM but `ucum-java` allows it.                                                                                                                                                                                                                       |
+| 71      | -5.2           | Invalid  | Valid              | Negative integers are not allowed in UCUM but `ucum-java` allows it.                                                                                                                                                                                                                       |
+| 72      | -5\{abc\}      | Invalid  | Valid              | Negative integers are not allowed in UCUM but `ucum-java` allows it.                                                                                                                                                                                                                       |
+| 73      | /Cel           | Invalid  | Valid              | Special units may not be part of a division.                                                                                                                                                                                                                                               |
+| 74      | Cel/3          | Invalid  | Valid              | Special units may not be part of a division.                                                                                                                                                                                                                                               |
+| 75      | Cel/m          | Invalid  | Valid              | Special units may not be part of a division.                                                                                                                                                                                                                                               |
+| 76      | Cel/Cel        | Invalid  | Valid              | Special units may not be part of a division. (**See Note below**)                                                                                                                                                                                                                          |
+| 82      | Cel+2          | Invalid  | Valid              | Special units may not have an exponent.                                                                                                                                                                                                                                                    |
+| 83      | Cel2           | Invalid  | Valid              | Special units may not have an exponent.                                                                                                                                                                                                                                                    |
+| 84      | Cel-2          | Invalid  | Valid              | Special units may not have an exponent.                                                                                                                                                                                                                                                    |
+| 85      | m.5.Cel2.s.2   | Invalid  | Valid              | Special units may not have an exponent.                                                                                                                                                                                                                                                    |
+| 86      | m.5.Cel2.s/2   | Invalid  | Valid              | Special units may not have an exponent and may not be part of a division.                                                                                                                                                                                                                  |">
 <div class="table-wrapper scrollbar overflow-hidden">
 <table class="comfortable">
 <thead>
@@ -312,14 +306,14 @@ compared to the core implementation.</p>
 <td>da</td>
 <td>Valid</td>
 <td>Invalid</td>
-<td><code v-pre>da</code> is parsed as the single prefix (correctly marked as invalid). But it can also be parsed as <code v-pre>dezi * year</code> (if non-metric units are allowed to have prefixes).</td>
+<td><code translate="no" v-pre>da</code> is parsed as the single prefix (correctly marked as invalid). But it can also be parsed as <code translate="no" v-pre>dezi * year</code> (if non-metric units are allowed to have prefixes).</td>
 </tr>
 <tr>
 <td>52</td>
 <td>m{{}</td>
 <td>Invalid</td>
 <td>Valid</td>
-<td>The UCUM spec states &#x27;Curly brackets may not be nested&#x27; but includes <code v-pre>{</code> and <code v-pre>}</code> as valid symbols inside an annotation. This is ambiguous and there is no use case for this, so ucumate just disallows this. Also see <a href="https://github.com/orgs/ucum-org/discussions/380" class="outbound" target="_blank"><span>this discussion</span><svg xmlns="http://www.w3.org/2000/svg" class="retype-outbound-trigger docs-icon ml-1" viewBox="0 0 24 24" role="presentation"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a>.</td>
+<td>The UCUM spec states &#x27;Curly brackets may not be nested&#x27; but includes <code translate="no" v-pre>{</code> and <code translate="no" v-pre>}</code> as valid symbols inside an annotation. This is ambiguous and there is no use case for this, so ucumate just disallows this. Also see <a href="https://github.com/orgs/ucum-org/discussions/380" class="outbound" target="_blank"><span>this discussion</span><svg xmlns="http://www.w3.org/2000/svg" class="retype-outbound-trigger docs-icon ml-1" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><path d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75Z"/><path d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75V4.25Z"/></g></svg></a>.</td>
 </tr>
 <tr>
 <td>55</td>
@@ -333,49 +327,49 @@ compared to the core implementation.</p>
 <td>2+5</td>
 <td>Valid</td>
 <td>Invalid</td>
-<td><code v-pre>Ucum-java</code> does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so <code v-pre>ucumate</code> allows it.</td>
+<td><code translate="no" v-pre>Ucum-java</code> does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so <code translate="no" v-pre>ucumate</code> allows it.</td>
 </tr>
 <tr>
 <td>67</td>
 <td>12+5</td>
 <td>Valid</td>
 <td>Invalid</td>
-<td><code v-pre>Ucum-java</code> does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so <code v-pre>ucumate</code> allows it.</td>
+<td><code translate="no" v-pre>Ucum-java</code> does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so <code translate="no" v-pre>ucumate</code> allows it.</td>
 </tr>
 <tr>
 <td>68</td>
 <td>10+5</td>
 <td>Valid</td>
 <td>Invalid</td>
-<td><code v-pre>Ucum-java</code> does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so <code v-pre>ucumate</code> allows it.</td>
+<td><code translate="no" v-pre>Ucum-java</code> does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so <code translate="no" v-pre>ucumate</code> allows it.</td>
 </tr>
 <tr>
 <td>69</td>
 <td>10-5</td>
 <td>Valid</td>
 <td>Invalid</td>
-<td><code v-pre>Ucum-java</code> does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so <code v-pre>ucumate</code> allows it.</td>
+<td><code translate="no" v-pre>Ucum-java</code> does not allow integer units to be raised to an exponent. This is ambiguous in the UCUM spec but there is no real disadvantage to supporting it, so <code translate="no" v-pre>ucumate</code> allows it.</td>
 </tr>
 <tr>
 <td>71</td>
 <td>-1</td>
 <td>Invalid</td>
 <td>Valid</td>
-<td>Negative integers are not allowed in UCUM but <code v-pre>ucum-java</code> allows it.</td>
+<td>Negative integers are not allowed in UCUM but <code translate="no" v-pre>ucum-java</code> allows it.</td>
 </tr>
 <tr>
 <td>71</td>
 <td>-5.2</td>
 <td>Invalid</td>
 <td>Valid</td>
-<td>Negative integers are not allowed in UCUM but <code v-pre>ucum-java</code> allows it.</td>
+<td>Negative integers are not allowed in UCUM but <code translate="no" v-pre>ucum-java</code> allows it.</td>
 </tr>
 <tr>
 <td>72</td>
 <td>-5{abc}</td>
 <td>Invalid</td>
 <td>Valid</td>
-<td>Negative integers are not allowed in UCUM but <code v-pre>ucum-java</code> allows it.</td>
+<td>Negative integers are not allowed in UCUM but <code translate="no" v-pre>ucum-java</code> allows it.</td>
 </tr>
 <tr>
 <td>73</td>
@@ -443,11 +437,12 @@ compared to the core implementation.</p>
 </tbody>
 </table>
 </div>
+</retype-table>
 <div class="flex mb-6">
     <div class="shrink-0 w-1.5 rounded-tl-lg rounded-bl-lg bg-callout-warning"></div>
     <div class="flex w-full py-4 border border-l-0 rounded-tr-lg rounded-br-lg doc-callout bg-callout-base-bg border-callout-base-border" role="alert">
         <div class="flex items-center ml-4 h-7">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mb-px text-callout-warning" width="22" height="22" viewBox="0 0 24 24" role="presentation">
+            <svg xmlns="http://www.w3.org/2000/svg" class="block text-callout-warning" width="22" height="22" viewBox="0 0 24 24" role="presentation">
                 <g fill="currentColor"><g>
                     <path d="M22.48 15.59L14.01 1.45A2.968 2.968 0 0012.16.09c-.78-.19-1.58-.07-2.27.35-.41.25-.76.6-1.01 1.01v.01L.4 15.6c-.83 1.43-.33 3.27 1.1 4.1.45.26.95.4 1.48.4h16.95c.8-.01 1.55-.33 2.11-.9.56-.57.87-1.33.86-2.13a3.04 3.04 0 00-.42-1.48zm-1.87 2.21c-.19.19-.44.3-.69.3H2.99c-.17 0-.34-.05-.49-.13a.992.992 0 01-.37-1.35L10.6 2.48c.08-.14.2-.25.34-.33a.992.992 0 011.37.33l8.46 14.13c.09.15.13.32.13.49 0 .26-.1.51-.29.7z"></path>
                     <path d="M11.45 12.1c.55 0 1-.45 1-1v-4c0-.55-.45-1-1-1s-1 .45-1 1v4c0 .56.45 1 1 1zM11.46 14.1c-.56 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"></path>
@@ -456,72 +451,87 @@ compared to the core implementation.</p>
         </div>
         <div class="pr-5 ml-3 w-full">
             <h5>Normalizing with Special Units</h5>
-<p>Special units are not allowed to be part of an expression that also contains a division. I.e. <code v-pre>Cel/m</code> is invalid. Now it is unclear how this
-behaves in regard to expression normalization. I.e. <code v-pre>m/m</code> canonicalizes to <code v-pre>1</code>. Should therefore <code v-pre>Cel/Cel</code> normalize to <code v-pre>1</code> and be counted
-as a valid UCUM expression? Currently, this is not the case in ucumate and it will show <code v-pre>Cel/Cel</code> as invalid.
+<p>Special units are not allowed to be part of an expression that also contains a division. I.e. <code translate="no" v-pre>Cel/m</code> is invalid. Now it is unclear how this
+behaves in regard to expression normalization. I.e. <code translate="no" v-pre>m/m</code> canonicalizes to <code translate="no" v-pre>1</code>. Should therefore <code translate="no" v-pre>Cel/Cel</code> normalize to <code translate="no" v-pre>1</code> and be counted
+as a valid UCUM expression? Currently, this is not the case in ucumate and it will show <code translate="no" v-pre>Cel/Cel</code> as invalid.
 <strong>Please get in contact if you have an opinion on this.</strong></p>
         </div>
     </div>
 </div>
-
-                                
-                                <!-- Required only on API pages -->
-                                <doc-toolbar-member-filter-no-results></doc-toolbar-member-filter-no-results>
-                            </div>
-                            <footer id="retype-content-footer" class="clear-both">
-                            
-                                <nav id="retype-nextprev" class="print:hidden flex mt-14">
-                                    <div class="w-1/2">
-                                        <a class="px-5 py-4 h-full flex items-center break-normal font-medium text-body-link border border-base-border hover:border-base-border-hover rounded-r rounded-l-lg transition-colors duration-150 relative hover:z-5" href="../mol_mass_conversion/">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-3" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" overflow="visible"><path d="M19 11H7.41l5.29-5.29a.996.996 0 10-1.41-1.41l-7 7a1 1 0 000 1.42l7 7a1.024 1.024 0 001.42-.01.996.996 0 000-1.41L7.41 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
-                                            <span>
-                                                <span class="block text-xs font-normal text-base-text-muted">Previous</span>
-                                                <span class="block mt-1">Mole <-> Mass Conversion</span>
-                                            </span>
-                                        </a>
-                                    </div>
-                            
-                                    <div class="w-1/2">
-                                    </div>
-                                </nav>
-                            </footer>
-                        </main>
-                
-                        <div id="retype-page-footer" class="print:border-none border-t border-base-border pt-6 mb-8">
-                            <footer class="flex flex-wrap items-center justify-between print:justify-center">
-                                <div id="retype-footer-links" class="print:hidden">
-                                    <ul class="flex flex-wrap items-center text-sm">
-                                    </ul>
-                                </div>
-                                <div id="retype-copyright" class="print:justify-center py-2 text-footer-text font-footer-link-weight text-sm leading-relaxed"><p>© Copyright 2025. All rights reserved.</p></div>
-                            </footer>
-                        </div>
-                    </div>
-                
-                    <!-- Rendered if sidebar right is enabled -->
-                    <!-- Sidebar right skeleton-->
-                    <div v-cloak class="fixed top-0 bottom-0 right-0 translate-x-full bg-sidebar-right-bg border-sidebar-right-border lg:sticky lg:border-l lg:shrink-0 lg:pt-6 lg:transform-none sm:w-1/2 lg:w-64 lg:z-0 md:w-104 sidebar-right skeleton">
-                        <div class="pl-5">
-                            <div class="w-32 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
-                            <div class="w-48 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
-                            <div class="w-40 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
-                        </div>
-                    </div>
-                
-                    <!-- User should be able to hide sidebar right -->
-                    <doc-sidebar-right v-cloak></doc-sidebar-right>
-                </div>
-
+<div id="retype-backlinks">
+    <h2>See also</h2>
+<div class="card-compact-group">
+<div class="card-compact-container">
+    <a href="/ucumate/" class="group card-compact no-link">
+        <div class="card-compact-body">
+            <div class="card-compact-header">
+                <span class="card-compact-title">ucumate</span>
             </div>
+            <p class="card-compact-description">ucumate is a developer-friendly Java library for working with units of measure based on the UCUM standard. At its core, it provides validation, canonicalization, conversion, and printing support with automatic caching.</p>
         </div>
-    
-        <doc-search-mobile></doc-search-mobile>
-        <doc-back-to-top></doc-back-to-top>
+    </a>
+</div>
+</div>
+</div>
+
+                
+                <!-- Required only on API pages -->
+                <doc-toolbar-member-filter-no-results></doc-toolbar-member-filter-no-results>
+            </div>
+            <footer id="retype-content-footer" class="clear-both">
+            
+                <nav id="retype-nextprev" class="print:hidden flex mt-14">
+                    <div class="w-1/2">
+                        <a class="px-5 py-4 h-full flex items-center break-normal font-medium text-body-link border border-base-border hover:border-base-border-hover rounded-r rounded-l-lg transition-colors duration-150 relative hover:z-5" href="../mol_mass_conversion/">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-3" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" overflow="visible"><path d="M19 11H7.41l5.29-5.29a.996.996 0 10-1.41-1.41l-7 7a1 1 0 000 1.42l7 7a1.024 1.024 0 001.42-.01.996.996 0 000-1.41L7.41 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
+                            <span>
+                                <span class="block text-xs font-normal text-base-text-muted">Previous</span>
+                                <span class="block mt-1">Mole &lt;-&gt; Mass Conversion</span>
+                            </span>
+                        </a>
+                    </div>
+            
+                    <div class="w-1/2">
+                    </div>
+                </nav>
+            </footer>
+        </main>
+
+        <div id="retype-page-footer" class="print:border-none border-t border-base-border pt-6 mb-8">
+            <footer class="flex flex-wrap items-center justify-between print:justify-center">
+                <div id="retype-footer-links" class="print:hidden">
+                    <ul class="flex flex-wrap items-center text-sm">
+                    </ul>
+                </div>
+                <div id="retype-copyright" class="print:justify-center py-2 text-footer-text font-footer-link text-sm leading-relaxed"><p>© Copyright 2026. All rights reserved.</p></div>
+            </footer>
+        </div>
     </div>
+
+    <!-- Rendered if sidebar right is enabled -->
+    <!-- Sidebar right skeleton-->
+    <div v-cloak class="fixed top-0 bottom-0 right-0 translate-x-full bg-sidebar-right-bg border-sidebar-right-border lg:sticky lg:border-l lg:shrink-0 lg:pt-6 lg:translate-x-0 sm:w-1/2 lg:w-64 lg:z-0 md:w-104 sidebar-right skeleton">
+        <div class="pl-5">
+            <div class="w-32 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
+            <div class="w-48 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
+            <div class="w-40 h-3 mb-4 bg-skeleton-bg rounded-full loading"></div>
+        </div>
+    </div>
+
+    <!-- User should be able to hide sidebar right -->
+    <doc-sidebar-right v-cloak></doc-sidebar-right>
+</div>
+
+        </div>
+    </div>
+
+    <doc-search-mobile></doc-search-mobile>
+    <doc-back-to-top></doc-back-to-top>
+</div>
 
 
     <div id="retype-overlay-target"></div>
 
-    <script data-cfasync="false">window.__DOCS__ = { "title": "Ucum-Java Legacy Support", level: 1, icon: "file", hasPrism: true, hasMermaid: false, hasMath: false, tocDepth: 23 }</script>
+        <script data-cfasync="false">window.__DOCS__ = { "title": "Ucum-Java Legacy Support", level: 1, icon: "file", hasPrism: true, hasInstagram: false, hasMermaid: false, hasMath: false, tocDepth: 23, "md": "/ucumate_ucumjava_bridge.md" }</script>
 </body>
 </html>
