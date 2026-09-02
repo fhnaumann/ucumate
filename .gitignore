@@ -71,3 +71,10 @@ ucumate-spi-tests/target
 
 **/target
 target
+
+### Python bindings ###
+ucumate-python/.venv/
+ucumate-python/dist/
+ucumate-python/src/ucumate/jars/*.jar
+__pycache__/
+.pytest_cache/

@@ -1,0 +1,100 @@
+name: Release Python Package
+
+on:
+  push:
+    tags:
+      - 'python-v*'   # e.g. python-v1.0.8
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Where to publish'
+        required: true
+        default: 'testpypi'
+        type: choice
+        options:
+          - testpypi
+          - pypi
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+
+      - name: Check the Python and Maven versions agree
+        run: |
+          py_version=$(grep -m1 '^version = ' ucumate-python/pyproject.toml | cut -d'"' -f2)
+          jar_version=$(mvn -q -f ucumate-python-bundle/pom.xml help:evaluate \
+            -Dexpression=project.version -DforceStdout)
+          echo "pyproject.toml: $py_version"
+          echo "bundle pom.xml: $jar_version"
+          if [ "$py_version" != "$jar_version" ]; then
+            echo "::error::Version mismatch — the wheel would ship a JAR whose version does not match its own."
+            exit 1
+          fi
+
+      - name: Build the fat JAR
+        run: mvn -B package -DskipTests -f ucumate-python-bundle/pom.xml
+
+      - name: Stage the JAR into the package
+        run: cp ucumate-python-bundle/target/ucumate-python-bundle-*.jar ucumate-python/src/ucumate/jars/
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Build the wheel and sdist
+        run: uv build
+        working-directory: ucumate-python
+
+      - name: Verify the wheel installs and passes its tests
+        working-directory: ucumate-python
+        run: |
+          uv venv /tmp/verify
+          VIRTUAL_ENV=/tmp/verify uv pip install dist/*.whl pytest
+          # Run from a directory without the source tree, so the installed
+          # distribution is what gets imported.
+          cd /tmp && /tmp/verify/bin/python -m pytest \
+            "$GITHUB_WORKSPACE/ucumate-python/tests/" -q
+
+      - name: Upload the artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-dist
+          path: ucumate-python/dist/
+
+  publish-testpypi:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi'
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write   # Trusted Publishing — no API token stored
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/python-v') || (github.event_name == 'workflow_dispatch' && inputs.target == 'pypi')
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # Trusted Publishing — no API token stored
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
