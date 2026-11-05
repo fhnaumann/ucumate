@@ -1900,7 +1900,16 @@
     { "id": "com-100", "expr1": "/m/s.g", "expr2": "g/(m.s)", "commensurable": true, "reason": "Operators are evaluated left to right: /m/s.g is ((1/m)/s).g" },
     { "id": "com-101", "expr1": "/m/s/g", "expr2": "/(m.s.g)", "commensurable": true, "reason": "" },
     { "id": "com-102", "expr1": "/m{a}", "expr2": "/m", "commensurable": true, "reason": "" },
-    { "id": "com-103", "expr1": "/({a}).m", "expr2": "m", "commensurable": true, "reason": "An annotation is semantically the unity, so /({a}) is 1" }
+    { "id": "com-103", "expr1": "/({a}).m", "expr2": "m", "commensurable": true, "reason": "An annotation is semantically the unity, so /({a}) is 1" },
+    { "id": "com-104", "expr1": "[IU]", "expr2": "[IU]", "commensurable": true, "reason": "Identity check" },
+    { "id": "com-105", "expr1": "[IU]", "expr2": "m[IU]", "commensurable": true, "reason": "Identity check" },
+    { "id": "com-106", "expr1": "[IU]", "expr2": "[iU]", "commensurable": true, "reason": "[IU] is defined as 1 [iU]" },
+    { "id": "com-107", "expr1": "[IU]/mL", "expr2": "m[IU]/L", "commensurable": true, "reason": "Same arbitrary unit with different prefixes" },
+    { "id": "com-108", "expr1": "10*3.[CFU]/mL", "expr2": "[CFU]/mL", "commensurable": true, "reason": "Scalar multiples of the same arbitrary unit" },
+    { "id": "com-109", "expr1": "[IU]", "expr2": "1", "commensurable": false, "reason": "Arbitrary units are not dimensionless, each arbitrary unit is its own dimension" },
+    { "id": "com-110", "expr1": "[IU]", "expr2": "[arb'U]", "commensurable": false, "reason": "Different arbitrary units are not commensurable" },
+    { "id": "com-111", "expr1": "[IU]/mL", "expr2": "/mL", "commensurable": false, "reason": "Arbitrary units are not dimensionless, each arbitrary unit is its own dimension" },
+    { "id": "com-112", "expr1": "[PFU]/[TCID_50]", "expr2": "[PFU]/[TCID_50]", "commensurable": true, "reason": "Identity check with multiple arbitrary units" }
   ],
   "convert": [
     { "id":  "conv-1", "conversionFactor": "1", "from": "m", "resultingConversionFactor": "100", "to": "cm", "valid": true, "reason": ""},
@@ -1946,6 +1955,11 @@
     { "id":  "conv-41", "conversionFactor": "1", "from": "/km.s", "resultingConversionFactor": "0", "to": "/(m.s)", "valid": false, "reason": "/km.s is s/km and not 1/(km.s), so the units are not commensurable"},
     { "id":  "conv-42", "conversionFactor": "1", "from": "/m/s.kg", "resultingConversionFactor": "1000", "to": "g/(m.s)", "valid": true, "reason": ""},
     { "id":  "conv-43", "conversionFactor": "1", "from": "/({a}).km", "resultingConversionFactor": "1000", "to": "m", "valid": true, "reason": ""},
+    { "id":  "conv-44", "conversionFactor": "1", "from": "[IU]", "resultingConversionFactor": "1", "to": "[IU]", "valid": true, "reason": "Arbitrary units can be compared to itself"},
+    { "id":  "conv-45", "conversionFactor": "1", "from": "[IU]", "resultingConversionFactor": "1000", "to": "m[IU]", "valid": true, "reason": "Arbitrary units can be compared to itself (including prefixes)"},
+    { "id":  "conv-46", "conversionFactor": "1", "from": "[IU]/mL", "resultingConversionFactor": "1000000", "to": "m[IU]/L", "valid": true, "reason": "Same arbitrary unit with different prefixes"},
+    { "id":  "conv-47", "conversionFactor": "1", "from": "10*3.[CFU]/mL", "resultingConversionFactor": "1000", "to": "[CFU]/mL", "valid": true, "reason": "Scalar multiples of the same arbitrary unit"},
+    { "id":  "conv-48", "conversionFactor": "1", "from": "[IU]", "resultingConversionFactor": "0", "to": "[arb'U]", "valid": false, "reason": "Different arbitrary units cannot be converted into each other"},
 
 
     { "id":  "conv-special-1", "conversionFactor": "0", "from": "Cel", "resultingConversionFactor": "273.15", "to": "K", "valid": true, "reason": ""},

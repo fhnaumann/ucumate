@@ -13,6 +13,7 @@ public class SyntaxVisitorHelper {
     public static UCUMExpression fromUCUMUnit(UCUMDefinition.UCUMUnit unit) {
         return switch (unit) {
             case UCUMDefinition.BaseUnit baseUnit -> new UCUMExpression.CanonicalNoPrefixSimpleUnit(baseUnit);
+            case UCUMDefinition.ArbitraryUnit arbitraryUnit when ArbitraryUnitUtil.isTerminal(arbitraryUnit) -> new UCUMExpression.CanonicalNoPrefixSimpleUnit(arbitraryUnit);
             case UCUMDefinition.DefinedUnit definedUnit -> new UCUMExpression.MixedNoPrefixSimpleUnit(definedUnit);
             case null -> null;
         };
@@ -21,6 +22,7 @@ public class SyntaxVisitorHelper {
     public static UCUMExpression from(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.UCUMUnit unit) {
         return switch (unit) {
             case UCUMDefinition.BaseUnit baseUnit -> new UCUMExpression.CanonicalPrefixSimpleUnit(prefix, baseUnit);
+            case UCUMDefinition.ArbitraryUnit arbitraryUnit when ArbitraryUnitUtil.isTerminal(arbitraryUnit) -> new UCUMExpression.CanonicalPrefixSimpleUnit(prefix, arbitraryUnit);
             case UCUMDefinition.DefinedUnit definedUnit -> new UCUMExpression.MixedPrefixSimpleUnit(prefix, definedUnit);
             case null -> null;
         };

@@ -46,6 +46,15 @@ public sealed interface UCUMDefinition extends UCUMExpression {
         String property();
     }
 
+    /**
+     * A unit that can appear in a canonical term. Base units are the regular building blocks of canonical terms.
+     * Arbitrary units have no canonical form in terms of base units, so they are kept as opaque atoms (each acting
+     * as its own dimension) when canonicalizing terms that contain them.
+     */
+    sealed public interface CanonicalAtom extends UCUMUnit permits BaseUnit, ArbitraryUnit {
+        String code();
+    }
+
     sealed public interface DefinedUnit extends UCUMUnit {
 
         boolean isMetric();
@@ -61,7 +70,7 @@ public sealed interface UCUMDefinition extends UCUMExpression {
             @JacksonXmlProperty(localName = "name") Collection<String> names,
             @JacksonXmlProperty(localName = "printSymbol") String printSymbol,
             @JacksonXmlProperty(localName = "property") String property
-    ) implements UCUMUnit {
+    ) implements CanonicalAtom {
     }
 
     public record DerivedUnit(
@@ -83,7 +92,7 @@ public sealed interface UCUMDefinition extends UCUMExpression {
     public record ArbitraryUnit(
             String code, String codeCaseInsensitive, boolean isMetric, String unitClass, Collection<String> names,
             String printSymbol, String property, UCUMValue value
-    ) implements DefinedUnit {}
+    ) implements DefinedUnit, CanonicalAtom {}
 
     @JacksonXmlRootElement(localName = "unit")
     public record UnitDto(

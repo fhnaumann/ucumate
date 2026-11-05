@@ -7,36 +7,57 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public enum DimensionType {
-    LENGTH,
-    TIME,
-    MASS,
-    PLANE_ANGLE,
-    TEMPERATURE,
-    ELECTRIC_CHARGE,
-    LUMINOUS_INTENSITY,
-    NO_DIMENSION;
+/**
+ * A dimension of a canonical term. This is either one of the UCUM base dimensions or an arbitrary dimension.
+ */
+public sealed interface DimensionType permits DimensionType.BaseDimension, DimensionType.ArbitraryDimension {
 
-    public static UCUMDefinition.BaseUnit getBaseUnit(DimensionType dimensionType, VersionSpecificUCUMRegistry ucumRegistry) {
+    /**
+     * The dimensions of the UCUM base units.
+     */
+    enum BaseDimension implements DimensionType {
+        LENGTH,
+        TIME,
+        MASS,
+        PLANE_ANGLE,
+        TEMPERATURE,
+        ELECTRIC_CHARGE,
+        LUMINOUS_INTENSITY,
+        NO_DIMENSION
+    }
+
+    /**
+     * Each (terminal) arbitrary unit is its own dimension, i.e. <code>[iU]</code> and <code>[arb'U]</code> are two
+     * different dimensions which are also different from all base dimensions.
+     * @param code The code of the arbitrary unit.
+     */
+    record ArbitraryDimension(String code) implements DimensionType {
+        @Override
+        public String toString() {
+            return code;
+        }
+    }
+
+    static UCUMDefinition.BaseUnit getBaseUnit(BaseDimension dimensionType, VersionSpecificUCUMRegistry ucumRegistry) {
         return ucumRegistry.getBaseUnits().stream()
                 .filter(baseUnit -> fromUCUMEssenceString(baseUnit.dim()) == dimensionType)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No base unit found for dim %s.".formatted(dimensionType)));
     }
 
-    public static String getStringBaseUnit(DimensionType dimensionType, VersionSpecificUCUMRegistry ucumRegistry) {
+    static String getStringBaseUnit(BaseDimension dimensionType, VersionSpecificUCUMRegistry ucumRegistry) {
         return getBaseUnit(dimensionType, ucumRegistry).code();
     }
 
-    public static DimensionType fromUCUMEssenceString(String ucucmEssenceDimString) {
+    static BaseDimension fromUCUMEssenceString(String ucucmEssenceDimString) {
         return switch(ucucmEssenceDimString) {
-            case "L" -> LENGTH;
-            case "T" -> TIME;
-            case "M" -> MASS;
-            case "A" -> PLANE_ANGLE;
-            case "C" -> TEMPERATURE;
-            case "Q" -> ELECTRIC_CHARGE;
-            case "F" -> LUMINOUS_INTENSITY;
+            case "L" -> BaseDimension.LENGTH;
+            case "T" -> BaseDimension.TIME;
+            case "M" -> BaseDimension.MASS;
+            case "A" -> BaseDimension.PLANE_ANGLE;
+            case "C" -> BaseDimension.TEMPERATURE;
+            case "Q" -> BaseDimension.ELECTRIC_CHARGE;
+            case "F" -> BaseDimension.LUMINOUS_INTENSITY;
             default -> throw new IllegalArgumentException("Unknown UCUM Essence Dimension %s".formatted(ucucmEssenceDimString));
         };
     }

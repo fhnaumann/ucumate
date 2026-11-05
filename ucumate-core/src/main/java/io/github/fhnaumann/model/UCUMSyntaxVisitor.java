@@ -61,7 +61,8 @@ public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
     @Override
     public UCUMExpression visitStigmatizedSymbolUnit(NewUCUMParser.StigmatizedSymbolUnitContext ctx) {
         UCUMDefinition.DefinedUnit definedUnit = registry.getDefinedUnit(ctx.getText()).orElseThrow(() -> new ParserException("'%s' could not be parsed to a stigmatized unit.".formatted(ctx.getText())));
-        return new MixedNoPrefixSimpleUnit(definedUnit);
+        // arbitrary units (i.e. [iU]) are canonical atoms, so let the helper decide between canonical and mixed
+        return fromUCUMUnit(definedUnit);
     }
 
     @Override

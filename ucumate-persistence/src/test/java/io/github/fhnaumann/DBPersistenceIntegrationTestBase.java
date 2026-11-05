@@ -83,6 +83,17 @@ public abstract class DBPersistenceIntegrationTestBase {
     }
 
     @Test
+    public void can_persist_canonicalization_arbitrary_unit() {
+        // arbitrary units have no canonical form, but their scaled form is still cached (and has to be parsable when read back)
+        assertThat(canonicalizerService.canonicalize("m[IU]/mL")).isInstanceOf(CanonicalizerService.TermHasArbitraryUnit.class);
+        Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(CanonKey.of(parse("m[IU]/mL"), UcumVersion.getLatest()));
+        assertThat(canonicalStepResult).isNotNull();
+        assertThat(printerService.print(canonicalStepResult.term())).isEqualTo("[iU].m-3");
+        assertThat(new PreciseDecimal("1000")).isEqualTo(canonicalStepResult.magnitude());
+        assertFalse(canonicalStepResult.specialHandlingActive());
+    }
+
+    @Test
     public void can_persist_canonicalization_special_unit() {
         canonicalizerService.canonicalize("Cel");
         Canonicalizer.CanonicalStepResult canonicalStepResult = PersistenceRegistry.getInstance().getCanonical(CanonKey.of(parse("Cel"), UcumVersion.getLatest()));

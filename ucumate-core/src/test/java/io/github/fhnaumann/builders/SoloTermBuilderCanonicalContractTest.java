@@ -49,11 +49,22 @@ public class SoloTermBuilderCanonicalContractTest {
     @Test
     public void mixed_prefix_simple_unit_yields_mixed_term() {
         UCUMExpression.Term term = builder
-                .withPrefix(giga, hp_c)
+                .withPrefix(giga, newton)
                 .noExpNoAnnot()
                 .asTerm()
                 .build();
         assertThat(term).isInstanceOf(UCUMExpression.MixedTerm.class);
+    }
+
+    @Test
+    public void arbitrary_prefix_simple_unit_yields_canonical_term() {
+        // arbitrary units have no definition in terms of base units, so they are canonical atoms themselves
+        UCUMExpression.Term term = builder
+                .withPrefix(giga, hp_c)
+                .noExpNoAnnot()
+                .asTerm()
+                .build();
+        assertThat(term).isInstanceOf(UCUMExpression.CanonicalTerm.class);
     }
 
     @Test
