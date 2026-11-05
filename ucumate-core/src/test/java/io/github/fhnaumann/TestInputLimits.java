@@ -111,6 +111,15 @@ public class TestInputLimits {
     }
 
     @Test
+    public void deep_terms_are_rejected_without_overflowing() {
+        UCUMExpression.Term term = service.parseOrError("m");
+        for(int i = 0; i < 100_000; i++) {
+            term = new UCUMExpression.MixedParenTerm(term);
+        }
+        assertThat(service.canonicalize(term)).isInstanceOf(ValidatorService.InputLimitExceeded.class);
+    }
+
+    @Test
     public void limits_can_be_disabled_per_instance() {
         UCUMService unlimited = new UCUMService(UcumVersion.V2_2, InputLimits.unlimited());
         assertThat(unlimited.validateToBool("[pi]301")).isTrue();

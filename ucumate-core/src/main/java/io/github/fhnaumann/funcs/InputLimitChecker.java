@@ -5,13 +5,11 @@ import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 
 import java.math.BigDecimal;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Optional;
 
 /**
  * Checks inputs against {@link InputLimits}. Each check returns the reason if a limit is exceeded and is cheap
- * compared to processing the input. The checks themselves never recurse, so they are safe for arbitrarily deep input.
+ * compared to processing the input.
  *
  * @author Felix Naumann
  */
@@ -44,31 +42,37 @@ public final class InputLimitChecker {
         if(!limits.enable() || term == null) {
             return Optional.empty();
         }
-        long nodes = 0;
-        long totalExponent = 0;
-        Deque<UCUMExpression.Term> stack = new ArrayDeque<>();
-        stack.push(term);
-        while(!stack.isEmpty()) {
-            // every node takes up at least one character, so the node count is bounded by the unit length limit
-            if(++nodes > limits.maxUnitLength()) {
-                return Optional.of("Unit has more than %d terms, the limit is %d.".formatted(limits.maxUnitLength(), limits.maxUnitLength()));
-            }
-            switch(stack.pop()) {
-                case UCUMExpression.ComponentTerm componentTerm -> totalExponent += absExponent(componentTerm.component());
-                case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> {}
-                case UCUMExpression.AnnotTerm annotTerm -> stack.push(annotTerm.term());
-                case UCUMExpression.ParenTerm parenTerm -> stack.push(parenTerm.term());
-                case UCUMExpression.UnaryDivTerm unaryDivTerm -> stack.push(unaryDivTerm.term());
-                case UCUMExpression.BinaryTerm binaryTerm -> {
-                    stack.push(binaryTerm.left());
-                    stack.push(binaryTerm.right());
-                }
-            }
-            if(totalExponent > limits.maxTotalExponent()) {
-                return Optional.of("Unit has a total exponent of more than %d, the limit is %d.".formatted(limits.maxTotalExponent(), limits.maxTotalExponent()));
-            }
+        return checkTermImpl(term, limits, new TermCounts());
+    }
+
+    /*
+    The node count is incremented before descending, so the recursion depth never exceeds the unit length limit, no
+    matter how deep the given term is.
+     */
+    private static Optional<String> checkTermImpl(UCUMExpression.Term term, InputLimits limits, TermCounts counts) {
+        // every node takes up at least one character, so the node count is bounded by the unit length limit
+        if(++counts.nodes > limits.maxUnitLength()) {
+            return Optional.of("Unit has more than %d terms, the limit is %d.".formatted(limits.maxUnitLength(), limits.maxUnitLength()));
         }
-        return Optional.empty();
+        return switch(term) {
+            case UCUMExpression.ComponentTerm componentTerm -> {
+                counts.totalExponent += absExponent(componentTerm.component());
+                yield counts.totalExponent > limits.maxTotalExponent()
+                      ? Optional.of("Unit has a total exponent of more than %d, the limit is %d.".formatted(limits.maxTotalExponent(), limits.maxTotalExponent()))
+                      : Optional.empty();
+            }
+            case UCUMExpression.AnnotOnlyTerm annotOnlyTerm -> Optional.empty();
+            case UCUMExpression.AnnotTerm annotTerm -> checkTermImpl(annotTerm.term(), limits, counts);
+            case UCUMExpression.ParenTerm parenTerm -> checkTermImpl(parenTerm.term(), limits, counts);
+            case UCUMExpression.UnaryDivTerm unaryDivTerm -> checkTermImpl(unaryDivTerm.term(), limits, counts);
+            case UCUMExpression.BinaryTerm binaryTerm -> checkTermImpl(binaryTerm.left(), limits, counts)
+                    .or(() -> checkTermImpl(binaryTerm.right(), limits, counts));
+        };
+    }
+
+    private static final class TermCounts {
+        long nodes;
+        long totalExponent;
     }
 
     /**
