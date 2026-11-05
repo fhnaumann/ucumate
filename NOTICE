@@ -1,0 +1,25 @@
+ucumate
+Copyright Felix Naumann
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+---------------------------------------------------------------------------
+Unified Code for Units of Measure (UCUM)
+---------------------------------------------------------------------------
+
+ucumate-core bundles the UCUM essence files ucum-essence-2_1.xml and
+ucum-essence-2_2.xml.
+
+Copyright 1999-2024 Regenstrief Institute, Inc. All rights reserved.
+
+Licensed under the UCUM License, Version 1.1. You may obtain a copy of the
+License at
+
+    https://unitsofmeasure.org/license
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+Note: the bundled ucum-essence-2_2.xml adds a definition for "Torr", which is
+not part of the official UCUM 2.2 release.

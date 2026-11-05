@@ -16,8 +16,8 @@ public class UcumateToUcumJavaTestBase {
 
     @BeforeAll
     public static void init() throws UcumException {
-        oldService = new UcumEssenceService(UcumateToUcumJavaTestBase.class.getResourceAsStream("/ucum-essence.xml"));
-        newService = new UcumateToUcumJavaService(UcumateToUcumJavaTestBase.class.getResourceAsStream("/ucum-essence.xml"));
+        oldService = new UcumEssenceService(UcumateToUcumJavaTestBase.class.getResourceAsStream("/ucum-essence-2_2.xml"));
+        newService = new UcumateToUcumJavaService(UcumateToUcumJavaTestBase.class.getResourceAsStream("/ucum-essence-2_2.xml"));
     }
 
     protected static Stream<String> provide_units() {

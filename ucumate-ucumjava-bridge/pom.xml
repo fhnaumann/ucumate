@@ -46,12 +46,13 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>1.0.8</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-test-utils</artifactId>
-            <version>1.0.8</version>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.fhir</groupId>
