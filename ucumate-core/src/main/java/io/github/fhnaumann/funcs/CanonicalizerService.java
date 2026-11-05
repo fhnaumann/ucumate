@@ -4,6 +4,8 @@ import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 
+import java.util.Set;
+
 import static io.github.fhnaumann.funcs.Validator.*;
 
 /**
@@ -98,11 +100,19 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
         CanonicalizationResult {}
 
     /**
-     * The canonicalization failed because the input term contains an arbitrary unit. Arbitrary units cannot be
-     * converted to or from anything.
-     * @param arbitraryUnit The arbitrary unit that was encountered and caused the failure.
+     * The canonicalization failed because the input term contains at least one arbitrary unit. Arbitrary units are
+     * not defined in terms of the base units, so a term containing them has no proper canonical form (see UCUM §24).
+     * <br>
+     * Nevertheless, the scaled form of the term is provided: Every arbitrary unit is treated as an opaque atom that acts
+     * as its own dimension (i.e. <code>m[IU]</code> becomes the magnitude <code>0.001</code> and the term
+     * <code>[iU]</code>, because <code>[IU]</code> is defined as <code>1 [iU]</code>). This allows callers to compare
+     * scalar multiples of the same arbitrary unit (i.e. <code>[IU]</code> and <code>m[IU]</code>), while different arbitrary
+     * units remain incommensurable with each other and with any unit that does not contain them.
+     * @param arbitraryUnits The (terminal) arbitrary units that are present in the canonical term.
+     * @param magnitude The conversion factor that was created during the canonicalization.
+     * @param canonicalTerm The canonical form of the given input term with the arbitrary units kept as opaque atoms.
      */
-    record TermHasArbitraryUnit(UCUMDefinition.ArbitraryUnit arbitraryUnit) implements
+    record TermHasArbitraryUnit(Set<UCUMDefinition.ArbitraryUnit> arbitraryUnits, PreciseDecimal magnitude, UCUMExpression.CanonicalTerm canonicalTerm) implements
         FailedCanonicalization {}
 
     /**

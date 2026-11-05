@@ -67,7 +67,8 @@ public class MyFeedbackVisitor extends ErrorFeedbackUCUMBaseVisitor<UCUMExpressi
     @Override
     public UCUMExpression visitStigmatizedSymbolUnit(ErrorFeedbackUCUMParser.StigmatizedSymbolUnitContext ctx) {
         UCUMDefinition.DefinedUnit definedUnit = registry.getDefinedUnit(ctx.getText()).orElseThrow(() -> new Validator.ParserException("'%s' could not be parsed to a stigmatized unit.".formatted(ctx.getText())));
-        return new MixedNoPrefixSimpleUnit(definedUnit);
+        // arbitrary units (i.e. [iU]) are canonical atoms, so let the helper decide between canonical and mixed
+        return fromUCUMUnit(definedUnit);
     }
 
     @Override

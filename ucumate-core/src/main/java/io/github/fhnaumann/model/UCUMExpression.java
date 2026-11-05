@@ -27,7 +27,7 @@ public sealed interface UCUMExpression permits UCUMDefinition, UCUMExpression.An
     }
     sealed interface CanonicalSimpleUnit extends CanonicalUnit, SimpleUnit {
         @Override
-        UCUMDefinition.BaseUnit ucumUnit();
+        UCUMDefinition.CanonicalAtom ucumUnit();
     }
     sealed interface MixedSimpleUnit extends MixedUnit, SimpleUnit {}
     sealed interface PrefixSimpleUnit extends SimpleUnit {
@@ -41,8 +41,8 @@ public sealed interface UCUMExpression permits UCUMDefinition, UCUMExpression.An
         }
     }
 
-    record CanonicalPrefixSimpleUnit(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.BaseUnit ucumUnit) implements CanonicalSimpleUnit, PrefixSimpleUnit {}
-    record CanonicalNoPrefixSimpleUnit(UCUMDefinition.BaseUnit ucumUnit) implements CanonicalSimpleUnit, NoPrefixSimpleUnit {}
+    record CanonicalPrefixSimpleUnit(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.CanonicalAtom ucumUnit) implements CanonicalSimpleUnit, PrefixSimpleUnit {}
+    record CanonicalNoPrefixSimpleUnit(UCUMDefinition.CanonicalAtom ucumUnit) implements CanonicalSimpleUnit, NoPrefixSimpleUnit {}
     record MixedPrefixSimpleUnit(UCUMDefinition.UCUMPrefix prefix, UCUMDefinition.DefinedUnit ucumUnit) implements MixedSimpleUnit, PrefixSimpleUnit {}
     record MixedNoPrefixSimpleUnit(UCUMDefinition.DefinedUnit ucumUnit) implements MixedSimpleUnit, NoPrefixSimpleUnit {}
 

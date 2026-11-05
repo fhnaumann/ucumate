@@ -5,6 +5,7 @@ import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.funcs.*;
 import io.github.fhnaumann.funcs.printer.Printer;
+import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.PreciseDecimal;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,6 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,6 +72,52 @@ public class CanonicalizerTest {
                 .extracting(CanonicalizerService.Success::canonicalTerm)
                 .extracting(printer::print)
                 .isEqualTo(expectedTerm);
+    }
+
+    private static Stream<Arguments> provide_arbitrary_units() {
+        return Stream.of(
+                Arguments.of("[IU]", "1", "[iU]", Set.of("[iU]")),
+                Arguments.of("m[IU]", "0.001", "[iU]", Set.of("[iU]")),
+                Arguments.of("[IU]/mL", "1000000", "[iU].m-3", Set.of("[iU]")),
+                Arguments.of("10*3.[CFU]/mL", "1000000000", "[CFU].m-3", Set.of("[CFU]")),
+                Arguments.of("[PFU]/[TCID_50]", "1", "[PFU].[TCID_50]-1", Set.of("[PFU]", "[TCID_50]"))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provide_arbitrary_units")
+    public void test_arbitrary_units_have_no_canonical_form_but_provide_scaled_form(String input, String expectedFactor, String expectedTerm, Set<String> expectedArbitraryCodes) {
+        CanonicalizerService.CanonicalizationResult canonicalizationResult = canonicalizer.canonicalize(input);
+        assertThat(canonicalizationResult)
+                .isInstanceOf(CanonicalizerService.TermHasArbitraryUnit.class)
+                .extracting(CanonicalizerService.TermHasArbitraryUnit.class::cast)
+                .satisfies(arbitrary -> {
+                    assertThat(arbitrary.magnitude()).isEqualTo(new PreciseDecimal(expectedFactor));
+                    assertThat(printer.print(arbitrary.canonicalTerm())).isEqualTo(expectedTerm);
+                    assertThat(arbitrary.arbitraryUnits())
+                            .extracting(UCUMDefinition.ArbitraryUnit::code)
+                            .containsExactlyInAnyOrderElementsOf(expectedArbitraryCodes);
+                });
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"[iU]", "m[iU]", "[iU].m-3", "[PFU].[TCID_50]-1"})
+    public void test_arbitrary_units_are_parsed_as_canonical_terms(String input) {
+        // the scaled form of arbitrary units is cached by the persistence providers and parsed back with parseCanonical
+        assertThat(Validator.parseCanonical(input, canonicalizer.getUCUMVersion())).isInstanceOf(UCUMExpression.CanonicalTerm.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"[IU]", "m[IU]", "[IU]/mL"})
+    public void test_non_terminal_arbitrary_units_are_not_parsed_as_canonical_terms(String input) {
+        // [IU] is an alias defined as 1 [iU], so it still needs to be expanded by the canonicalizer
+        assertThat(Validator.parseByPassChecks(input, canonicalizer.getUCUMVersion())).isInstanceOf(UCUMExpression.MixedTerm.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"m", "mL", "10*3/mL"})
+    public void test_terms_without_arbitrary_units_are_still_successful(String input) {
+        assertThat(canonicalizer.canonicalize(input)).isInstanceOf(CanonicalizerService.Success.class);
     }
 
     @ParameterizedTest

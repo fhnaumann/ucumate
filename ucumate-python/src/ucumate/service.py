@@ -139,7 +139,7 @@ class UCUMService:
             )
         if isinstance(result, self._JCanonArbitrary):
             return CanonicalizationFailedArbitraryUnit(
-                arbitrary_unit=str(result.arbitraryUnit().code())
+                arbitrary_unit=", ".join(str(unit.code()) for unit in result.arbitraryUnits())
             )
         if isinstance(result, self._JCanonPH):
             return CanonicalizationFailedPHWithMass()

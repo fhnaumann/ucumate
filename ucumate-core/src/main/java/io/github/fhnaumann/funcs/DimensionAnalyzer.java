@@ -1,5 +1,6 @@
 package io.github.fhnaumann.funcs;
 
+import io.github.fhnaumann.model.UCUMDefinition;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.util.MapUtil;
 
@@ -59,8 +60,12 @@ public class DimensionAnalyzer {
 
     private static Map<DimensionType, Integer> analyzeUnit(UCUMExpression.CanonicalUnit unit, int sign) {
         return switch(unit) {
-            case UCUMExpression.CanonicalSimpleUnit canonicalSimpleUnit -> Map.of(DimensionType.fromUCUMEssenceString(canonicalSimpleUnit.ucumUnit().dim()), Math.abs(sign)); // was: just 'sign'
-            case UCUMExpression.IntegerUnit integerUnit -> Map.of(DimensionType.NO_DIMENSION, 1); //Map.of(Dimension.NO_DIMENSION, 1); // sign does not matter here (I think?)
+            case UCUMExpression.CanonicalSimpleUnit canonicalSimpleUnit -> switch (canonicalSimpleUnit.ucumUnit()) {
+                case UCUMDefinition.BaseUnit baseUnit -> Map.of(DimensionType.fromUCUMEssenceString(baseUnit.dim()), Math.abs(sign)); // was: just 'sign'
+                // each arbitrary unit is its own dimension
+                case UCUMDefinition.ArbitraryUnit arbitraryUnit -> Map.of(new DimensionType.ArbitraryDimension(arbitraryUnit.code()), Math.abs(sign));
+            };
+            case UCUMExpression.IntegerUnit integerUnit -> Map.of(DimensionType.BaseDimension.NO_DIMENSION, 1); //Map.of(Dimension.NO_DIMENSION, 1); // sign does not matter here (I think?)
         };
     }
 

@@ -18,10 +18,10 @@ public class DimAnalyzerTest {
         UCUMExpression.CanonicalTerm canonicalFrom = ((CanonicalizerService.Success)new Canonicalizer(new Printer(), new Validator()).canonicalize(from)).canonicalTerm();
         var map1 = DimensionAnalyzer.analyze(canonicalFrom);
         assertThat(map1)
-                .contains(Map.entry(DimensionType.ELECTRIC_CHARGE, 2))
-                .contains(Map.entry(DimensionType.MASS, -1))
-                .contains(Map.entry(DimensionType.LENGTH, -2))
-                .contains(Map.entry(DimensionType.TIME, 1));
+                .contains(Map.entry(DimensionType.BaseDimension.ELECTRIC_CHARGE, 2))
+                .contains(Map.entry(DimensionType.BaseDimension.MASS, -1))
+                .contains(Map.entry(DimensionType.BaseDimension.LENGTH, -2))
+                .contains(Map.entry(DimensionType.BaseDimension.TIME, 1));
     }
 
 

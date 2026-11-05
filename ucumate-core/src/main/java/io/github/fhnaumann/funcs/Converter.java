@@ -62,21 +62,29 @@ public class Converter implements ConverterService {
         }
         Canonicalizer canonicalizer = new Canonicalizer(ucumVersion, printerService, validatorService);
         CanonicalizerService.CanonicalizationResult fromResult = canonicalizer.canonicalize(from.factor(), from.term(), true, true, UnitDirection.FROM, toContainsMol ? null : substanceMolarMassCoeff);
-        return switch (fromResult) {
-            case CanonicalizerService.FailedCanonicalization failedCanonicalization -> new FailedCanonicalization(failedCanonicalization);
-            case CanonicalizerService.Success fromSuccess -> {
-
-                CanonicalizerService.CanonicalizationResult toResult = canonicalizer.canonicalize(fromSuccess.magnitude(), to, true, true, UnitDirection.TO, fromContainsMol ? null : substanceMolarMassCoeff);
-                yield switch (toResult) {
-                    case CanonicalizerService.FailedCanonicalization failedCanonicalization -> new FailedCanonicalization(failedCanonicalization);
-                    case CanonicalizerService.Success toSuccess -> {
-                        DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(fromSuccess.canonicalTerm(), toSuccess.canonicalTerm());
-                        yield switch (comparisonResult) {
-                            case Failure failure -> new BaseDimensionMismatch(failure);
-                            case DimensionAnalyzer.DimensionsMatch dimDimensionsMatch -> new Success(toSuccess.magnitude());
-                        };
-                    }
-                };
+        ScaledForm fromScaled = ScaledForm.of(fromResult);
+        if(fromScaled == null) {
+            return new FailedCanonicalization((CanonicalizerService.FailedCanonicalization) fromResult);
+        }
+        CanonicalizerService.CanonicalizationResult toResult = canonicalizer.canonicalize(fromScaled.magnitude(), to, true, true, UnitDirection.TO, fromContainsMol ? null : substanceMolarMassCoeff);
+        ScaledForm toScaled = ScaledForm.of(toResult);
+        if(toScaled == null) {
+            return new FailedCanonicalization((CanonicalizerService.FailedCanonicalization) toResult);
+        }
+        /*
+        Arbitrary units are part of the dimension analysis (each one is its own dimension). So if only one side contains
+        arbitrary units (i.e. "[IU]" and "1"), then the dimensions don't match and this is reported as a BaseDimensionMismatch,
+        the same as for two different arbitrary units (i.e. "[IU]" and "[arb'U]").
+         */
+        DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(fromScaled.canonicalTerm(), toScaled.canonicalTerm());
+        return switch (comparisonResult) {
+            case Failure failure -> new BaseDimensionMismatch(failure);
+            case DimensionAnalyzer.DimensionsMatch dimDimensionsMatch -> {
+                if(fromScaled.hasArbitraryUnits() != toScaled.hasArbitraryUnits()) {
+                    // should not be reachable because arbitrary units always introduce their own dimension, but never convert between arbitrary and non-arbitrary terms
+                    yield new FailedCanonicalization((CanonicalizerService.FailedCanonicalization) (fromScaled.hasArbitraryUnits() ? fromResult : toResult));
+                }
+                yield new Success(toScaled.magnitude());
             }
         };
     }

@@ -35,7 +35,7 @@ class CanonicalizationSuccess:
 @dataclass(frozen=True)
 class CanonicalizationFailedArbitraryUnit:
     """canonicalize() failed — term contains an arbitrary unit."""
-    arbitrary_unit: str
+    arbitrary_unit: str  # code(s) of the arbitrary unit(s) in the term, comma-separated if there are several
 
 
 @dataclass(frozen=True)

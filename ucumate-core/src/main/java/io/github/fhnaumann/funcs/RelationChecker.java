@@ -21,33 +21,40 @@ public class RelationChecker implements RelationCheckerService {
     public RelationResult checkRelation(Term term1, Term term2) {
         CanonicalizerService.CanonicalizationResult result1 = new Canonicalizer(printerService, validatorService).canonicalize(term1);
         CanonicalizerService.CanonicalizationResult result2 = new Canonicalizer(printerService, validatorService).canonicalize(term2);
-        if(!(result1 instanceof CanonicalizerService.Success success1) || !(result2 instanceof CanonicalizerService.Success success2)) {
+        // terms with arbitrary units have no canonical form, but their scaled form can still be compared
+        ScaledForm scaled1 = ScaledForm.of(result1);
+        ScaledForm scaled2 = ScaledForm.of(result2);
+        if(scaled1 == null || scaled2 == null) {
             return new Failure();
         }
         boolean strictEqual = checkEquality(term1, term2);
-        boolean equalAfterProcessing = checkEqualityAfterProcessing(success1, success2);
+        boolean equalAfterProcessing = checkEqualityAfterProcessing(scaled1, scaled2);
         if(strictEqual || equalAfterProcessing) {
-            return new IsEqual(strictEqual, equalAfterProcessing, success1.canonicalTerm());
+            return new IsEqual(strictEqual, equalAfterProcessing, scaled1.canonicalTerm());
         }
-        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm());
+        return checkCommensurable(scaled1.canonicalTerm(), scaled2.canonicalTerm());
     }
 
-    private boolean checkEqualityAfterProcessing(CanonicalizerService.Success success1, CanonicalizerService.Success success2) {
-        return checkEquality(success1.canonicalTerm(), success2.canonicalTerm())
-                && success1.magnitude().equals(success2.magnitude());
+    private boolean checkEqualityAfterProcessing(ScaledForm scaled1, ScaledForm scaled2) {
+        return checkEquality(scaled1.canonicalTerm(), scaled2.canonicalTerm())
+                && scaled1.magnitude().equals(scaled2.magnitude());
     }
 
     public CommensurableResult checkCommensurable(Term term1, Term term2) {
         CanonicalizerService.CanonicalizationResult result1 = new Canonicalizer(printerService, validatorService).canonicalize(term1);
         CanonicalizerService.CanonicalizationResult result2 = new Canonicalizer(printerService, validatorService).canonicalize(term2);
-        if(!(result1 instanceof CanonicalizerService.Success success1) || !(result2 instanceof CanonicalizerService.Success success2)) {
+        // terms with arbitrary units have no canonical form, but their scaled form can still be compared
+        ScaledForm scaled1 = ScaledForm.of(result1);
+        ScaledForm scaled2 = ScaledForm.of(result2);
+        if(scaled1 == null || scaled2 == null) {
             return new NotCommensurable(Map.of());
         }
-        return checkCommensurable(success1.canonicalTerm(), success2.canonicalTerm());
+        return checkCommensurable(scaled1.canonicalTerm(), scaled2.canonicalTerm());
 
     }
 
     private CommensurableResult checkCommensurable(CanonicalTerm term1, CanonicalTerm term2) {
+        // each arbitrary unit is its own dimension, so terms with different (or without) arbitrary units are never commensurable
         DimensionAnalyzer.ComparisonResult comparisonResult = DimensionAnalyzer.compare(term1, term2);
         return switch (comparisonResult) {
             case DimensionAnalyzer.Failure failure -> new NotCommensurable(failure.difference());
