@@ -2,7 +2,6 @@ grammar NewUCUM;
 
 mainTerm
     : term EOF # completeMainTerm
-    | '/' term # unaryDivTerm
     ;
 
 term
@@ -10,8 +9,16 @@ term
     | term annotation # termWithAnnotation
     | annotation # annotationOnly
     | '(' term ')' # parenthesisedTerm
+    | '/' unaryDivOperand # unaryDivTerm // only valid as the very first token, enforced in the visitor
     | term '/' term # binaryDivTerm
     | term '.' term # binaryMulTerm
+    ;
+
+// The leading '/' only applies to the directly following operand, i.e. "/m.s" is "(/m).s"
+unaryDivOperand
+    : component # unaryDivComponent
+    | annotation # unaryDivAnnotationOnly
+    | '(' term ')' # unaryDivParenthesised
     ;
 
 component

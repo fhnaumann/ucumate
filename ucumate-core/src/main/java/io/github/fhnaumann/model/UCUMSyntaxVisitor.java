@@ -127,8 +127,30 @@ public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
 
     @Override
     public UCUMExpression visitUnaryDivTerm(NewUCUMParser.UnaryDivTermContext ctx) {
-        Term term = (Term) visit(ctx.term());
+        // The grammar accepts a unary div anywhere a term may appear, but UCUM only allows it at the very beginning.
+        if(ctx.getStart().getTokenIndex() != 0) {
+            throw new ParserException("A unary '/' is only allowed at the start of an expression.");
+        }
+        Term term = (Term) visit(ctx.unaryDivOperand());
         return fromForUnaryDiv(term);
+    }
+
+    @Override
+    public UCUMExpression visitUnaryDivComponent(NewUCUMParser.UnaryDivComponentContext ctx) {
+        Component component = (Component) visit(ctx.component());
+        return from(component);
+    }
+
+    @Override
+    public UCUMExpression visitUnaryDivAnnotationOnly(NewUCUMParser.UnaryDivAnnotationOnlyContext ctx) {
+        Annotation annotation = (Annotation) visit(ctx.annotation());
+        return new AnnotOnlyTerm(annotation);
+    }
+
+    @Override
+    public UCUMExpression visitUnaryDivParenthesised(NewUCUMParser.UnaryDivParenthesisedContext ctx) {
+        Term term = (Term) visit(ctx.term());
+        return fromForParen(term);
     }
 
     @Override
