@@ -5,7 +5,6 @@ import io.github.fhnaumann.NewUCUMLexer;
 import io.github.fhnaumann.NewUCUMParser;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
 import io.github.fhnaumann.configuration.ValKey;
-import io.github.fhnaumann.model.CanonicalUCUMSyntaxVisitor;
 import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UCUMExpression.Term;
 import io.github.fhnaumann.model.UCUMSyntaxVisitor;
@@ -37,7 +36,8 @@ public class Validator implements ValidatorService {
      * @return The parsed canonical term, avoiding expensive calls to {@link Canonicalizer}.
      */
     public static UCUMExpression.CanonicalTerm parseCanonical(String input, UcumVersion version) {
-        return (UCUMExpression.CanonicalTerm) validateImpl(input, new CanonicalUCUMSyntaxVisitor(UCUMRegistry.getInstance().getVersionSpecificUCUMRegistry(version)));
+        // UCUMSyntaxVisitor already produces canonical nodes when all parts of the input are canonical
+        return (UCUMExpression.CanonicalTerm) parseByPassChecks(input, version);
     }
 
     /**
