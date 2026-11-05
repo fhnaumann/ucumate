@@ -2,6 +2,7 @@ package io.github.fhnaumann.funcs;
 
 import io.github.fhnaumann.configuration.Configuration;
 import io.github.fhnaumann.configuration.ConfigurationRegistry;
+import io.github.fhnaumann.configuration.InputLimits;
 import io.github.fhnaumann.funcs.printer.Printer;
 import io.github.fhnaumann.funcs.printer.Printer.PrintType;
 import io.github.fhnaumann.model.UCUMExpression;
@@ -13,6 +14,7 @@ import io.github.fhnaumann.util.VersionSpecificUCUMRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
@@ -20,6 +22,9 @@ import java.util.ServiceLoader;
  * This class provides all the functionality of the ucumate library in a centralized place.
  * This includes validation, canonicalization, conversion, commensurability, and printing.
  * Each functionality is overloaded to take either a string or an already parsed input.
+ * <br>
+ * Inputs exceeding the {@link InputLimits} are rejected before they are processed. The limits are taken from the
+ * global configuration unless they are set for this instance with {@link #setInputLimits(InputLimits)}.
  *
  * @author Felix Naumann
  */
@@ -40,6 +45,7 @@ public class UCUMService implements IUCUMService {
     private ValidatorService validatorService;
     private RelationCheckerService relationCheckerService;
     private PrinterService printerService;
+    private InputLimits inputLimits;
 
     public UCUMService() {
         this(ConfigurationRegistry.get().getUCUMVersion());
@@ -60,6 +66,16 @@ public class UCUMService implements IUCUMService {
         );
     }
 
+    /**
+     * @param ucumVersion The UCUM version.
+     * @param inputLimits The input limits for this instance, overriding the ones in the global configuration.
+     *                    Use {@link InputLimits#unlimited()} to process any input regardless of its cost.
+     */
+    public UCUMService(UcumVersion ucumVersion, InputLimits inputLimits) {
+        this(ucumVersion);
+        setInputLimits(inputLimits);
+    }
+
     public UCUMService(UcumVersion ucumVersion, CanonicalizerService canonicalizerService, ConverterService converterService, ValidatorService validatorService, RelationCheckerService relationCheckerService, PrinterService printerService) {
         this.canonicalizerService = canonicalizerService;
         this.converterService = converterService;
@@ -76,18 +92,85 @@ public class UCUMService implements IUCUMService {
 
     @Override
     public ValidationResult validate(String input) {
-        return validatorService.validate(input);
+        Optional<String> exceeded = InputLimitChecker.checkUnit(input, getInputLimits());
+        if(exceeded.isPresent()) {
+            return new ValidatorService.Failure(exceeded.get());
+        }
+        ValidationResult result = validatorService.validate(input);
+        if(result instanceof ValidatorService.Success success) {
+            exceeded = InputLimitChecker.checkTerm(success.term(), getInputLimits());
+            if(exceeded.isPresent()) {
+                return new ValidatorService.Failure(exceeded.get());
+            }
+        }
+        return result;
     }
 
 
     @Override
     public CanonicalizationResult canonicalize(PreciseDecimal factor, UCUMExpression.Term term, PreciseDecimal substanceMolarMassCoeff) {
+        Optional<String> exceeded = firstExceeded(
+                InputLimitChecker.checkValue(factor, getInputLimits()),
+                InputLimitChecker.checkValue(substanceMolarMassCoeff, getInputLimits()),
+                InputLimitChecker.checkTerm(term, getInputLimits())
+        );
+        if(exceeded.isPresent()) {
+            return new InputLimitExceeded(exceeded.get());
+        }
         return canonicalizerService.canonicalize(factor, term, substanceMolarMassCoeff);
     }
 
     @Override
+    public CanonicalizationResult canonicalize(String factor, UCUMExpression.Term term) {
+        Optional<String> exceeded = InputLimitChecker.checkValue(factor, getInputLimits());
+        if(exceeded.isPresent()) {
+            return new InputLimitExceeded(exceeded.get());
+        }
+        return IUCUMService.super.canonicalize(factor, term);
+    }
+
+    @Override
+    public CanonicalizationResult canonicalize(String factor, String term) {
+        Optional<String> exceeded = InputLimitChecker.checkValue(factor, getInputLimits());
+        if(exceeded.isPresent()) {
+            return new InputLimitExceeded(exceeded.get());
+        }
+        return IUCUMService.super.canonicalize(factor, term);
+    }
+
+    @Override
     public ConversionResult convert(PreciseDecimal factor, UCUMExpression.Term from, UCUMExpression.Term to, PreciseDecimal substanceMolMassCoeff) {
+        Optional<String> exceeded = firstExceeded(
+                InputLimitChecker.checkValue(factor, getInputLimits()),
+                InputLimitChecker.checkValue(substanceMolMassCoeff, getInputLimits()),
+                InputLimitChecker.checkTerm(from, getInputLimits()),
+                InputLimitChecker.checkTerm(to, getInputLimits())
+        );
+        if(exceeded.isPresent()) {
+            return new InputLimitExceeded(exceeded.get());
+        }
         return converterService.convert(factor, from, to, substanceMolMassCoeff);
+    }
+
+    @Override
+    public ConversionResult convert(String factor, String from, String to) {
+        Optional<String> exceeded = InputLimitChecker.checkValue(factor, getInputLimits());
+        if(exceeded.isPresent()) {
+            return new InputLimitExceeded(exceeded.get());
+        }
+        return IUCUMService.super.convert(factor, from, to);
+    }
+
+    @Override
+    public ConversionResult convert(String factor, String from, String to, String substanceMolMassCoeff) {
+        Optional<String> exceeded = firstExceeded(
+                InputLimitChecker.checkValue(factor, getInputLimits()),
+                InputLimitChecker.checkValue(substanceMolMassCoeff, getInputLimits())
+        );
+        if(exceeded.isPresent()) {
+            return new InputLimitExceeded(exceeded.get());
+        }
+        return IUCUMService.super.convert(factor, from, to, substanceMolMassCoeff);
     }
 
     @Override
@@ -97,17 +180,66 @@ public class UCUMService implements IUCUMService {
 
     @Override
     public RelationCheckerService.RelationResult checkRelation(UCUMExpression.Term term1, UCUMExpression.Term term2) {
+        Optional<String> exceeded = firstExceeded(
+                InputLimitChecker.checkTerm(term1, getInputLimits()),
+                InputLimitChecker.checkTerm(term2, getInputLimits())
+        );
+        if(exceeded.isPresent()) {
+            return new InputLimitExceeded(exceeded.get());
+        }
         return relationCheckerService.checkRelation(term1, term2);
     }
 
     @Override
     public RelationCheckerService.CommensurableResult checkCommensurable(UCUMExpression.Term term1, UCUMExpression.Term term2) {
+        Optional<String> exceeded = firstExceeded(
+                InputLimitChecker.checkTerm(term1, getInputLimits()),
+                InputLimitChecker.checkTerm(term2, getInputLimits())
+        );
+        if(exceeded.isPresent()) {
+            return new InputLimitExceeded(exceeded.get());
+        }
         return relationCheckerService.checkCommensurable(term1, term2);
     }
 
     @Override
     public UCUMExpression.Term parseOrError(String input) {
-        return staticParseOrError(input, validatorService);
+        Optional<String> exceeded = InputLimitChecker.checkUnit(input, getInputLimits());
+        if(exceeded.isPresent()) {
+            throw new InputLimitExceededException(exceeded.get());
+        }
+        UCUMExpression.Term term = staticParseOrError(input, validatorService);
+        exceeded = InputLimitChecker.checkTerm(term, getInputLimits());
+        if(exceeded.isPresent()) {
+            throw new InputLimitExceededException(exceeded.get());
+        }
+        return term;
+    }
+
+    @SafeVarargs
+    private static Optional<String> firstExceeded(Optional<String>... checks) {
+        for(Optional<String> check : checks) {
+            if(check.isPresent()) {
+                return check;
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * @return The input limits of this instance, or the ones of the global configuration if none are set.
+     */
+    public InputLimits getInputLimits() {
+        return inputLimits != null ? inputLimits : ConfigurationRegistry.get().getInputLimits();
+    }
+
+    /**
+     * Sets the input limits for this instance, overriding the ones in the global configuration.
+     * @param inputLimits The input limits, {@link InputLimits#unlimited()} to process any input regardless of its cost,
+     *                    or null to use the ones in the global configuration again.
+     */
+    public void setInputLimits(InputLimits inputLimits) {
+        this.inputLimits = inputLimits;
     }
 
     public static UCUMExpression.Term staticParseOrError(String input, ValidatorService validatorService) {

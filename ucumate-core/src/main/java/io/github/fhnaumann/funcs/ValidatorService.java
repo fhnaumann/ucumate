@@ -93,4 +93,25 @@ public interface ValidatorService extends UcumVersioning {
             Converter.FailedConversion, RelationChecker.FailedRelationCheck,
             RelationChecker.FailedCommensurableCheck
     {}
+
+    /**
+     * Thrown by {@link QuickParse#parseOrError(String)} if the input exceeds the configured
+     * {@link io.github.fhnaumann.configuration.InputLimits}.
+     */
+    public class InputLimitExceededException extends ParserException {
+        public InputLimitExceededException(String message) {
+            super(message);
+        }
+    }
+
+    /**
+     * The input was rejected without processing it because it exceeds the configured
+     * {@link io.github.fhnaumann.configuration.InputLimits}.
+     * @param reason Which limit was exceeded.
+     */
+    public record InputLimitExceeded(String reason) implements
+            CanonicalizerService.FailedCanonicalization,
+            Converter.FailedConversion, RelationChecker.FailedRelationCheck,
+            RelationChecker.FailedCommensurableCheck
+    {}
 }

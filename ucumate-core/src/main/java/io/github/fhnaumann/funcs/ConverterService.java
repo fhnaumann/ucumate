@@ -28,6 +28,8 @@ public interface ConverterService extends UcumVersioning, QuickParse {
     public default ConverterService.ConversionResult convert(PreciseDecimal factor, String from, String to) {
         try {
             return convert(factor, parseOrError(from), parseOrError(to));
+        } catch (ValidatorService.InputLimitExceededException e) {
+            return new ValidatorService.InputLimitExceeded(e.getMessage());
         } catch (Validator.ParserException e) {
             return new Validator.ParserError();
         }
@@ -129,6 +131,8 @@ public interface ConverterService extends UcumVersioning, QuickParse {
         substanceMolMassCoeff = CompoundUtil.resolveMolarMass(substanceMolMassCoeff);
         try {
             return convert(new PreciseDecimal(factor), parseOrError(from), parseOrError(to), substanceMolMassCoeff != null ? new PreciseDecimal(substanceMolMassCoeff) : null);
+        } catch (ValidatorService.InputLimitExceededException e) {
+            return new ValidatorService.InputLimitExceeded(e.getMessage());
         } catch (Validator.ParserException e) {
             return new Validator.ParserError();
         }
@@ -156,7 +160,7 @@ public interface ConverterService extends UcumVersioning, QuickParse {
     /**
      * Represents a failed conversion. The subclasses provide more details.
      */
-    sealed interface FailedConversion extends ConversionResult permits ConverterService.BaseDimensionMismatch, ConverterService.FailedCanonicalization, ValidatorService.ParserError {}
+    sealed interface FailedConversion extends ConversionResult permits ConverterService.BaseDimensionMismatch, ConverterService.FailedCanonicalization, ValidatorService.ParserError, ValidatorService.InputLimitExceeded {}
 
     /**
      * The conversion was successful.

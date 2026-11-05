@@ -33,6 +33,8 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
     public default CanonicalizationResult canonicalize(String term, PreciseDecimal substanceMolarMassCoeff) {
         try {
             return canonicalize(parseOrError(term), substanceMolarMassCoeff);
+        } catch (ValidatorService.InputLimitExceededException e) {
+            return new ValidatorService.InputLimitExceeded(e.getMessage());
         } catch (ParserException e) {
             return new ParserError();
         }
@@ -62,6 +64,8 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
     public default CanonicalizationResult canonicalize(PreciseDecimal factor, String term) {
         try {
             return canonicalize(factor, parseOrError(term));
+        } catch (ValidatorService.InputLimitExceededException e) {
+            return new ValidatorService.InputLimitExceeded(e.getMessage());
         } catch (ParserException e) {
             return new ParserError();
         }
@@ -89,7 +93,7 @@ public interface CanonicalizerService extends UcumVersioning, QuickParse {
     /**
      * Represents a failed canonicalization. The subclasses provide more details.
      */
-    sealed interface FailedCanonicalization extends CanonicalizationResult permits TermContainsPHAndCanonicalizingToMass, TermHasArbitraryUnit, ParserError {}
+    sealed interface FailedCanonicalization extends CanonicalizationResult permits TermContainsPHAndCanonicalizingToMass, TermHasArbitraryUnit, ParserError, ValidatorService.InputLimitExceeded {}
 
     /**
      * The canonicalization was successful.

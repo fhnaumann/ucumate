@@ -35,7 +35,8 @@ public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
             int number = Integer.parseInt(digitsAsText);
             return new IntegerUnit(number);
         } catch(NumberFormatException e) {
-            throw new RuntimeException("ANTLR4 should not have matched a number if it can't be parsed.");
+            // only digits are matched, so this can only be an overflow
+            throw new ParserException("'%s' is too large to be parsed as a number unit.".formatted(digitsAsText));
         }
     }
 
@@ -74,14 +75,21 @@ public class UCUMSyntaxVisitor extends NewUCUMBaseVisitor<UCUMExpression> {
 
     @Override
     public UCUMExpression visitExponentWithExplicitSign(NewUCUMParser.ExponentWithExplicitSignContext ctx) {
-        int exponent = Integer.parseInt(ctx.getText());
-        return new Exponent(exponent);
+        return new Exponent(parseExponent(ctx.getText()));
     }
 
     @Override
     public UCUMExpression visitExponentWithoutSign(NewUCUMParser.ExponentWithoutSignContext ctx) {
-        int exponent = Integer.parseInt(ctx.getText());
-        return new Exponent(exponent);
+        return new Exponent(parseExponent(ctx.getText()));
+    }
+
+    private static int parseExponent(String exponentText) {
+        try {
+            return Integer.parseInt(exponentText);
+        } catch(NumberFormatException e) {
+            // only (signed) digits are matched, so this can only be an overflow
+            throw new ParserException("'%s' is too large to be parsed as an exponent.".formatted(exponentText));
+        }
     }
 
     @Override
