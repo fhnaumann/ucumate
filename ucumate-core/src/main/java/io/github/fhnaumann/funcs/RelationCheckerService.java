@@ -32,6 +32,8 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
     public default RelationCheckerService.CommensurableResult checkCommensurable(String term1, String term2) {
         try {
             return checkCommensurable(parseOrError(term1), parseOrError(term2));
+        } catch (ValidatorService.InputLimitExceededException e) {
+            return new ValidatorService.InputLimitExceeded(e.getMessage());
         } catch (Validator.ParserException e) {
             return new ParserError();
         }
@@ -61,9 +63,9 @@ public interface RelationCheckerService extends UcumVersioning, QuickParse {
     /**
      * The relation check failed. The subclasses provide more details.
      */
-    sealed interface FailedRelationCheck extends RelationResult permits FailedCommensurableCheck, Failure, ParserError {}
+    sealed interface FailedRelationCheck extends RelationResult permits FailedCommensurableCheck, Failure, ParserError, ValidatorService.InputLimitExceeded {}
 
-    sealed interface FailedCommensurableCheck extends RelationCheckerService.CommensurableResult, FailedRelationCheck permits ParserError {}
+    sealed interface FailedCommensurableCheck extends RelationCheckerService.CommensurableResult, FailedRelationCheck permits ParserError, ValidatorService.InputLimitExceeded {}
 
     /**
      * The two given terms are not equal. Information about the commensurability is found here and in the subclasses.
