@@ -69,7 +69,8 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-test-utils</artifactId>
-            <version>1.0.8</version>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jol</groupId>
@@ -188,6 +189,15 @@
                 <!--includes>
                     <include>**/*.json</include>
                 </includes-->
+            </resource>
+            <!-- ships the UCUM attribution alongside the bundled essence files -->
+            <resource>
+                <directory>${project.basedir}/..</directory>
+                <targetPath>META-INF</targetPath>
+                <includes>
+                    <include>NOTICE</include>
+                    <include>LICENSE</include>
+                </includes>
             </resource>
         </resources>
     </build>
