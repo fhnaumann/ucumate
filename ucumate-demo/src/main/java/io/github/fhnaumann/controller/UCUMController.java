@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class UCUMController {
 
+    private static final UCUMService UCUM_SERVICE = new UCUMService();
+
     private static final Map<RenderFormat, Printer> PRINTERS = Map.of(
             RenderFormat.ucum, new UCUMSyntaxPrinter(),
             RenderFormat.ucum_expressive, new ExpressiveUCUMSyntaxPrinter(),
@@ -58,7 +60,7 @@ public class UCUMController {
             @Parameter(description = "UCUM input string") @RequestParam String input,
             @Parameter(description = "Rendering options") @RequestParam(required = false) List<RenderFormat> formats
             ) {
-        return switch (UCUMService.validate(input)) {
+        return switch (UCUM_SERVICE.validate(input)) {
             case Validator.Failure failure -> new ValidationResponse(false, null);
             case Validator.Success success -> new ValidationResponse(true, createRenderedFormats(success.term(), formats));
         };
@@ -70,10 +72,10 @@ public class UCUMController {
             @Parameter(description = "UCUM input string") @RequestParam String input,
             @Parameter(description = "Rendering options") @RequestParam(required = false) List<RenderFormat> formats
     ) {
-        Validator.ValidationResult validationResult = UCUMService.validate(input);
+        Validator.ValidationResult validationResult = UCUM_SERVICE.validate(input);
         return switch (validationResult) {
             case Validator.Failure failure -> new CanonicalizationResponse(false, null,null);
-            case Validator.Success success -> switch (UCUMService.canonicalize(success.term())) {
+            case Validator.Success success -> switch (UCUM_SERVICE.canonicalize(success.term())) {
                 case Canonicalizer.FailedCanonicalization failedCanonicalization -> new CanonicalizationResponse(false, null,null);
                 case Canonicalizer.Success success1 -> new CanonicalizationResponse(true, success1.magnitude().toString(), createRenderedFormats(success1.canonicalTerm(), formats));
             };
@@ -93,15 +95,15 @@ public class UCUMController {
         } catch (Exception e) {
             return new ConversionResponse(false, null);
         }
-        Validator.ValidationResult fromValidation = UCUMService.validate(fromInput);
-        Validator.ValidationResult toValidation = UCUMService.validate(toInput);
+        Validator.ValidationResult fromValidation = UCUM_SERVICE.validate(fromInput);
+        Validator.ValidationResult toValidation = UCUM_SERVICE.validate(toInput);
         if(!(fromValidation instanceof Validator.Success fromSuccess)) {
             return new ConversionResponse(false, null);
         }
         if(!(toValidation instanceof Validator.Success toSuccess)) {
             return new ConversionResponse(false, null);
         }
-        return switch (UCUMService.convert(fromFactorPd, fromSuccess.term(), toSuccess.term())) {
+        return switch (UCUM_SERVICE.convert(fromFactorPd, fromSuccess.term(), toSuccess.term())) {
             case Converter.FailedConversion failedConversion -> new ConversionResponse(false, null);
             case Converter.Success success -> new ConversionResponse(true, success.conversionFactor().toString());
         };
