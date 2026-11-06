@@ -4,6 +4,8 @@
     "config:recommended"
   ],
   "dependencyDashboard": true,
+  "npmrc": "allow-remote=all",
+  "npmrcMerge": true,
   "groupName": "All dependencies",
   "packageRules": [
     {
