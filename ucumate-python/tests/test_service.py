@@ -10,11 +10,14 @@ import pytest
 from ucumate import (
     UCUMService,
     CanonicalizationSuccess,
+    CanonicalizationFailedInputLimitExceeded,
     CanonicalizationFailedParserError,
     ConversionSuccess,
     ConversionFailedBaseDimensionMismatch,
+    ConversionFailedInputLimitExceeded,
     ConversionFailedParserError,
     PrintType,
+    RelationInputLimitExceeded,
     RelationIsCommensurable,
     RelationIsEqual,
     RelationNotCommensurable,
@@ -135,6 +138,55 @@ class TestRelation:
     def test_parser_error(self, svc):
         result = svc.check_commensurable("!!!!", "kg")
         assert isinstance(result, RelationParserError)
+
+
+# ── Input limits ──────────────────────────────────────────────────────────────
+
+# Each exceeds one of the default limits: unit length 1000, total exponent 300, value digits 1000.
+TOO_LONG = ".".join(["m"] * 600)
+TOO_LARGE_EXPONENT = "m301"
+TOO_MANY_DIGITS = "1" * 1001
+
+
+class TestInputLimits:
+    def test_validate(self, svc):
+        result = svc.validate(TOO_LONG)
+        assert isinstance(result, ValidationFailure)
+        assert "limit" in result.messages[0]
+
+    @pytest.mark.parametrize("kwargs", [
+        {"term": TOO_LONG},
+        {"term": TOO_LARGE_EXPONENT},
+        {"term": "m", "factor": TOO_MANY_DIGITS},
+        {"term": TOO_LONG, "substance_molar_mass": "18"},
+    ])
+    def test_canonicalize(self, svc, kwargs):
+        result = svc.canonicalize(**kwargs)
+        assert isinstance(result, CanonicalizationFailedInputLimitExceeded)
+        assert "limit" in result.reason
+
+    @pytest.mark.parametrize("kwargs", [
+        {"from_term": TOO_LONG, "to_term": "m"},
+        {"from_term": "m", "to_term": TOO_LARGE_EXPONENT},
+        {"from_term": "m", "to_term": "m", "factor": TOO_MANY_DIGITS},
+        {"from_term": TOO_LONG, "to_term": "m", "substance_molar_mass": "18"},
+    ])
+    def test_convert(self, svc, kwargs):
+        result = svc.convert(**kwargs)
+        assert isinstance(result, ConversionFailedInputLimitExceeded)
+        assert "limit" in result.reason
+
+    @pytest.mark.parametrize("term", [TOO_LONG, TOO_LARGE_EXPONENT])
+    def test_check_relation(self, svc, term):
+        result = svc.check_relation(term, "m")
+        assert isinstance(result, RelationInputLimitExceeded)
+        assert "limit" in result.reason
+
+    @pytest.mark.parametrize("term", [TOO_LONG, TOO_LARGE_EXPONENT])
+    def test_check_commensurable(self, svc, term):
+        result = svc.check_commensurable("m", term)
+        assert isinstance(result, RelationInputLimitExceeded)
+        assert "limit" in result.reason
 
 
 # ── Print ─────────────────────────────────────────────────────────────────────

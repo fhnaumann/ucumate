@@ -68,21 +68,27 @@ sealed interface hierarchy in the Java library. Check with `isinstance`:
 | Operation | Success | Failure variants |
 |---|---|---|
 | `validate` | `ValidationSuccess` | `ValidationFailure` (`.messages`) |
-| `canonicalize` | `CanonicalizationSuccess` (`.canonical_term`, `.magnitude`) | `CanonicalizationFailedParserError`, `CanonicalizationFailedArbitraryUnit` (`.arbitrary_unit`), `CanonicalizationFailedPHWithMass` |
-| `convert` | `ConversionSuccess` (`.conversion_factor`) | `ConversionFailedParserError`, `ConversionFailedBaseDimensionMismatch`, `ConversionFailedCanonicalization` |
-| `check_relation` | `RelationIsEqual`, `RelationIsCommensurable`, `RelationNotCommensurable` | `RelationFailure`, `RelationParserError` |
+| `canonicalize` | `CanonicalizationSuccess` (`.canonical_term`, `.magnitude`) | `CanonicalizationFailedParserError`, `CanonicalizationFailedArbitraryUnit` (`.arbitrary_unit`), `CanonicalizationFailedPHWithMass`, `CanonicalizationFailedInputLimitExceeded` (`.reason`) |
+| `convert` | `ConversionSuccess` (`.conversion_factor`) | `ConversionFailedParserError`, `ConversionFailedBaseDimensionMismatch`, `ConversionFailedCanonicalization`, `ConversionFailedInputLimitExceeded` (`.reason`) |
+| `check_relation` | `RelationIsEqual`, `RelationIsCommensurable`, `RelationNotCommensurable` | `RelationFailure`, `RelationParserError`, `RelationInputLimitExceeded` (`.reason`) |
+| `check_commensurable` | `RelationIsCommensurable`, `RelationNotCommensurable` | `RelationParserError`, `RelationInputLimitExceeded` (`.reason`) |
 
 Numeric values (`magnitude`, `conversion_factor`) are returned as **strings**. They
 come from ucumate's arbitrary-precision `PreciseDecimal`, and converting to `float`
 would silently discard precision. Wrap them in `decimal.Decimal` if you need
 arithmetic.
 
-### Known issue in 1.0.8
+Inputs that exceed ucumate's input limits (unit length 1000, total exponent 300,
+1000 digits in a numeric value, by default) are rejected before any work is done:
+`validate` returns a `ValidationFailure` and the other operations return their
+`*InputLimitExceeded` result, with `.reason` naming the limit.
 
-Some inputs with a zero denominator — `/0mg` is a confirmed case — pass `validate()`
-and then let a raw Java `ArithmeticException: Division by zero` escape from
-`canonicalize()` instead of returning a `CanonicalizationFailed*` result. If your
-input set can contain these, guard the call:
+### Known issue
+
+Inputs with a zero denominator — `m/0` and `1/0` are confirmed cases — pass
+`validate()` and then let a raw Java `ArithmeticException: Division by zero` escape
+from `canonicalize()`, `convert()` and `check_relation()` instead of returning a
+failure result. If your input set can contain these, guard the call:
 
 ```python
 try:
