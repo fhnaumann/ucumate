@@ -13,6 +13,21 @@
       "matchPackageNames": [
         "/.*/"
       ]
+    },
+    {
+      "description": "eslint-plugin-oxlint needs a matching oxlint minor (peer ~X.Y.0) and is usually released after oxlint; wait so both are available",
+      "matchPackageNames": [
+        "oxlint"
+      ],
+      "minimumReleaseAge": "7 days",
+      "internalChecksFilter": "strict"
+    },
+    {
+      "description": "vue-tsc, typescript-eslint and @vue/compiler-sfc don't support TypeScript 7 yet",
+      "matchPackageNames": [
+        "typescript"
+      ],
+      "allowedVersions": "<7"
     }
   ]
 }
