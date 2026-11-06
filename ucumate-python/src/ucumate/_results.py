@@ -48,11 +48,18 @@ class CanonicalizationFailedPHWithMass:
     """canonicalize() failed — [pH] cannot be canonicalized to mass."""
 
 
+@dataclass(frozen=True)
+class CanonicalizationFailedInputLimitExceeded:
+    """canonicalize() failed — the input exceeds the configured input limits."""
+    reason: str  # which limit was exceeded
+
+
 CanonicalizationResult = (
     CanonicalizationSuccess
     | CanonicalizationFailedArbitraryUnit
     | CanonicalizationFailedParserError
     | CanonicalizationFailedPHWithMass
+    | CanonicalizationFailedInputLimitExceeded
 )
 
 
@@ -81,11 +88,18 @@ class ConversionFailedParserError:
     """convert() failed — one or both inputs could not be parsed."""
 
 
+@dataclass(frozen=True)
+class ConversionFailedInputLimitExceeded:
+    """convert() failed — an input exceeds the configured input limits."""
+    reason: str  # which limit was exceeded
+
+
 ConversionResult = (
     ConversionSuccess
     | ConversionFailedBaseDimensionMismatch
     | ConversionFailedCanonicalization
     | ConversionFailedParserError
+    | ConversionFailedInputLimitExceeded
 )
 
 
@@ -120,18 +134,26 @@ class RelationParserError:
     """Relation check failed — input could not be parsed."""
 
 
+@dataclass(frozen=True)
+class RelationInputLimitExceeded:
+    """Relation check failed — an input exceeds the configured input limits."""
+    reason: str  # which limit was exceeded
+
+
 RelationResult = (
     RelationIsEqual
     | RelationIsCommensurable
     | RelationNotCommensurable
     | RelationFailure
     | RelationParserError
+    | RelationInputLimitExceeded
 )
 
 CommensurableResult = (
     RelationIsCommensurable
     | RelationNotCommensurable
     | RelationParserError
+    | RelationInputLimitExceeded
 )
 
 

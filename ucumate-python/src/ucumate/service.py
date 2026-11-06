@@ -7,6 +7,7 @@ from typing import Optional
 from ._jvm import ensure_jvm
 from ._results import (
     CanonicalizationFailedArbitraryUnit,
+    CanonicalizationFailedInputLimitExceeded,
     CanonicalizationFailedParserError,
     CanonicalizationFailedPHWithMass,
     CanonicalizationResult,
@@ -14,11 +15,13 @@ from ._results import (
     CommensurableResult,
     ConversionFailedBaseDimensionMismatch,
     ConversionFailedCanonicalization,
+    ConversionFailedInputLimitExceeded,
     ConversionFailedParserError,
     ConversionResult,
     ConversionSuccess,
     PrintType,
     RelationFailure,
+    RelationInputLimitExceeded,
     RelationIsCommensurable,
     RelationIsEqual,
     RelationNotCommensurable,
@@ -55,6 +58,10 @@ class UCUMService:
         # Cache all Java result-type class references (use JVM binary names for nested types).
         self._JValidatorSuccess = jpype.JClass("io.github.fhnaumann.funcs.ValidatorService$Success")
         self._JParserError = jpype.JClass("io.github.fhnaumann.funcs.ValidatorService$ParserError")
+        self._JInputLimitExceeded = jpype.JClass("io.github.fhnaumann.funcs.ValidatorService$InputLimitExceeded")
+        self._JInputLimitExceededException = jpype.JClass(
+            "io.github.fhnaumann.funcs.ValidatorService$InputLimitExceededException"
+        )
         self._JCanonSuccess = jpype.JClass("io.github.fhnaumann.funcs.CanonicalizerService$Success")
         self._JCanonArbitrary = jpype.JClass("io.github.fhnaumann.funcs.CanonicalizerService$TermHasArbitraryUnit")
         self._JCanonPH = jpype.JClass("io.github.fhnaumann.funcs.CanonicalizerService$TermContainsPHAndCanonicalizingToMass")
@@ -122,6 +129,8 @@ class UCUMService:
         else:
             try:
                 j_term = self._svc.parseOrError(term)
+            except self._JInputLimitExceededException as e:
+                return CanonicalizationFailedInputLimitExceeded(reason=str(e.getMessage()))
             except Exception:
                 return CanonicalizationFailedParserError()
             result = self._svc.canonicalize(
@@ -143,6 +152,8 @@ class UCUMService:
             )
         if isinstance(result, self._JCanonPH):
             return CanonicalizationFailedPHWithMass()
+        if isinstance(result, self._JInputLimitExceeded):
+            return CanonicalizationFailedInputLimitExceeded(reason=str(result.reason()))
         return CanonicalizationFailedParserError()
 
     # ── Convert ───────────────────────────────────────────────────────────────
@@ -185,6 +196,8 @@ class UCUMService:
             return ConversionFailedCanonicalization(
                 details=str(result.failedCanonicalization())
             )
+        if isinstance(result, self._JInputLimitExceeded):
+            return ConversionFailedInputLimitExceeded(reason=str(result.reason()))
         return ConversionFailedParserError()
 
     # ── Relation ──────────────────────────────────────────────────────────────
@@ -197,11 +210,13 @@ class UCUMService:
         - ``RelationIsEqual`` — the terms are semantically equal.
         - ``RelationIsCommensurable`` — same base dimensions, not equal.
         - ``RelationNotCommensurable`` — different base dimensions.
-        - ``RelationFailure`` / ``RelationParserError`` on error.
+        - ``RelationFailure`` / ``RelationParserError`` / ``RelationInputLimitExceeded`` on error.
         """
         try:
             j1 = self._svc.parseOrError(term1)
             j2 = self._svc.parseOrError(term2)
+        except self._JInputLimitExceededException as e:
+            return RelationInputLimitExceeded(reason=str(e.getMessage()))
         except Exception:
             return RelationParserError()
         result = self._svc.checkRelation(j1, j2)
@@ -212,7 +227,7 @@ class UCUMService:
         Check whether two UCUM terms are commensurable (share the same base dimensions).
 
         Returns ``RelationIsCommensurable``, ``RelationNotCommensurable``,
-        or ``RelationParserError``.
+        ``RelationParserError`` or ``RelationInputLimitExceeded``.
         """
         result = self._svc.checkCommensurable(term1, term2)
         return self._map_commensurable(result)
@@ -232,6 +247,8 @@ class UCUMService:
             )
         if isinstance(result, self._JParserError):
             return RelationParserError()
+        if isinstance(result, self._JInputLimitExceeded):
+            return RelationInputLimitExceeded(reason=str(result.reason()))
         return RelationFailure()
 
     def _map_commensurable(self, result) -> CommensurableResult:
@@ -241,6 +258,8 @@ class UCUMService:
             return RelationNotCommensurable(
                 diff={str(e.getKey()): int(e.getValue()) for e in result.diff().entrySet()}
             )
+        if isinstance(result, self._JInputLimitExceeded):
+            return RelationInputLimitExceeded(reason=str(result.reason()))
         return RelationParserError()
 
     # ── Print ─────────────────────────────────────────────────────────────────

@@ -18,7 +18,7 @@
 
     <groupId>io.github.fhnaumann</groupId>
     <artifactId>ucumate-python-bundle</artifactId>
-    <version>1.0.8</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
     <name>ucumate Python Bundle</name>
     <description>Fat JAR bundling ucumate-core for the Python JPype bindings.</description>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>io.github.fhnaumann</groupId>
             <artifactId>ucumate-core</artifactId>
-            <version>1.0.8</version>
+            <version>2.0.0</version>
         </dependency>
         <!-- Provide an SLF4J backend so logging doesn't warn at runtime -->
         <dependency>
