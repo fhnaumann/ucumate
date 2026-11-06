@@ -106,7 +106,7 @@ snapshot), set `UCUMATE_JAR` to its full path before the first call.
 ## Versioning
 
 The Python package version tracks the `ucumate-core` version it bundles, so
-`ucumate==1.0.8` on PyPI contains `io.github.fhnaumann:ucumate-core:1.0.8`.
+`ucumate==2.0.0` on PyPI contains `io.github.fhnaumann:ucumate-core:2.0.0`.
 
 ## License
 
