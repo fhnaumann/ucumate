@@ -28,6 +28,17 @@ Read more about the usage in the [documentation](https://fhnaumann.github.io/ucu
 
 Try out the [live demo](https://virtuous-respect-production.up.railway.app/).
 
+# Repository layout
+
+| Folder | Contents |
+|---|---|
+| [`ucumate-java/`](ucumate-java) | Java implementation (reference), Maven multi-module build |
+| [`go/`](go) | Native Go port (work in progress) |
+| [`ucumate-python/`](ucumate-python) | Python bindings for the Java implementation |
+| [`ucumate-port-parity/`](ucumate-port-parity) | Shared grammar, UCUM data and test suites; parity checks between ports |
+| [`ucumate-demo/`](ucumate-demo) | Online demo |
+| [`docs/`](docs) | Documentation site |
+
 # Build process
 
 1. Build docks, retype build. Copy .retype into demo/src/resources/doc

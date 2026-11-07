@@ -4,9 +4,17 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'ucumate-java/**'
+      - 'ucumate-port-parity/**'
+      - '.github/workflows/functional-tests.yml'
   pull_request:
     branches:
       - main
+    paths:
+      - 'ucumate-java/**'
+      - 'ucumate-port-parity/**'
+      - '.github/workflows/functional-tests.yml'
 jobs:
   functional-tests:
     permissions:
@@ -23,12 +31,12 @@ jobs:
           java-version: '21'
           distribution: 'zulu'
       - name: Run Functional Tests
-        run: mvn -pl ucumate-core -am test -Dgroups=functional-tests
+        run: mvn -f ucumate-java/pom.xml -pl ucumate-core -am test -Dgroups=functional-tests
       - name: Report Unit Tests
         uses: dorny/test-reporter@v3
         if: always()
         with:
           name: Maven Tests
-          path: ucumate-core/target/surefire-reports/*.xml
+          path: ucumate-java/ucumate-core/target/surefire-reports/*.xml
           reporter: java-junit
           fail-on-error: true

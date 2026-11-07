@@ -84,6 +84,18 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- functional test suites, shared with the other ports -->
+            <resource>
+                <directory>${project.basedir}/../../ucumate-port-parity/test-suites</directory>
+            </resource>
+        </resources>
+    </build>
+
     <repositories>
         <repository>
             <name>Central Portal Snapshots</name>

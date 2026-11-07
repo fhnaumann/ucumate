@@ -4,9 +4,17 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'ucumate-java/**'
+      - 'ucumate-port-parity/**'
+      - '.github/workflows/junit-tests.yml'
   pull_request:
     branches:
       - main
+    paths:
+      - 'ucumate-java/**'
+      - 'ucumate-port-parity/**'
+      - '.github/workflows/junit-tests.yml'
 jobs:
   junit-tests:
     permissions:
@@ -23,7 +31,7 @@ jobs:
           java-version: '21'
           distribution: 'zulu'
       - name: Run Functional Tests
-        run: mvn test -Dgroups=!functional-tests # skip functional tests, they have their own workflow
+        run: mvn -f ucumate-java/pom.xml test -Dgroups=!functional-tests # skip functional tests, they have their own workflow
       - name: Report Unit Tests
         uses: dorny/test-reporter@v3
         if: always()

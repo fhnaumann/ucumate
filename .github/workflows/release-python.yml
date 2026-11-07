@@ -31,7 +31,7 @@ jobs:
       - name: Check the Python and Maven versions agree
         run: |
           py_version=$(grep -m1 '^version = ' ucumate-python/pyproject.toml | cut -d'"' -f2)
-          jar_version=$(mvn -q -f ucumate-python-bundle/pom.xml help:evaluate \
+          jar_version=$(mvn -q -f ucumate-java/ucumate-python-bundle/pom.xml help:evaluate \
             -Dexpression=project.version -DforceStdout)
           echo "pyproject.toml: $py_version"
           echo "bundle pom.xml: $jar_version"
@@ -41,10 +41,10 @@ jobs:
           fi
 
       - name: Build the fat JAR
-        run: mvn -B package -DskipTests -f ucumate-python-bundle/pom.xml
+        run: mvn -B package -DskipTests -f ucumate-java/ucumate-python-bundle/pom.xml
 
       - name: Stage the JAR into the package
-        run: cp ucumate-python-bundle/target/ucumate-python-bundle-*.jar ucumate-python/src/ucumate/jars/
+        run: cp ucumate-java/ucumate-python-bundle/target/ucumate-python-bundle-*.jar ucumate-python/src/ucumate/jars/
 
       - name: Install uv
         uses: astral-sh/setup-uv@v10.3.3

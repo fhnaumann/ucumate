@@ -144,6 +144,15 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>4.13.2</version>
                 <configuration>
+                    <!-- shared with the other ports, see ucumate-port-parity/ -->
+                    <sourceDirectory>${project.basedir}/../../ucumate-port-parity/grammar</sourceDirectory>
+                    <includes>
+                        <include>NewUCUM.g4</include>
+                    </includes>
+                    <arguments>
+                        <argument>-package</argument>
+                        <argument>io.github.fhnaumann</argument>
+                    </arguments>
                     <listener>true</listener>
                     <visitor>true</visitor>
                 </configuration>
@@ -190,9 +199,16 @@
                     <include>**/*.json</include>
                 </includes-->
             </resource>
+            <!-- UCUM essence files, shared with the other ports -->
+            <resource>
+                <directory>${project.basedir}/../../ucumate-port-parity/ucum-essence</directory>
+                <includes>
+                    <include>ucum-essence-*.xml</include>
+                </includes>
+            </resource>
             <!-- ships the UCUM attribution alongside the bundled essence files -->
             <resource>
-                <directory>${project.basedir}/..</directory>
+                <directory>${project.basedir}/../..</directory>
                 <targetPath>META-INF</targetPath>
                 <includes>
                     <include>NOTICE</include>
