@@ -8,6 +8,8 @@ import io.github.fhnaumann.model.UCUMExpression;
 import io.github.fhnaumann.model.UcumVersion;
 import io.github.fhnaumann.util.UCUMRegistry;
 import org.antlr.v4.runtime.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
  */
 public class FeedbackValidator implements ValidatorService {
 
+    private static final Logger log = LoggerFactory.getLogger(FeedbackValidator.class);
     private UcumVersion ucumVersion;
 
     private final ValidatorService normalValidator;
@@ -84,6 +87,7 @@ public class FeedbackValidator implements ValidatorService {
             errorMessages.addAll(visitor.getErrorMessages());
             // not all errors throw an actual exceptions, some just add an error message
             if(errorMessages.isEmpty()) {
+                log.warn("Input {} for default validator resulted in failure, but the error-feedback validator results in success now. Inconsistency detected, please report. ({})", input, ucumVersion);
                 return new ComplexSuccess(term);
             }
             else {

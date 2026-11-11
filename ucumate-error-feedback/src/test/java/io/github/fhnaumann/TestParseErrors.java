@@ -1,5 +1,6 @@
 package io.github.fhnaumann;
 
+import io.github.fhnaumann.funcs.Validator;
 import io.github.fhnaumann.funcs.ValidatorService;
 import io.github.fhnaumann.model.UcumVersion;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -33,12 +34,16 @@ public class TestParseErrors {
     private static final String MISSING_L_CB = "missing_left_curly_bracket";
     private static final String MISSING_R_CB = "missing_right_curly_bracket";
     private static final String NEG_NUM = "negative_number";
+    private static final String NESTED_ANNOTS = "nested_annotations";
+    private static final String NESTED_SQUARE_BRACKETS = "nested_square_brackets";
 
     private static ValidatorService validatorService;
+    private static ValidatorService normalValidatorService;
 
     @BeforeAll
     public static void init() {
         validatorService = new FeedbackValidator(UcumVersion.V2_2);
+        normalValidatorService = new Validator(UcumVersion.getLatest());
     }
 
     @ParameterizedTest
@@ -87,7 +92,8 @@ public class TestParseErrors {
                 Arguments.of("m{abc", List.of(msg(MISSING_R_CB, "{abc"))),
                 Arguments.of("mabc}", List.of(msg(MISSING_L_CB, "mabc}"), msg(UNIT_CORRECTION, "mabc}", "m"))),
                 Arguments.of("{abc", List.of(msg(MISSING_R_CB, "{abc"))),
-                Arguments.of("abc}", List.of(msg(MISSING_L_CB, "abc}"), msg(UNIT_CORRECTION, "abc}", "a")))
+                Arguments.of("abc}", List.of(msg(MISSING_L_CB, "abc}"), msg(UNIT_CORRECTION, "abc}", "a"))),
+                Arguments.of("{{copies}}", List.of(msg(NESTED_ANNOTS)))
         );
     }
 
